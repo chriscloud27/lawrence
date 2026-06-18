@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITS Education Asia - International schooling and educational services</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #066ebd;
+    --dark-blue: #04508a;
+    --light-blue: #e8f4fd;
+    --gold: #f5a623;
+    --text: #333;
+    --muted: #666;
+    --border: #ddd;
+    --white: #fff;
+    --bg: #f8f9fa;
+  }
+  body { font-family: Arial, Helvetica, sans-serif; color: var(--text); font-size: 15px; line-height: 1.5; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* TOP BAR */
+  .top-bar { background: var(--dark-blue); color: #fff; font-size: 12px; padding: 5px 20px; display: flex; justify-content: space-between; align-items: center; }
+  .top-bar a { color: #cde; font-size: 12px; }
+  .top-bar span { opacity: .8; }
+
+  /* HEADER */
+  header { background: #fff; border-bottom: 3px solid var(--blue); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .logo-wrap { display: flex; flex-direction: column; }
+  .logo-text { font-size: 22px; font-weight: 900; color: var(--blue); letter-spacing: -0.5px; line-height: 1; }
+  .logo-text span { color: var(--gold); }
+  .logo-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .logo-reg { font-size: 10px; color: var(--muted); }
+  .header-ctas { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .btn { display: inline-block; padding: 8px 18px; border-radius: 4px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: .15s; }
+  .btn-blue { background: var(--blue); color: #fff; }
+  .btn-blue:hover { background: var(--dark-blue); text-decoration: none; color: #fff; }
+  .btn-outline { background: transparent; color: var(--blue); border: 2px solid var(--blue); }
+  .btn-outline:hover { background: var(--blue); color: #fff; text-decoration: none; }
+  .btn-gold { background: var(--gold); color: #fff; }
+  .btn-gold:hover { background: #d4881a; text-decoration: none; color: #fff; }
+
+  /* NAV */
+  nav { background: var(--blue); position: sticky; top: 0; z-index: 100; }
+  .nav-inner { display: flex; align-items: stretch; max-width: 1400px; margin: 0 auto; padding: 0 10px; flex-wrap: wrap; }
+  .nav-item { position: relative; }
+  .nav-item > a { display: block; color: #fff; padding: 13px 14px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: background .15s; }
+  .nav-item > a:hover { background: var(--dark-blue); text-decoration: none; }
+  .dropdown { display: none; position: absolute; top: 100%; left: 0; background: #fff; min-width: 220px; box-shadow: 0 4px 16px rgba(0,0,0,.15); z-index: 200; border-top: 3px solid var(--gold); }
+  .dropdown a { display: block; padding: 9px 16px; color: var(--text); font-size: 13px; border-bottom: 1px solid #f0f0f0; }
+  .dropdown a:hover { background: var(--light-blue); text-decoration: none; color: var(--blue); }
+  .nav-item:hover .dropdown { display: block; }
+  .nav-mobile-btn { display: none; background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 10px; }
+
+  /* TRUSTPILOT STRIP */
+  .trust-strip { background: #1a1a1a; color: #fff; padding: 10px 20px; display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; font-size: 13px; }
+  .tp-logo { display: flex; align-items: center; gap: 6px; }
+  .tp-stars { color: #00b67a; font-size: 18px; letter-spacing: 2px; }
+  .tp-text { font-weight: 600; }
+  .tp-quote { font-style: italic; color: #ccc; max-width: 500px; text-align: center; }
+  .tp-score { font-size: 20px; font-weight: 900; color: #00b67a; }
+
+  /* HERO / CAROUSEL */
+  .hero { position: relative; background: linear-gradient(135deg, #04508a 0%, #066ebd 50%, #0888e8 100%); min-height: 420px; display: flex; align-items: center; overflow: hidden; }
+  .hero-slide { display: none; width: 100%; padding: 50px 40px; max-width: 1400px; margin: 0 auto; }
+  .hero-slide.active { display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; }
+  .hero-content { max-width: 560px; }
+  .hero-eyebrow { display: inline-block; background: var(--gold); color: #fff; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .hero-title { font-size: 38px; font-weight: 900; color: #fff; line-height: 1.15; margin-bottom: 12px; }
+  .hero-sub { font-size: 16px; color: rgba(255,255,255,.85); margin-bottom: 24px; line-height: 1.6; }
+  .hero-meta { font-size: 13px; color: rgba(255,255,255,.7); margin-bottom: 24px; }
+  .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-badge { background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.3); border-radius: 12px; padding: 20px 28px; color: #fff; text-align: center; max-width: 260px; }
+  .hero-badge h3 { font-size: 24px; margin-bottom: 6px; }
+  .hero-badge p { font-size: 13px; opacity: .85; }
+  .carousel-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+  .carousel-dots span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,.4); cursor: pointer; transition: .2s; }
+  .carousel-dots span.active { background: #fff; }
+  .carousel-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.2); border: none; color: #fff; font-size: 22px; padding: 10px 16px; cursor: pointer; border-radius: 4px; }
+  .carousel-nav:hover { background: rgba(255,255,255,.35); }
+  .carousel-prev { left: 10px; }
+  .carousel-next { right: 10px; }
+
+  /* SERVICES TABS */
+  .services { background: #fff; padding: 50px 20px; }
+  .section-label { font-size: 12px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .section-title { font-size: 28px; font-weight: 900; color: var(--text); margin-bottom: 30px; }
+  .service-tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 30px; flex-wrap: wrap; gap: 2px; }
+  .service-tab { padding: 12px 22px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; background: none; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: .15s; }
+  .service-tab.active, .service-tab:hover { color: var(--blue); border-bottom-color: var(--blue); }
+  .service-panel { display: none; }
+  .service-panel.active { display: flex; flex-wrap: wrap; gap: 12px; }
+  .service-tag { display: inline-block; background: var(--light-blue); color: var(--blue); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid #c5dff5; transition: .15s; }
+  .service-tag:hover { background: var(--blue); color: #fff; text-decoration: none; }
+
+  /* ABOUT */
+  .about { background: var(--bg); padding: 60px 20px; }
+  .about-inner { max-width: 1100px; margin: 0 auto; display: flex; gap: 50px; align-items: flex-start; flex-wrap: wrap; }
+  .about-img { width: 380px; max-width: 100%; border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+  .about-img-placeholder { background: linear-gradient(135deg, #066ebd, #0888e8); height: 280px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+  .about-img-placeholder svg { opacity: .4; }
+  .about-text { flex: 1; min-width: 280px; }
+  .about-text p { color: var(--muted); line-height: 1.8; margin-bottom: 20px; }
+  .accreditations { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  .accred-badge { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 700; color: var(--muted); }
+
+  /* TUTORS */
+  .tutors { background: #fff; padding: 60px 20px; }
+  .tutors-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+  .tutor-tag { display: block; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; font-size: 13px; color: var(--text); text-align: center; transition: .15s; }
+  .tutor-tag:hover { background: var(--blue); color: #fff; border-color: var(--blue); text-decoration: none; }
+  .view-all-wrap { text-align: center; margin-top: 24px; }
+
+  /* AWARDS */
+  .awards { background: var(--light-blue); padding: 40px 20px; text-align: center; }
+  .awards-inner { max-width: 900px; margin: 0 auto; }
+  .award-badge { display: inline-flex; flex-direction: column; align-items: center; gap: 8px; background: #fff; border-radius: 12px; padding: 24px 32px; margin: 10px; box-shadow: 0 2px 12px rgba(0,0,0,.08); max-width: 260px; vertical-align: top; }
+  .award-icon { font-size: 36px; }
+  .award-title { font-weight: 800; font-size: 14px; color: var(--blue); }
+  .award-sub { font-size: 12px; color: var(--muted); }
+
+  /* NEWS */
+  .news { background: var(--bg); padding: 60px 20px; }
+  .news-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+  .news-card { background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.07); transition: .2s; }
+  .news-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.12); transform: translateY(-2px); }
+  .news-card-img { height: 160px; background: linear-gradient(135deg, #e8f4fd, #c5dff5); display: flex; align-items: center; justify-content: center; font-size: 40px; }
+  .news-card-body { padding: 18px; }
+  .news-date { font-size: 11px; color: var(--gold); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+  .news-card h4 { font-size: 14px; line-height: 1.5; color: var(--text); margin-bottom: 8px; }
+  .news-card p { font-size: 12px; color: var(--muted); }
+
+  /* FOOTER */
+  footer { background: #1a2a3a; color: #aab; padding: 40px 20px 20px; }
+  .footer-inner { max-width: 1100px; margin: 0 auto; }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; }
+  .footer-col h4 { color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .footer-col a { display: block; font-size: 12px; color: #8ab; margin-bottom: 6px; }
+  .footer-col a:hover { color: #fff; text-decoration: none; }
+  .footer-brand { font-size: 18px; font-weight: 900; color: var(--blue); margin-bottom: 8px; }
+  .footer-brand span { color: var(--gold); }
+  .footer-desc { font-size: 12px; line-height: 1.7; }
+  .footer-bottom { border-top: 1px solid #2a3a4a; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .footer-bottom p { font-size: 11px; }
+
+  /* AI CHAT WIDGET */
+  .chat-btn { position: fixed; bottom: 28px; right: 28px; z-index: 999; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #066ebd, #0888e8); border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(6,110,189,.5); display: flex; align-items: center; justify-content: center; transition: .2s; }
+  .chat-btn:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(6,110,189,.6); }
+  .chat-btn svg { width: 30px; height: 30px; fill: #fff; }
+  .chat-popup { position: fixed; bottom: 100px; right: 28px; width: 540px; max-width: calc(100vw - 40px); background: #fff; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,.2); z-index: 998; display: none; flex-direction: column; overflow: hidden; font-family: Arial, sans-serif; }
+  .chat-popup.open { display: flex; animation: slideUp .25s ease; }
+  @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+  .chat-header { background: linear-gradient(135deg, #04508a, #066ebd); color: #fff; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; }
+  .chat-header-left { display: flex; align-items: center; gap: 10px; }
+  .chat-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .chat-header h3 { font-size: 14px; font-weight: 700; margin: 0; }
+  .chat-header p { font-size: 11px; opacity: .8; margin: 0; }
+  .chat-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; opacity: .7; line-height: 1; padding: 0 4px; }
+  .chat-close:hover { opacity: 1; }
+  .chat-login-btn { margin: 14px 14px 0; display: block; background: var(--gold); color: #fff; text-align: center; padding: 11px; border-radius: 8px; font-weight: 700; font-size: 13px; border: none; cursor: pointer; transition: .15s; width: calc(100% - 28px); }
+  .chat-login-btn:hover { background: #d4881a; }
+  .chat-messages { padding: 14px; height: 429px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #f8f9fa; }
+  .msg { max-width: 85%; }
+  .msg-bot { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+  .msg-bubble { padding: 10px 14px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+  .msg-bot .msg-bubble { background: #fff; color: var(--text); border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+  .msg-user .msg-bubble { background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
+  .msg-time { font-size: 10px; color: #aaa; margin-top: 3px; padding: 0 4px; }
+  .chat-input-wrap { display: flex; padding: 12px; border-top: 1px solid var(--border); gap: 8px; background: #fff; }
+  .chat-input { flex: 1; border: 1px solid var(--border); border-radius: 20px; padding: 9px 16px; font-size: 13px; outline: none; }
+  .chat-input:focus { border-color: var(--blue); }
+  .chat-send { background: var(--blue); border: none; color: #fff; border-radius: 50%; width: 38px; height: 38px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: .15s; }
+  .chat-send:hover { background: var(--dark-blue); }
+  .chat-powered { text-align: center; font-size: 10px; color: #bbb; padding: 6px; background: #fff; }
+
+  /* UTIL */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+  .text-center { text-align: center; }
+  .mt-20 { margin-top: 20px; }
+
+  @media (max-width: 768px) {
+    .hero-title { font-size: 26px; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .nav-inner .nav-item:not(:first-child):not(:last-child) { display: none; }
+    .about-inner { flex-direction: column; }
+    .about-img { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <span>🏫 Hong Kong Registered School 566985 — Est. 2005</span>
+  <div style="display:flex;gap:16px;">
+    <a href="#">+852 2648 2001</a>
+    <a href="#">Contact Us</a>
+    <a href="#">Enrol Now</a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <div class="logo-text">ITS<span>.</span>education</div>
+    <div class="logo-sub">IF IT'S EDUCATION, IT'S ITS · Pathways To Learning Since 2005</div>
+    <div class="logo-reg">Hong Kong Registered School 566985</div>
+  </div>
+  <div class="header-ctas">
+    <a href="#" class="btn btn-outline">Course Finder</a>
+    <a href="#" class="btn btn-gold">Enrol Now</a>
+    <a href="#" class="btn btn-blue">Contact Us</a>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-item"><a href="#">Home</a></div>
+    <div class="nav-item">
+      <a href="#">Tuition ▾</a>
+      <div class="dropdown">
+        <a href="#">Primary Tuition</a>
+        <a href="#">IGCSE Tuition</a>
+        <a href="#">A-levels Tuition</a>
+        <a href="#">IB Tuition</a>
+        <a href="#">SAT Prep</a>
+        <a href="#">SSAT / ISEE</a>
+        <a href="#">Online School</a>
+        <a href="#">Online Timetables</a>
+      </div>
+    </div>
+    <div class="nav-item">
+      <a href="#">Full-Time Programmes ▾</a>
+      <div class="dropdown">
+        <a href="#">IGCSE Private Candidates</a>
+        <a href="#">IAL Private Candidates</a>
+        <a href="#">IAL Group Class</a>
+      </div>
+    </div>
+    <div class="nav-item">
+      <a href="#">Uni Admissions ▾</a>
+      <div class="dropdown">
+        <a href="#">Choosing Your University</a>
+        <a href="#">US University Admissions</a>
+        <a href="#">UK / UCAS Applications</a>
+        <a href="#">Oxbridge Applications</a>
+        <a href="#">EPQ</a>
+        <a href="#">Get Predicted Grades</a>
+      </div>
+    </div>
+    <div class="nav-item">
+      <a href="#">School Admissions ▾</a>
+      <div class="dropdown">
+        <a href="#">HK / Singapore Schools</a>
+        <a href="#">School Interview Prep</a>
+        <a href="#">School Search Database</a>
+        <a href="#">UK School Admissions</a>
+        <a href="#">School Placement Services</a>
+      </div>
+    </div>
+    <div class="nav-item">
+      <a href="#">SDG Education ▾</a>
+      <div class="dropdown">
+        <a href="#">Young Changemaker (YCI)</a>
+        <a href="#">YAAPP (United Nations)</a>
+        <a href="#">ITS Foundation</a>
+        <a href="#">Sustainability Library</a>
+      </div>
+    </div>
+    <div class="nav-item">
+      <a href="#">Exams ▾</a>
+      <div class="dropdown">
+        <a href="#">IGCSE Exams</a>
+        <a href="#">A-level Exams</a>
+        <a href="#">Mock Exams</a>
+        <a href="#">UCAT</a>
+        <a href="#">STEP</a>
+        <a href="#">Invigilation Services</a>
+      </div>
+    </div>
+    <div class="nav-item"><a href="#">Events</a></div>
+    <div class="nav-item">
+      <a href="#">Resources ▾</a>
+      <div class="dropdown">
+        <a href="#">Free Plagiarism Checker</a>
+        <a href="#">School Reviews</a>
+        <a href="#">School Search Database</a>
+        <a href="#">Article Library</a>
+        <a href="#">IB Resources</a>
+        <a href="#">Subject Dictionaries</a>
+      </div>
+    </div>
+    <div class="nav-item">
+      <a href="#">About Us ▾</a>
+      <div class="dropdown">
+        <a href="#">Contact Details</a>
+        <a href="#">Why ITS?</a>
+        <a href="#">The ITS Team</a>
+        <a href="#">Testimonials</a>
+        <a href="#">Careers With ITS</a>
+        <a href="#">Mission Statement</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- TRUSTPILOT STRIP -->
+<div class="trust-strip">
+  <div class="tp-logo">
+    <div style="background:#00b67a;color:#fff;font-weight:900;font-size:14px;padding:4px 10px;border-radius:4px;">★ Trustpilot</div>
+    <div>
+      <div class="tp-stars">★★★★★</div>
+      <div style="font-size:11px;color:#888;">Excellent · 4.8 / 5</div>
+    </div>
+  </div>
+  <div class="tp-quote">"A great learning experience with committed, caring people. Passionate about what they do." — <strong>Sever Mican</strong></div>
+  <div>
+    <a href="#" style="color:#00b67a;font-size:12px;font-weight:700;">Read our reviews on Trustpilot →</a>
+  </div>
+</div>
+
+<!-- HERO CAROUSEL -->
+<div class="hero" id="hero">
+  <!-- Slide 1 -->
+  <div class="hero-slide active" id="slide-0">
+    <div class="hero-content">
+      <div class="hero-eyebrow">📅 Sat, 20 Jun 2026 · 10:00–18:00 HKT</div>
+      <h1 class="hero-title">Join Our Open House</h1>
+      <p class="hero-sub">Explore our International A-Level & Admissions pathways. Meet tutors, discover courses, and find the right path for your child.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn btn-gold">Register Now</a>
+        <a href="#" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5);">Learn More</a>
+      </div>
+    </div>
+    <div class="hero-badge">
+      <div style="font-size:42px;margin-bottom:8px;">🎓</div>
+      <h3>Open House</h3>
+      <p>A-Level, IGCSE & University Admissions Pathways</p>
+    </div>
+  </div>
+  <!-- Slide 2 -->
+  <div class="hero-slide" id="slide-1">
+    <div class="hero-content">
+      <div class="hero-eyebrow">🏆 Award Winning</div>
+      <h1 class="hero-title">In-Person or Online</h1>
+      <p class="hero-sub">Voted "Best Tutoring Center" Hong Kong. IB, A-level, IGCSE, SAT, DSE, Common Entrance — expert tutors since 2005.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn btn-gold">Course Finder</a>
+        <a href="#" class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,.5);">Enrol Now</a>
+      </div>
+    </div>
+    <div class="hero-badge">
+      <div style="font-size:42px;margin-bottom:8px;">🥇</div>
+      <h3>Best Tutoring</h3>
+      <p>Center in Hong Kong — Hong Kong Living Award</p>
+    </div>
+  </div>
+  <!-- Slide 3 -->
+  <div class="hero-slide" id="slide-2">
+    <div class="hero-content">
+      <div class="hero-eyebrow">🇬🇧 UK Boarding Schools</div>
+      <h1 class="hero-title">Securing Places at the UK's Top Boarding Schools</h1>
+      <p class="hero-sub">ISEB · CAT4 · UKiset · Common Entrance — preparation built around your child. Hong Kong's trusted school admissions specialists.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn btn-gold">Learn More</a>
+      </div>
+    </div>
+    <div class="hero-badge">
+      <div style="font-size:42px;margin-bottom:8px;">🏫</div>
+      <h3>Top UK Schools</h3>
+      <p>Eton, Harrow, Westminster & more — expert prep</p>
+    </div>
+  </div>
+  <!-- Slide 4 -->
+  <div class="hero-slide" id="slide-3">
+    <div class="hero-content">
+      <div class="hero-eyebrow">🌏 Asia's Best</div>
+      <h1 class="hero-title">Asia's Leading School Search Database</h1>
+      <p class="hero-sub">Find, research, and discover the top international schools in Hong Kong and Singapore. Compare up to 4 schools simultaneously.</p>
+      <div class="hero-btns">
+        <a href="#" class="btn btn-gold">Compare Schools Now</a>
+      </div>
+    </div>
+    <div class="hero-badge">
+      <div style="font-size:42px;margin-bottom:8px;">🔍</div>
+      <h3>School Search</h3>
+      <p>HK & Singapore International Schools Database</p>
+    </div>
+  </div>
+
+  <button class="carousel-nav carousel-prev" onclick="moveSlide(-1)">&#8249;</button>
+  <button class="carousel-nav carousel-next" onclick="moveSlide(1)">&#8250;</button>
+  <div class="carousel-dots" id="carousel-dots">
+    <span class="active" onclick="goSlide(0)"></span>
+    <span onclick="goSlide(1)"></span>
+    <span onclick="goSlide(2)"></span>
+    <span onclick="goSlide(3)"></span>
+  </div>
+</div>
+
+<!-- SERVICES TABS -->
+<div class="services">
+  <div class="container text-center">
+    <div class="section-label">What We Offer</div>
+    <div class="section-title">School & Tuition · Global Qualifications · Admissions</div>
+  </div>
+  <div class="container">
+    <div class="service-tabs">
+      <button class="service-tab active" onclick="showTab('school')">🏫 School &amp; Tuition</button>
+      <button class="service-tab" onclick="showTab('qualifications')">📜 Global Qualifications</button>
+      <button class="service-tab" onclick="showTab('admissions')">🎓 School &amp; Uni Admissions</button>
+    </div>
+    <div id="tab-school" class="service-panel active">
+      <a href="#" class="service-tag">Tuition for Secondary</a>
+      <a href="#" class="service-tag">A-level Support</a>
+      <a href="#" class="service-tag">Full-time Schooling</a>
+      <a href="#" class="service-tag">IB Tuition &amp; Support</a>
+      <a href="#" class="service-tag">School Entrance Test Prep</a>
+      <a href="#" class="service-tag">SAT Tuition &amp; Courses</a>
+      <a href="#" class="service-tag">IGCSE Support</a>
+      <a href="#" class="service-tag">Online Classes</a>
+      <a href="#" class="service-tag">Primary Tuition</a>
+    </div>
+    <div id="tab-qualifications" class="service-panel">
+      <a href="#" class="service-tag">Private Candidates</a>
+      <a href="#" class="service-tag">A-level Courses</a>
+      <a href="#" class="service-tag">IGCSE Courses</a>
+      <a href="#" class="service-tag">Exam Enrolment</a>
+      <a href="#" class="service-tag">University Entrance Tests</a>
+      <a href="#" class="service-tag">School Entrance Prep</a>
+      <a href="#" class="service-tag">BTEC Courses</a>
+      <a href="#" class="service-tag">IAL Group Classes</a>
+    </div>
+    <div id="tab-admissions" class="service-panel">
+      <a href="#" class="service-tag">School Search HK &amp; Singapore</a>
+      <a href="#" class="service-tag">School Interview Prep Classes</a>
+      <a href="#" class="service-tag">School Search Database</a>
+      <a href="#" class="service-tag">Young Changemakers (YCI)</a>
+      <a href="#" class="service-tag">US University Admissions</a>
+      <a href="#" class="service-tag">UCAS Admissions</a>
+      <a href="#" class="service-tag">UK Boarding Schools</a>
+      <a href="#" class="service-tag">Invigilation / Proctoring</a>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="about">
+  <div class="about-inner">
+    <div class="about-img">
+      <div class="about-img-placeholder">
+        <svg viewBox="0 0 100 80" width="120" fill="white">
+          <rect x="10" y="20" width="80" height="50" rx="4"/>
+          <polygon points="50,5 10,22 90,22"/>
+          <rect x="35" y="40" width="30" height="30" fill="rgba(0,0,0,.3)"/>
+        </svg>
+      </div>
+    </div>
+    <div class="about-text">
+      <div class="section-label">About ITS Education Asia</div>
+      <div class="section-title">WHY CHOOSE US?</div>
+      <p>ITS Education Asia (ITS) provides flexible learning options (English medium) for a comprehensive range of university, secondary and primary school subjects and courses. Students learn with us both full-time and as tutorial support for mainstream school.</p>
+      <p>We have a wide range of fully qualified and experienced international teachers, examiners &amp; tutors who are native English speakers. ITS operates a school in Hong Kong registered with the Hong Kong Education Bureau — Hong Kong's only alternative open-access examination centre for IGCSE, IAL, GCE and many more exams.</p>
+      <p>ITS is accredited with a wide range of official government and educational bodies including UCAS, Pearson Edexcel, OCR and more. We have been offering live online lessons since 2012.</p>
+      <div class="accreditations">
+        <div class="accred-badge">UCAS Accredited</div>
+        <div class="accred-badge">Pearson Edexcel</div>
+        <div class="accred-badge">OCR Partner</div>
+        <div class="accred-badge">Cambridge CAIE</div>
+        <div class="accred-badge">HKEB Registered</div>
+      </div>
+      <div class="mt-20">
+        <a href="#" class="btn btn-blue">Submit Enquiry Now!</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AWARDS -->
+<div class="awards">
+  <div class="awards-inner">
+    <div class="section-label text-center">Recognition</div>
+    <div class="section-title text-center" style="margin-bottom:24px;">Trusted by Families Across Asia Since 2005</div>
+    <div class="award-badge">
+      <div class="award-icon">🏆</div>
+      <div class="award-title">Best Tutoring Center</div>
+      <div class="award-sub">Hong Kong Living Award</div>
+    </div>
+    <div class="award-badge">
+      <div class="award-icon">⭐</div>
+      <div class="award-title">4.8 / 5 on Trustpilot</div>
+      <div class="award-sub">Excellent · 200+ reviews</div>
+    </div>
+    <div class="award-badge">
+      <div class="award-icon">🎓</div>
+      <div class="award-title">20+ Years Experience</div>
+      <div class="award-sub">Established 2005 · HK Reg'd School</div>
+    </div>
+    <div class="award-badge">
+      <div class="award-icon">🌏</div>
+      <div class="award-title">Asia's #1 School Search</div>
+      <div class="award-sub">HK &amp; Singapore Database</div>
+    </div>
+  </div>
+</div>
+
+<!-- TUTORS -->
+<div class="tutors">
+  <div class="container">
+    <div class="section-label text-center">Our Experts</div>
+    <div class="section-title text-center">View All Our Experienced International Tutors</div>
+  </div>
+  <div class="tutors-grid">
+    <a href="#" class="tutor-tag">Accounting Tutors</a>
+    <a href="#" class="tutor-tag">Biology Tutors</a>
+    <a href="#" class="tutor-tag">Business Studies Tutors</a>
+    <a href="#" class="tutor-tag">Chemistry Tutors</a>
+    <a href="#" class="tutor-tag">Chinese Tutors</a>
+    <a href="#" class="tutor-tag">Economics Tutors</a>
+    <a href="#" class="tutor-tag">English Tutors</a>
+    <a href="#" class="tutor-tag">English Literature Tutors</a>
+    <a href="#" class="tutor-tag">French Tutors</a>
+    <a href="#" class="tutor-tag">Geography Tutors</a>
+    <a href="#" class="tutor-tag">History Tutors</a>
+    <a href="#" class="tutor-tag">Law Tutors</a>
+    <a href="#" class="tutor-tag">Mandarin Tutors</a>
+    <a href="#" class="tutor-tag">Maths Tutors</a>
+    <a href="#" class="tutor-tag">Physics Tutors</a>
+    <a href="#" class="tutor-tag">Psychology Tutors</a>
+    <a href="#" class="tutor-tag">SAT Tutors</a>
+    <a href="#" class="tutor-tag">Science Tutors</a>
+    <a href="#" class="tutor-tag">Spanish Tutors</a>
+    <a href="#" class="tutor-tag">Latin Tutors</a>
+  </div>
+  <div class="view-all-wrap mt-20">
+    <a href="#" class="btn btn-blue">View All Tutors</a>
+  </div>
+</div>
+
+<!-- NEWS -->
+<div class="news">
+  <div class="container">
+    <div class="section-label">SDG Education News &amp; Announcements</div>
+    <div class="section-title">YCI Lab — Latest Articles</div>
+    <div class="news-grid">
+      <div class="news-card">
+        <div class="news-card-img">🌍</div>
+        <div class="news-card-body">
+          <div class="news-date">13 May 2026</div>
+          <h4>ITS Education Asia, UNITAR, and the UN SDGs</h4>
+          <p>The Young Changemakers Incubator begins with a belief that young people are capable of far more than the world often expects of them…</p>
+        </div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-img">✈️</div>
+        <div class="news-card-body">
+          <div class="news-date">25 Mar 2026</div>
+          <h4>From Hormuz to Hong Kong: A Real-Time Lesson in How the World Works</h4>
+          <p>This week's events involving Iran and the resulting spike in fuel prices has shown how quickly the world can shift beneath our feet…</p>
+        </div>
+      </div>
+      <div class="news-card">
+        <div class="news-card-img">🎓</div>
+        <div class="news-card-body">
+          <div class="news-date">10 Feb 2026</div>
+          <h4>University Admissions 2026 — What You Need to Know Now</h4>
+          <p>With application deadlines approaching, here's a comprehensive guide to UCAS, US Common App, and what universities are really looking for…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-col">
+        <div class="footer-brand">ITS<span>.</span>education</div>
+        <p class="footer-desc">ITS Education Asia — Hong Kong's leading international school &amp; tuition provider since 2005. Registered School 566985. Official exam centre for IGCSE, A-level &amp; more.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tuition</h4>
+        <a href="#">IGCSE Tuition</a>
+        <a href="#">A-level Tuition</a>
+        <a href="#">IB Tuition</a>
+        <a href="#">SAT Prep</a>
+        <a href="#">Primary Tuition</a>
+        <a href="#">Online School</a>
+      </div>
+      <div class="footer-col">
+        <h4>Admissions</h4>
+        <a href="#">School Placement HK</a>
+        <a href="#">UK Boarding Schools</a>
+        <a href="#">UCAS / UK Uni</a>
+        <a href="#">US University</a>
+        <a href="#">School Search Database</a>
+        <a href="#">Interview Prep</a>
+      </div>
+      <div class="footer-col">
+        <h4>About</h4>
+        <a href="#">Contact Us</a>
+        <a href="#">Why ITS?</a>
+        <a href="#">Our Tutors</a>
+        <a href="#">Testimonials</a>
+        <a href="#">Careers</a>
+        <a href="#">Sitemap</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 ITS Education Asia Ltd. All rights reserved. Hong Kong Registered School 566985.</p>
+      <div style="display:flex;gap:14px;">
+        <a href="#" style="font-size:11px;color:#8ab;">Privacy Policy</a>
+        <a href="#" style="font-size:11px;color:#8ab;">Terms</a>
+        <a href="#" style="font-size:11px;color:#8ab;">Sitemap</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- AI CHAT WIDGET -->
+<button class="chat-btn" onclick="toggleChat()" title="Chat with ITS AI Assistant" aria-label="Open AI assistant">
+  <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+    <!-- Graduation cap bot icon -->
+    <circle cx="20" cy="22" r="12" fill="white" opacity=".95"/>
+    <circle cx="16" cy="20" r="2" fill="#066ebd"/>
+    <circle cx="24" cy="20" r="2" fill="#066ebd"/>
+    <path d="M15 26 Q20 30 25 26" stroke="#066ebd" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <!-- Cap -->
+    <polygon points="20,6 8,12 20,16 32,12" fill="white" opacity=".95"/>
+    <rect x="28" y="12" width="2" height="6" rx="1" fill="white" opacity=".8"/>
+    <circle cx="29" cy="18.5" r="1.5" fill="#f5a623"/>
+  </svg>
+</button>
+
+<div class="chat-popup" id="chat-popup">
+  <div class="chat-header">
+    <div class="chat-header-left">
+      <div class="chat-avatar">🎓</div>
+      <div>
+        <h3>ITS Education Assistant</h3>
+        <p>● Online · Ask me anything</p>
+      </div>
+    </div>
+    <button class="chat-close" onclick="toggleChat()">×</button>
+  </div>
+
+  <button class="chat-login-btn" onclick="alert('Login with your Badge — coming soon!')">
+    🏷️ Login with your Badge
+  </button>
+
+  <div class="chat-messages" id="chat-messages">
+    <div class="msg msg-bot">
+      <div class="msg-bubble">Hi! 👋 I'm the ITS Education Assistant. I can help you find the right course, tutor, or school placement service. What are you looking for today?</div>
+      <div class="msg-time">Just now</div>
+    </div>
+    <div class="msg msg-bot">
+      <div class="msg-bubble">You can ask me about <strong>IGCSE</strong>, <strong>A-levels</strong>, <strong>IB</strong>, <strong>university admissions</strong>, or <strong>school placements</strong> in Hong Kong &amp; beyond.</div>
+      <div class="msg-time">Just now</div>
+    </div>
+  </div>
+
+  <div class="chat-input-wrap">
+    <input class="chat-input" id="chat-input" type="text" placeholder="Type a message…" onkeydown="if(event.key==='Enter') sendMsg()">
+    <button class="chat-send" onclick="sendMsg()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+    </button>
+  </div>
+  <div class="chat-powered">Powered by ITS AI · itseducation.asia</div>
+</div>
+
+<script>
+  // CAROUSEL
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.carousel-dots span');
+  let autoTimer = setInterval(() => moveSlide(1), 5000);
+
+  function goSlide(n) {
+    slides[currentSlide].classList.remove('active');
+    dots[currentSlide].classList.remove('active');
+    currentSlide = n;
+    slides[currentSlide].classList.add('active');
+    dots[currentSlide].classList.add('active');
+    clearInterval(autoTimer);
+    autoTimer = setInterval(() => moveSlide(1), 5000);
+  }
+
+  function moveSlide(dir) {
+    let next = (currentSlide + dir + slides.length) % slides.length;
+    goSlide(next);
+  }
+
+  // SERVICE TABS
+  function showTab(id) {
+    document.querySelectorAll('.service-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.service-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // CHAT
+  function toggleChat() {
+    const p = document.getElementById('chat-popup');
+    p.classList.toggle('open');
+  }
+
+  const sessionId = crypto.randomUUID();
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  async function sendMsg() {
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.querySelector('.chat-send');
+    const msgs = document.getElementById('chat-messages');
+    const text = input.value.trim();
+    if (!text) return;
+
+    // User bubble
+    const userDiv = document.createElement('div');
+    userDiv.className = 'msg msg-user';
+    userDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(text)}</div><div class="msg-time">Just now</div>`;
+    msgs.appendChild(userDiv);
+    input.value = '';
+    msgs.scrollTop = msgs.scrollHeight;
+
+    // Disable input while waiting
+    input.disabled = true;
+    sendBtn.disabled = true;
+
+    // Typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'msg msg-bot';
+    typingDiv.id = 'typing-indicator';
+    typingDiv.innerHTML = `<div class="msg-bubble" style="color:#aaa;font-style:italic">Thinking…</div>`;
+    msgs.appendChild(typingDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    try {
+      const res = await fetch(
+        'https://flow.mach2.cloud/webhook/e5616171-e3b5-4c39-81d4-67409f9fa60a/chat',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chatInput: text, sessionId })
+        }
+      );
+      const data = await res.json();
+      const reply = data.output || data.text || data.message || "Sorry, I didn't get a response.";
+
+      document.getElementById('typing-indicator')?.remove();
+      const botDiv = document.createElement('div');
+      botDiv.className = 'msg msg-bot';
+      botDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(reply)}</div><div class="msg-time">Just now</div>`;
+      msgs.appendChild(botDiv);
+      msgs.scrollTop = msgs.scrollHeight;
+    } catch (err) {
+      document.getElementById('typing-indicator')?.remove();
+      const errDiv = document.createElement('div');
+      errDiv.className = 'msg msg-bot';
+      errDiv.innerHTML = `<div class="msg-bubble" style="color:#c00">⚠️ Couldn't reach the assistant. Please try again.</div>`;
+      msgs.appendChild(errDiv);
+      msgs.scrollTop = msgs.scrollHeight;
+    } finally {
+      input.disabled = false;
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  }
+</script>
+</body>
+</html>
