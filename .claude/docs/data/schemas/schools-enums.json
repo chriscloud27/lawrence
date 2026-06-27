@@ -1,0 +1,138 @@
+{
+  "_meta": {
+    "description": "Valid values for array fields in the schools table. Derived from the Doris Discover filter UI — the standardised taxonomy used across all scraped schools.",
+    "version": "1.0.0",
+    "source": "doris.school/schools/united-kingdom (Discover filter panel, 2026-06-27)"
+  },
+
+  "curricula": {
+    "_description": "Maps to schools.curricula TEXT[]. A school may offer multiple curricula across different phases.",
+    "_phases": {
+      "brand": ["IB", "Cambridge"],
+      "preschool": [
+        "IEYC (International Early Years Curriculum)",
+        "Montessori Curriculum",
+        "Reggio Emilia Approach",
+        "IB (PYP)"
+      ],
+      "primary": [
+        "IB (PYP)",
+        "IPC (International Primary Curriculum)",
+        "Cambridge (Primary)"
+      ],
+      "secondary": [
+        "IB (MYP)",
+        "IMYC (International Middle Years Curriculum)",
+        "Cambridge (Secondary)",
+        "Cambridge IGCSE",
+        "Pearson Edexcel IGCSE"
+      ],
+      "pre_university": [
+        "IB (DP)",
+        "IBCP (International Baccalaureate Career-related Programme)",
+        "Advanced Placement (AP)",
+        "Cambridge International AS Levels",
+        "Cambridge A Levels",
+        "BTEC Qualification"
+      ],
+      "national": [
+        "American Curriculum",
+        "Australian Curriculum",
+        "British Curriculum",
+        "Canadian Curriculum",
+        "Dutch Curriculum",
+        "French Curriculum",
+        "German Curriculum",
+        "Indian Curriculum",
+        "Japanese Curriculum",
+        "Jordanian Curriculum",
+        "Korean Curriculum",
+        "Malaysian Curriculum",
+        "Myanmar Curriculum",
+        "Singapore Curriculum",
+        "Swiss Curriculum",
+        "Taiwan 108 Curriculum",
+        "Thai Curriculum"
+      ],
+      "other": [
+        "Christian Curriculum",
+        "SEN focussed",
+        "Bespoke Curriculum",
+        "Waldorf Steiner Curriculum"
+      ]
+    },
+    "_all_values": [
+      "IB", "Cambridge",
+      "IEYC (International Early Years Curriculum)", "Montessori Curriculum", "Reggio Emilia Approach",
+      "IB (PYP)", "IPC (International Primary Curriculum)", "Cambridge (Primary)",
+      "IB (MYP)", "IMYC (International Middle Years Curriculum)", "Cambridge (Secondary)",
+      "Cambridge IGCSE", "Pearson Edexcel IGCSE",
+      "IB (DP)", "IBCP (International Baccalaureate Career-related Programme)",
+      "Advanced Placement (AP)", "Cambridge International AS Levels", "Cambridge A Levels",
+      "BTEC Qualification",
+      "American Curriculum", "Australian Curriculum", "British Curriculum", "Canadian Curriculum",
+      "Dutch Curriculum", "French Curriculum", "German Curriculum", "Indian Curriculum",
+      "Japanese Curriculum", "Jordanian Curriculum", "Korean Curriculum", "Malaysian Curriculum",
+      "Myanmar Curriculum", "Singapore Curriculum", "Swiss Curriculum", "Taiwan 108 Curriculum",
+      "Thai Curriculum",
+      "Christian Curriculum", "SEN focussed", "Bespoke Curriculum", "Waldorf Steiner Curriculum"
+    ]
+  },
+
+  "languages_instruction": {
+    "_description": "Maps to schools.languages_instruction TEXT[]. Primary language(s) used for teaching.",
+    "values": ["English", "Mandarin", "French", "German", "Japanese", "Korean", "Spanish", "Hebrew", "Malay"]
+  },
+
+  "strengths": {
+    "_description": "Maps to schools.strengths TEXT[]. School's self-declared or editorially assigned focus areas.",
+    "values": [
+      "Sport",
+      "Performing Arts",
+      "Visual and Creative Arts",
+      "STEM",
+      "Academic Enrichment",
+      "Outdoor Education",
+      "Service and Sustainability",
+      "Languages"
+    ]
+  },
+
+  "sen_support_levels": {
+    "_description": "Maps to schools.sen_learning_support and schools.sen_behaviour_support. Ordered from least to most intensive.",
+    "values": ["Basic", "Moderate", "Advanced", "Specialist"],
+    "_order": "ascending by support intensity"
+  },
+
+  "fee_types": {
+    "_description": "Maps to school_fees.fee_type. Classification of fee line items.",
+    "values": [
+      "yearly_fee",
+      "application_fee",
+      "enrollment_fee",
+      "additional_fee"
+    ],
+    "_notes": {
+      "yearly_fee": "Annual tuition, typically quoted per academic year (3 terms). May vary by year_group.",
+      "application_fee": "Non-refundable registration fee paid on application.",
+      "enrollment_fee": "Acceptance/confirmation deposit. May be refundable under certain conditions.",
+      "additional_fee": "Supplementary charges: boarding, overseas residency deposit, uniforms, etc."
+    }
+  },
+
+  "scrape_statuses": {
+    "_description": "Maps to schools.scrape_status and scrape_queue.status.",
+    "school_scrape_status": ["pending", "ok", "failed", "needs_review"],
+    "queue_status": ["pending", "processing", "done", "failed"]
+  },
+
+  "gender_policies": {
+    "_description": "Maps to schools.gender_policy.",
+    "values": ["Co-educational", "Boys", "Girls", "Co-educational (boarding)"]
+  },
+
+  "school_types": {
+    "_description": "Maps to schools.school_type.",
+    "values": ["Independent", "State", "Semi-private", "International"]
+  }
+}

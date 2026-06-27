@@ -7,11 +7,12 @@ build/
 .next/
 .cache/
 
-# Secrets (should never be in context)
+# Secrets and runtime credential files (should never be in context)
 .env.local
 .env.production
 *.pem
 *.key
+supabase/.temp/
 
 # n8n runtime data (large, not source code)
 docker/volumes/

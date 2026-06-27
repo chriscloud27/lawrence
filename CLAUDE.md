@@ -30,8 +30,9 @@ Status flow: `proposed` → `accepted` → `superseded by [ADR-XXXX]`. Never edi
 - `.claude/docs/project-context.md` — customer, goals, constraints (fill in early)
 - `.claude/docs/glossary.md` — domain terms
 - `.claude/docs/pipeline-playbook.md` — how to add a pipeline end-to-end
+- `.claude/docs/supabase-cli-reference.md` — Supabase CLI commands, diff workflow, common errors
 - `.claude/docs/data/` — data schemas, source formats, pipeline field map, DB table specs
 - `n8n/workflows/` — exported workflow JSON (committed)
-- `database/migrations/` — Supabase migrations (timestamped SQL)
+- `supabase/migrations/` — Supabase migrations (timestamped SQL)
 - `src/agents/` — OpenAI agent functions
 - `.env.example` — all required env vars

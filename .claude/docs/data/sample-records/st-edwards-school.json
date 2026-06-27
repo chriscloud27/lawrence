@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "description": "Complete example record for St Edward's School, Oxford. Shows all fields populated. Use as reference for LLM extraction output validation.",
+    "source": "https://www.doris.school/schools/united-kingdom/st-edwards-school",
+    "scraped_at": "2026-06-27T00:00:00Z"
+  },
+
+  "school": {
+    "id": "8b00277d-5180-4ad4-8944-5dba8b683f9a",
+    "slug": "st-edwards-school",
+    "name": "St Edward's School",
+    "source_url": "https://www.doris.school/schools/united-kingdom/st-edwards-school",
+    "official_url": "https://www.stedwardsoxford.org/",
+    "founded_year": 1863,
+
+    "address_street": "Woodstock Road",
+    "address_city": "Oxford",
+    "address_region": "Oxfordshire",
+    "address_country": "United Kingdom",
+    "address_postcode": "OX2 7NN",
+    "lat": 51.7766695,
+    "lng": -1.2692306,
+
+    "description": "St Edward's School is an independent, co-educational day and boarding school in England for pupils aged 13 to 18, delivering the International Baccalaureate Diploma Programme.",
+    "school_type": "Independent",
+    "governance": "Charitable company limited by guarantee",
+    "religious_affiliation": "Church of England",
+    "gender_policy": "Co-educational",
+    "boarding_available": true,
+    "day_available": true,
+    "student_count": 815,
+    "age_min": 13,
+    "age_max": 18,
+
+    "curricula": ["IB (DP)"],
+    "languages_instruction": ["English"],
+    "languages_offered": ["French", "German", "Spanish"],
+
+    "strengths": ["Sport", "Performing Arts", "Visual and Creative Arts", "Academic Enrichment"],
+
+    "sen_learning_support": null,
+    "sen_behaviour_support": null,
+
+    "instagram_url": "https://www.instagram.com/stedwardsoxford/",
+    "linkedin_url": "https://www.linkedin.com/school/st-edwards-school-oxford",
+    "facebook_url": null,
+
+    "content_hash": "a3f9b2c1d4e5f6a7b8c9d0e1f2a3b4c5",
+    "last_scraped_at": "2026-06-27T00:00:00Z",
+    "last_modified_at": "2026-05-18T15:29:37.799Z",
+    "extraction_confidence": 0.97,
+    "scrape_status": "ok"
+  },
+
+  "fees": [
+    {
+      "year_group": "Year 9",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Day",
+      "amount": 38175,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 9",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Boarding",
+      "amount": 47718,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 10",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Day",
+      "amount": 38175,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 10",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Boarding",
+      "amount": 47718,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 11",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Day",
+      "amount": 38175,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 11",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Boarding",
+      "amount": 47718,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 12",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Day",
+      "amount": 38175,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 12",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Boarding",
+      "amount": 47718,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 13",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Day",
+      "amount": 38175,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": "Year 13",
+      "fee_type": "yearly_fee",
+      "label": "Annual tuition (three terms) — Boarding",
+      "amount": 47718,
+      "currency": "GBP",
+      "notes": null
+    },
+    {
+      "year_group": null,
+      "fee_type": "application_fee",
+      "label": "Registration (non-refundable)",
+      "amount": 200,
+      "currency": "GBP",
+      "notes": "Non-refundable; paid on registration"
+    },
+    {
+      "year_group": null,
+      "fee_type": "enrollment_fee",
+      "label": "Acceptance deposit",
+      "amount": 2000,
+      "currency": "GBP",
+      "notes": "Payable on acceptance of a place; refundability governed by school terms"
+    },
+    {
+      "year_group": null,
+      "fee_type": "additional_fee",
+      "label": "Outside-UK residence deposit",
+      "amount": 16000,
+      "currency": "GBP",
+      "notes": "Applies to families whose normal residence is outside the UK"
+    }
+  ],
+
+  "entry_points": [
+    {
+      "label": "Shell (Year 9)",
+      "year_group": "Year 9",
+      "places_available": 140,
+      "open_date": null,
+      "deadline_date": null,
+      "rolling_admissions": false,
+      "notes": "Main entry point. Approximately 140 places."
+    },
+    {
+      "label": "Fourth Form (Year 10)",
+      "year_group": "Year 10",
+      "places_available": 20,
+      "open_date": null,
+      "deadline_date": null,
+      "rolling_admissions": false,
+      "notes": "Approximately 20 places available."
+    },
+    {
+      "label": "Sixth Form (Year 12)",
+      "year_group": "Year 12",
+      "places_available": 60,
+      "open_date": null,
+      "deadline_date": null,
+      "rolling_admissions": false,
+      "notes": "Approximately 60 places. IB Diploma Programme entry."
+    }
+  ]
+}
