@@ -7,9 +7,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **lawrence** — data ingestion platform. Scrape, validate, AI-enrich, store.  
 **Domain:** chat.mach2.cloud | **Stage:** prototype
 
-**Stack:** n8n (orchestration MVP) · OpenAI (enrichment) · Supabase (PostgreSQL) · Docker · Node.js/TypeScript
+**Stack:** n8n (orchestration MVP) · OpenAI (enrichment) · Supabase (PostgreSQL) · Docker · Node.js/TypeScript · Next.js chatbot (`src/Chatbot/`)
 
-**Pipeline flow:** External source → n8n → validation → AI agent (optional) → Supabase
+**Pipeline flow:** External source → n8n → validation → AI agent (optional) → Supabase → Chatbot (read)
 
 ## Skills
 
@@ -35,4 +35,7 @@ Status flow: `proposed` → `accepted` → `superseded by [ADR-XXXX]`. Never edi
 - `n8n/workflows/` — exported workflow JSON (committed)
 - `supabase/migrations/` — Supabase migrations (timestamped SQL)
 - `src/agents/` — OpenAI agent functions
+- `src/Chatbot/` — Next.js chatbot; Anthropic SDK, Drizzle ORM, shadcn/ui
+- `src/Chatbot/db/` — Drizzle schema + local SQLite helpers
+- `src/Chatbot/lib/` — Supabase client, Anthropic client, business logic
 - `.env.example` — all required env vars
