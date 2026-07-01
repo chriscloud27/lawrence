@@ -42,7 +42,7 @@ supabase db diff -f supabase/migrations/<timestamp>_<name>.sql
 
 | Goal | Command |
 |------|---------|
-| Link to cloud project | `supabase link --project-ref cztmfcwhivnyeqiltyib` |
+| Link to cloud project | `supabase link --project-ref <your-project-ref>` — ref is in `supabase/.temp/project-ref` |
 | Push local migrations to cloud | `supabase db push` |
 | Pull remote schema to local | `supabase db pull` |
 

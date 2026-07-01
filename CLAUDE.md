@@ -24,6 +24,16 @@ Records live in `.claude/docs/adr/`. Write one when choosing between technologie
 
 Status flow: `proposed` → `accepted` → `superseded by [ADR-XXXX]`. Never edit an accepted ADR.
 
+## Security
+
+**No secrets in files or AI context.** Read `.claude/rules/secrets.md` before any action involving credentials, API keys, tokens, or external service config.
+
+Rules in brief:
+- Never read, log, reference, or store values from `.env.local`, `.env`, or `supabase/.temp/`
+- Never hardcode credentials, project refs, connection strings, or tokens in any committed file
+- Credential reference pattern in config/code: `$env.VAR`, `env(VAR)`, or `${VAR}` — never inline
+- Explicit user go-ahead required before accessing any credential file in this session
+
 ## Key Files
 
 - `.claude/docs/adr/` — architecture decisions

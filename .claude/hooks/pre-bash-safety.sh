@@ -13,9 +13,27 @@ DANGEROUS=(
   "rm -rf /"
 )
 
+# Block commands that would print secrets or credentials to stdout
+CREDENTIAL_READS=(
+  "cat \.env"
+  "cat supabase/\.temp"
+  "echo \\\$SUPABASE"
+  "echo \\\$OPENAI"
+  "printenv SUPABASE"
+  "printenv OPENAI"
+)
+
 for pattern in "${DANGEROUS[@]}"; do
   if echo "$CMD" | grep -qiE "$pattern"; then
     echo "[safety-hook] BLOCKED: Command matches dangerous pattern: $pattern"
+    echo "[safety-hook] Command was: $CMD"
+    exit 1
+  fi
+done
+
+for pattern in "${CREDENTIAL_READS[@]}"; do
+  if echo "$CMD" | grep -qiE "$pattern"; then
+    echo "[safety-hook] BLOCKED: Command would expose credentials. Explicit user go-ahead required."
     echo "[safety-hook] Command was: $CMD"
     exit 1
   fi
