@@ -1,28 +1,102 @@
 name: Terraform
 
 on:
+  pull_request:
+    branches: [main]
+    paths: ["terraform/**"]
   push:
     branches: [main]
+    paths: ["terraform/**"]
   workflow_dispatch:
 
 permissions:
+  id-token: write
   contents: read
+  pull-requests: write
 
 env:
   TF_VERSION: "1.8.5"
   WORKING_DIR: terraform
-  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_USE_OIDC: "true"
 
 jobs:
-  deploy:
-    name: Plan & Apply
+  plan:
+    name: Plan
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform init
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform init
+
+      - name: Terraform plan
+        id: plan
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          TF_VAR_pg_admin_password: ${{ secrets.TF_VAR_PG_ADMIN_PASSWORD }}
+        run: |
+          terraform plan -no-color -out=tfplan 2>&1 | tee plan.txt
+          {
+            echo "output<<TFPLAN_EOF"
+            head -c 65000 plan.txt
+            echo "TFPLAN_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post plan as PR comment
+        uses: actions/github-script@v7
+        if: always()
+        env:
+          PLAN: ${{ steps.plan.outputs.output }}
+        with:
+          script: |
+            const plan = process.env.PLAN;
+            const body = `### Terraform Plan\n\`\`\`\n${plan}\n\`\`\``;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.startsWith('### Terraform Plan'));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                comment_id: existing.id, body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: context.issue.number, body,
+              });
+            }
+
+  apply:
+    name: Apply
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - uses: hashicorp/setup-terraform@v3
         with:
@@ -48,9 +122,9 @@ jobs:
         id: tf_outputs
         working-directory: ${{ env.WORKING_DIR }}
         run: |
-          echo "fqdn=$(terraform output -raw server_fqdn)" >> "$GITHUB_OUTPUT"
-          echo "db=$(terraform output -raw database_name)"  >> "$GITHUB_OUTPUT"
-          echo "user=$(terraform output -raw admin_user)"   >> "$GITHUB_OUTPUT"
+          echo "fqdn=$(terraform output -raw server_fqdn)"   >> "$GITHUB_OUTPUT"
+          echo "db=$(terraform output -raw database_name)"   >> "$GITHUB_OUTPUT"
+          echo "user=$(terraform output -raw admin_user)"    >> "$GITHUB_OUTPUT"
 
       - name: Install psql client
         run: sudo apt-get install -y postgresql-client

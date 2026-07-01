@@ -45,6 +45,15 @@ out/
 .next/
 .cache/
 
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.*
+*.tfvars
+*.tfvars.json
+!terraform.example.tfvars
+
 # React / Vite
 vite.config.js.timestamp-*
 

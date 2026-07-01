@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Run once before the first `terraform init`.
 # Provisions the Azure Blob Storage backend for Terraform state.
-# The OIDC service principal must have Storage Blob Data Contributor on stlawrencetfstate.
+# The OIDC service principal must have Storage Blob Data Contributor on tfstatelawrence.
 set -euo pipefail
 
 LOCATION="westeurope"
 RG="rg-lawrence-tfstate"
-SA="stlawrencetfstate"
+SA="tfstatelawrence"
 CONTAINER="tfstate"
 
 az group create -n "$RG" -l "$LOCATION"
