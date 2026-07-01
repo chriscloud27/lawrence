@@ -1,0 +1,78 @@
+name: Terraform
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TF_VERSION: "1.8.5"
+  WORKING_DIR: terraform
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+
+jobs:
+  deploy:
+    name: Plan & Apply
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform init
+        working-directory: ${{ env.WORKING_DIR }}
+        run: terraform init
+
+      - name: Terraform plan
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          TF_VAR_pg_admin_password: ${{ secrets.TF_VAR_PG_ADMIN_PASSWORD }}
+        run: terraform plan -out=tfplan
+
+      - name: Terraform apply
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          TF_VAR_pg_admin_password: ${{ secrets.TF_VAR_PG_ADMIN_PASSWORD }}
+        run: terraform apply tfplan
+
+      - name: Capture outputs
+        id: tf_outputs
+        working-directory: ${{ env.WORKING_DIR }}
+        run: |
+          echo "fqdn=$(terraform output -raw server_fqdn)" >> "$GITHUB_OUTPUT"
+          echo "db=$(terraform output -raw database_name)"  >> "$GITHUB_OUTPUT"
+          echo "user=$(terraform output -raw admin_user)"   >> "$GITHUB_OUTPUT"
+
+      - name: Install psql client
+        run: sudo apt-get install -y postgresql-client
+
+      - name: Run schema migration
+        env:
+          PGPASSWORD: ${{ secrets.TF_VAR_PG_ADMIN_PASSWORD }}
+        run: |
+          psql \
+            "host=${{ steps.tf_outputs.outputs.fqdn }} \
+             dbname=${{ steps.tf_outputs.outputs.db }} \
+             user=${{ steps.tf_outputs.outputs.user }} \
+             sslmode=require" \
+            -f db/migrations/001_init_postgres.sql
+
+      - name: Seed schools table
+        env:
+          PGPASSWORD: ${{ secrets.TF_VAR_PG_ADMIN_PASSWORD }}
+        run: |
+          psql \
+            "host=${{ steps.tf_outputs.outputs.fqdn }} \
+             dbname=${{ steps.tf_outputs.outputs.db }} \
+             user=${{ steps.tf_outputs.outputs.user }} \
+             sslmode=require" \
+            -c "\copy schools(name,city,country,website) FROM 'src/Chatbot/data/thailand-schools-seed.csv' CSV HEADER"
