@@ -3,6 +3,30 @@ resource "azurerm_resource_group" "chatbot" {
   location = var.location
 }
 
+resource "azurerm_user_assigned_identity" "github_oidc" {
+  name                = "mi-lawrence-github-oidc"
+  resource_group_name = azurerm_resource_group.chatbot.name
+  location            = azurerm_resource_group.chatbot.location
+}
+
+resource "azurerm_federated_identity_credential" "github_main" {
+  name                = "fc-github-main"
+  resource_group_name = azurerm_resource_group.chatbot.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = "https://token.actions.githubusercontent.com"
+  parent_id           = azurerm_user_assigned_identity.github_oidc.id
+  subject             = "repo:chriscloud27/lawrence:ref:refs/heads/main"
+}
+
+resource "azurerm_federated_identity_credential" "github_pr" {
+  name                = "fc-github-pr"
+  resource_group_name = azurerm_resource_group.chatbot.name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = "https://token.actions.githubusercontent.com"
+  parent_id           = azurerm_user_assigned_identity.github_oidc.id
+  subject             = "repo:chriscloud27/lawrence:pull_request"
+}
+
 resource "azurerm_postgresql_flexible_server" "chatbot" {
   name                   = "psql-lawrence-${var.env}"
   resource_group_name    = azurerm_resource_group.chatbot.name
