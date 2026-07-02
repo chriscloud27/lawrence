@@ -2,92 +2,144 @@
   "name": "scrape-doris-school",
   "nodes": [
     {
-      "id": "11111111-1111-1111-1111-000000000001",
-      "name": "Manual Trigger",
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [240, 300],
-      "parameters": {}
-    },
-    {
-      "id": "11111111-1111-1111-1111-000000000002",
-      "name": "URL List",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [460, 300],
+      "id": "22222222-2222-2222-2222-000000000001",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ],
       "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "// Phase 1: 10 hardcoded Doris school URLs.\n// Replace slugs with your target schools before running.\nreturn [\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/st-edwards-school' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/eton-college' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/harrow-school' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/rugby-school' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/winchester-college' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/cheltenham-ladies-college' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/marlborough-college' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/charterhouse' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/shrewsbury-school' } },\n  { json: { url: 'https://www.doris.school/schools/united-kingdom/tonbridge-school' } }\n];"
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000003",
+      "id": "22222222-2222-2222-2222-000000000002",
+      "name": "Get Pending Queue",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        300
+      ],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/scrape_queue?status=eq.pending&limit=25&select=id,url,last_etag,last_hash' }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000003",
       "name": "Split In Batches",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
-      "position": [680, 300],
+      "position": [
+        680,
+        300
+      ],
       "parameters": {
         "batchSize": 1,
         "options": {}
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000004",
+      "id": "22222222-2222-2222-2222-000000000004",
       "name": "Mark Processing",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [900, 300],
+      "position": [
+        900,
+        300
+      ],
       "parameters": {
-        "method": "POST",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/scrape_queue' }}",
+        "method": "PATCH",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/scrape_queue?id=eq.' + $('Split In Batches').first().json.id }}",
         "authentication": "none",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "return=representation" }
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ url: $json.url, status: 'processing' }) }}",
+        "body": "={{ JSON.stringify({ status: 'processing' }) }}",
         "options": {}
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000005",
-      "name": "Parse Queue Response",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1120, 300],
-      "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "// Supabase returns an array with Prefer: return=representation.\n// Normalise to { url, scrape_queue_id } for downstream nodes.\nconst resp = $input.first().json;\nconst row = Array.isArray(resp) ? resp[0] : resp;\nreturn [{ json: { url: row.url, scrape_queue_id: row.id } }];"
-      }
-    },
-    {
-      "id": "11111111-1111-1111-1111-000000000006",
+      "id": "22222222-2222-2222-2222-000000000005",
       "name": "GET Doris Page",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1340, 300],
+      "position": [
+        1120,
+        300
+      ],
       "parameters": {
         "method": "GET",
-        "url": "={{ $json.url }}",
+        "url": "={{ $('Split In Batches').first().json.url }}",
         "authentication": "none",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "User-Agent", "value": "Mozilla/5.0 (compatible; LawrenceBot/1.0)" },
-            { "name": "Accept", "value": "text/html,application/xhtml+xml" }
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (compatible; LawrenceBot/1.0)"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml"
+            },
+            {
+              "name": "If-None-Match",
+              "value": "={{ $('Split In Batches').first().json.last_etag || '' }}"
+            }
           ]
         },
         "options": {
           "response": {
             "response": {
+              "fullResponse": true,
+              "neverError": true,
               "responseFormat": "text"
             }
           }
@@ -95,61 +147,218 @@
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000007",
-      "name": "Extract JSON-LD",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [1560, 300],
-      "parameters": {
-        "mode": "runOnceForEachItem",
-        "jsCode": "const html = $input.first().json.data;\nconst { url: sourceUrl, scrape_queue_id: scrapeQueueId } = $('Parse Queue Response').first().json;\n\nif (!html || html.length < 200) {\n  return [{ json: { scrape_status: 'failed', error: 'Empty or thin HTML — page may be JS-rendered', source_url: sourceUrl, scrape_queue_id: scrapeQueueId } }];\n}\n\nconst match = html.match(/<script type=\"application\\/ld\\+json\"[^>]*>([\\s\\S]*?)<\\/script>/);\nif (!match) {\n  return [{ json: { scrape_status: 'failed', error: 'No JSON-LD block found in HTML', source_url: sourceUrl, scrape_queue_id: scrapeQueueId } }];\n}\n\nlet data;\ntry {\n  data = JSON.parse(match[1]);\n} catch (e) {\n  return [{ json: { scrape_status: 'failed', error: 'JSON-LD parse error: ' + e.message, source_url: sourceUrl, scrape_queue_id: scrapeQueueId } }];\n}\n\nconst slug = sourceUrl.split('/').pop();\n\n// sameAs — split into social URLs and official school URL\nconst sameAs = Array.isArray(data.sameAs) ? data.sameAs : (data.sameAs ? [data.sameAs] : []);\nconst SOCIAL = ['instagram.com', 'linkedin.com', 'facebook.com', 'twitter.com', 'x.com'];\nconst instagramUrl = sameAs.find(u => u.includes('instagram.com')) ?? null;\nconst linkedinUrl  = sameAs.find(u => u.includes('linkedin.com'))  ?? null;\nconst facebookUrl  = sameAs.find(u => u.includes('facebook.com'))  ?? null;\nconst officialUrl  = sameAs.find(u => !SOCIAL.some(d => u.includes(d)) && !u.includes('doris.school')) ?? null;\n\n// Curricula: teaches may be a string or array\nconst curricula = data.teaches\n  ? (Array.isArray(data.teaches) ? data.teaches : [data.teaches])\n  : [];\n\n// Languages: first entry = instruction medium, rest = subjects offered\nconst allLangs = Array.isArray(data.knowsLanguage)\n  ? data.knowsLanguage\n  : (data.knowsLanguage ? [data.knowsLanguage] : []);\nconst languagesInstruction = allLangs.length > 0 ? [allLangs[0]] : ['English'];\nconst languagesOffered = allLangs.slice(1);\n\n// Religious affiliation from additionalProperty PropertyValue array\nconst religiousAffiliation = (data.additionalProperty ?? [])\n  .find(p => p.name === 'Religious Affiliation')?.value ?? null;\n\n// Fees: one row per offer object\nconst fees = (data.offers ?? []).map(o => {\n  const name = (o.name ?? '').toLowerCase();\n  let feeType = 'additional_fee';\n  if (name.includes('tuition') || name.includes('annual') || name.includes('yearly')) {\n    feeType = 'yearly_fee';\n  } else if (name.includes('application') || name.includes('registration')) {\n    feeType = 'application_fee';\n  } else if (name.includes('deposit') || name.includes('enrollment') || name.includes('enrolment') || name.includes('acceptance')) {\n    feeType = 'enrollment_fee';\n  }\n  return {\n    year_group: o.eligibleCustomerType ?? null,\n    fee_type: feeType,\n    label: o.name ?? null,\n    amount: parseFloat(o.price),\n    currency: o.priceCurrency ?? 'GBP',\n    notes: o.description ?? null\n  };\n});\n\nconst school = {\n  slug,\n  name: data.name,\n  source_url: sourceUrl,\n  official_url: officialUrl,\n  founded_year: data.foundingDate ? parseInt(data.foundingDate) : null,\n  address_street:  data.address?.streetAddress   ?? null,\n  address_city:    data.address?.addressLocality  ?? null,\n  address_region:  data.address?.addressRegion    ?? null,\n  address_country: data.address?.addressCountry   ?? null,\n  address_postcode: data.address?.postalCode      ?? null,\n  lat: data.geo?.latitude  ?? null,\n  lng: data.geo?.longitude ?? null,\n  description: data.description ? data.description.slice(0, 500) : null,\n  school_type:           null,\n  governance:            null,\n  religious_affiliation: religiousAffiliation,\n  gender_policy:         null,\n  boarding_available:    false,\n  day_available:         true,\n  student_count: data.numberOfStudents?.value ? parseInt(data.numberOfStudents.value) : null,\n  age_min: null,\n  age_max: null,\n  curricula,\n  languages_instruction: languagesInstruction,\n  languages_offered:     languagesOffered,\n  strengths:             [],\n  sen_learning_support:  null,\n  sen_behaviour_support: null,\n  instagram_url: instagramUrl,\n  linkedin_url:  linkedinUrl,\n  facebook_url:  facebookUrl,\n  last_modified_at:      data.dateModified ?? null,\n  last_scraped_at:       new Date().toISOString(),\n  extraction_confidence: 0.85,\n  scrape_status:         'ok'\n};\n\nreturn [{ json: { school, fees, entry_points: [], scrape_status: 'ok', source_url: sourceUrl, scrape_queue_id: scrapeQueueId } }];"
-      }
-    },
-    {
-      "id": "11111111-1111-1111-1111-000000000008",
-      "name": "IF Extraction OK",
+      "id": "22222222-2222-2222-2222-000000000006",
+      "name": "IF Not Modified",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
-      "position": [1780, 300],
+      "position": [
+        1340,
+        300
+      ],
       "parameters": {
         "conditions": {
           "options": {
             "caseSensitive": true,
-            "leftValue": "",
             "typeValidation": "strict"
           },
+          "combinator": "and",
           "conditions": [
             {
-              "id": "cond-scrape-status",
-              "leftValue": "={{ $json.scrape_status }}",
-              "rightValue": "ok",
+              "id": "c-304",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 304,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000007",
+      "name": "Prepare HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        420
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Truncate HTML to ~12,000 chars (≈3k tokens for gpt-4o-mini). Keep body + statusCode.\nconst resp = $input.first().json;\nconst html = (resp.body || '').slice(0, 12000);\nreturn [{ json: { html } }];"
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000008",
+      "name": "Hash HTML",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        1780,
+        420
+      ],
+      "parameters": {
+        "action": "hash",
+        "type": "MD5",
+        "value": "={{ $json.html }}",
+        "dataPropertyName": "content_hash"
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000009",
+      "name": "IF Hash Unchanged",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        420
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c-hash",
+              "leftValue": "={{ $json.content_hash }}",
+              "rightValue": "={{ $('Split In Batches').first().json.last_hash }}",
               "operator": {
                 "type": "string",
                 "operation": "equals"
               }
             }
-          ],
-          "combinator": "and"
+          ]
         }
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000009",
-      "name": "Upsert School",
+      "id": "22222222-2222-2222-2222-000000000010",
+      "name": "Build Extraction Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        540
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Source of truth for this prompt is src/agents/prompts/school-extraction.txt.\n// Keep in sync when the prompt changes (see the Sticky Note on this canvas).\nconst SYSTEM_PROMPT = \"You are a structured data extraction engine. Your only job is to extract school information from HTML and return a valid JSON object matching the schema exactly. Do not add commentary, explanation, or markdown. Return only the JSON object.\\n\\nSCHEMA:\\n{\\n  \\\"school\\\": {\\n    \\\"slug\\\": \\\"string — url-safe lowercase, hyphens, derived from school name\\\",\\n    \\\"name\\\": \\\"string\\\",\\n    \\\"official_url\\\": \\\"string | null\\\",\\n    \\\"founded_year\\\": \\\"integer | null\\\",\\n    \\\"address_street\\\": \\\"string | null\\\",\\n    \\\"address_city\\\": \\\"string | null\\\",\\n    \\\"address_region\\\": \\\"string | null\\\",\\n    \\\"address_country\\\": \\\"string | null\\\",\\n    \\\"address_postcode\\\": \\\"string | null\\\",\\n    \\\"lat\\\": \\\"float | null\\\",\\n    \\\"lng\\\": \\\"float | null\\\",\\n    \\\"description\\\": \\\"string | null — max 500 chars, factual summary\\\",\\n    \\\"school_type\\\": \\\"one of: Independent | State | Semi-private | International | null\\\",\\n    \\\"governance\\\": \\\"string | null\\\",\\n    \\\"religious_affiliation\\\": \\\"string | null — exact value or 'None'\\\",\\n    \\\"gender_policy\\\": \\\"one of: Co-educational | Boys | Girls | Co-educational (boarding) | null\\\",\\n    \\\"boarding_available\\\": \\\"boolean\\\",\\n    \\\"day_available\\\": \\\"boolean\\\",\\n    \\\"student_count\\\": \\\"integer | null\\\",\\n    \\\"age_min\\\": \\\"integer | null\\\",\\n    \\\"age_max\\\": \\\"integer | null\\\",\\n    \\\"curricula\\\": \\\"array of strings — ONLY use values from the CURRICULA ENUM LIST below\\\",\\n    \\\"languages_instruction\\\": \\\"array of strings — ONLY use values from LANGUAGES ENUM LIST below\\\",\\n    \\\"languages_offered\\\": \\\"array of strings — free text, languages taught as subjects\\\",\\n    \\\"strengths\\\": \\\"array of strings — ONLY use values from STRENGTHS ENUM LIST below\\\",\\n    \\\"sen_learning_support\\\": \\\"one of: Basic | Moderate | Advanced | Specialist | null\\\",\\n    \\\"sen_behaviour_support\\\": \\\"one of: Basic | Moderate | Advanced | Specialist | null\\\",\\n    \\\"instagram_url\\\": \\\"string | null\\\",\\n    \\\"linkedin_url\\\": \\\"string | null\\\",\\n    \\\"facebook_url\\\": \\\"string | null\\\",\\n    \\\"extraction_confidence\\\": \\\"float 0.0–1.0 — your confidence that all extracted fields are correct\\\"\\n  },\\n  \\\"fees\\\": [\\n    {\\n      \\\"year_group\\\": \\\"string | null — e.g. 'Year 9', 'Year 12', 'Sixth Form'\\\",\\n      \\\"fee_type\\\": \\\"one of: yearly_fee | application_fee | enrollment_fee | additional_fee\\\",\\n      \\\"label\\\": \\\"string | null\\\",\\n      \\\"amount\\\": \\\"float\\\",\\n      \\\"currency\\\": \\\"string — ISO 4217 code e.g. GBP, USD\\\",\\n      \\\"notes\\\": \\\"string | null\\\"\\n    }\\n  ],\\n  \\\"entry_points\\\": [\\n    {\\n      \\\"label\\\": \\\"string | null\\\",\\n      \\\"year_group\\\": \\\"string | null\\\",\\n      \\\"places_available\\\": \\\"integer | null\\\",\\n      \\\"open_date\\\": \\\"ISO date string YYYY-MM-DD | null\\\",\\n      \\\"deadline_date\\\": \\\"ISO date string YYYY-MM-DD | null\\\",\\n      \\\"rolling_admissions\\\": \\\"boolean\\\",\\n      \\\"notes\\\": \\\"string | null\\\"\\n    }\\n  ]\\n}\\n\\nCURRICULA ENUM LIST (use only these values):\\nIB, Cambridge, IEYC (International Early Years Curriculum), Montessori Curriculum, Reggio Emilia Approach, IB (PYP), IPC (International Primary Curriculum), Cambridge (Primary), IB (MYP), IMYC (International Middle Years Curriculum), Cambridge (Secondary), Cambridge IGCSE, Pearson Edexcel IGCSE, IB (DP), IBCP (International Baccalaureate Career-related Programme), Advanced Placement (AP), Cambridge International AS Levels, Cambridge A Levels, BTEC Qualification, American Curriculum, Australian Curriculum, British Curriculum, Canadian Curriculum, Dutch Curriculum, French Curriculum, German Curriculum, Indian Curriculum, Japanese Curriculum, Jordanian Curriculum, Korean Curriculum, Malaysian Curriculum, Myanmar Curriculum, Singapore Curriculum, Swiss Curriculum, Taiwan 108 Curriculum, Thai Curriculum, Christian Curriculum, SEN focussed, Bespoke Curriculum, Waldorf Steiner Curriculum\\n\\nLANGUAGES ENUM LIST (use only these for languages_instruction):\\nEnglish, Mandarin, French, German, Japanese, Korean, Spanish, Hebrew, Malay\\n\\nSTRENGTHS ENUM LIST (use only these values):\\nSport, Performing Arts, Visual and Creative Arts, STEM, Academic Enrichment, Outdoor Education, Service and Sustainability, Languages\\n\\nRULES:\\n1. Return ONLY valid JSON. No preamble, no trailing text.\\n2. If a field cannot be determined from the HTML, use null (not empty string).\\n3. For curricula/strengths/languages, only use values from the enum lists. If something doesn't match, omit it.\\n4. For fees: extract every distinct fee line item as a separate object in the fees array.\\n5. For entry_points: extract every distinct admissions cohort or entry window.\\n6. If HTML appears to be JavaScript-rendered with no real content, return: {\\\"error\\\": \\\"js_rendered\\\", \\\"school\\\": null, \\\"fees\\\": [], \\\"entry_points\\\": []}\\n7. Set extraction_confidence honestly: 1.0 if all major fields are clearly present, 0.5 if significant fields are missing or ambiguous.\\n\";\nreturn [{ json: { model: 'gpt-4o-mini', system: SYSTEM_PROMPT, html: $json.html, content_hash: $json.content_hash } }];"
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000011",
+      "name": "OpenAI Extract",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2000, 160],
+      "position": [
+        2440,
+        540
+      ],
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/schools' }}",
+        "url": "https://api.openai.com/v1/chat/completions",
         "authentication": "none",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "resolution=merge-duplicates,return=representation" }
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.OPENAI_API_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ model: $json.model, temperature: 0, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: $json.system }, { role: 'user', content: $json.html } ] }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000012",
+      "name": "Validate & Assemble",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2660,
+        540
+      ],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Parse the LLM JSON, gate on confidence, assemble the school + fees payload.\nconst raw = $input.first().json;\nconst content = raw.choices && raw.choices[0] && raw.choices[0].message && raw.choices[0].message.content;\nconst queue = $('Split In Batches').first().json;\nconst contentHash = $('Build Extraction Request').first().json.content_hash;\nconst headers = $('GET Doris Page').first().json.headers || {};\nconst etag = headers.etag || null;\nconst sourceUrl = queue.url;\nconst scrapeQueueId = queue.id;\n\nfunction fail(error) {\n  return [{ json: { scrape_status: 'failed', error, scrape_queue_id: scrapeQueueId, source_url: sourceUrl } }];\n}\n\nlet parsed;\ntry { parsed = JSON.parse(content); } catch (e) { return fail('LLM returned non-JSON: ' + e.message); }\nif (parsed.error === 'js_rendered') return fail('js_rendered — route to headless fallback');\nif (!parsed.school) return fail('No school object in extraction');\n\nconst conf = parsed.school.extraction_confidence;\nconst scrapeStatus = (typeof conf === 'number' && conf < 0.6) ? 'needs_review' : 'ok';\nconst slug = parsed.school.slug || sourceUrl.split('/').filter(Boolean).pop();\n\nconst school = Object.assign({}, parsed.school, {\n  slug,\n  source_url: sourceUrl,\n  content_hash: contentHash,\n  last_scraped_at: new Date().toISOString(),\n  scrape_status: scrapeStatus,\n});\n\nconst fees = Array.isArray(parsed.fees) ? parsed.fees : [];\n\nreturn [{ json: { school, fees, scrape_status: scrapeStatus, scrape_queue_id: scrapeQueueId, source_url: sourceUrl, content_hash: contentHash, etag } }];"
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000013",
+      "name": "IF Extraction OK",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        540
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c-ok",
+              "leftValue": "={{ $json.scrape_status }}",
+              "rightValue": "failed",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000014",
+      "name": "Upsert School",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3100,
+        440
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/schools?on_conflict=slug' }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=representation"
+            }
           ]
         },
         "sendBody": true,
@@ -160,22 +369,28 @@
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000010",
+      "id": "22222222-2222-2222-2222-000000000015",
       "name": "Get School ID",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [2220, 160],
+      "position": [
+        3320,
+        440
+      ],
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "// Supabase returns an array for upserts with return=representation.\nconst resp = $input.first().json;\nconst row = Array.isArray(resp) ? resp[0] : resp;\nconst schoolId = row.id;\n\nconst prev = $('Extract JSON-LD').first().json;\n\n// Inject school_id into child rows before insert\nconst feesWithId        = prev.fees.map(f => ({ ...f, school_id: schoolId }));\nconst entryPointsWithId = prev.entry_points.map(e => ({ ...e, school_id: schoolId }));\n\nreturn [{\n  json: {\n    school_id:       schoolId,\n    fees:            feesWithId,\n    entry_points:    entryPointsWithId,\n    source_url:      prev.source_url,\n    scrape_queue_id: prev.scrape_queue_id\n  }\n}];"
+        "jsCode": "// Supabase returns an array for upserts with return=representation. Inject school_id into fee rows.\nconst resp = $input.first().json;\nconst row = Array.isArray(resp) ? resp[0] : resp;\nconst schoolId = row.id;\nconst prev = $('Validate & Assemble').first().json;\nconst fees = prev.fees.map(f => Object.assign({}, f, { school_id: schoolId }));\nreturn [{ json: {\n  school_id: schoolId,\n  fees,\n  fees_count: fees.length,\n  scrape_queue_id: prev.scrape_queue_id,\n  content_hash: prev.content_hash,\n  etag: prev.etag,\n} }];"
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000011",
+      "id": "22222222-2222-2222-2222-000000000016",
       "name": "Delete Old Fees",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2440, 160],
+      "position": [
+        3540,
+        440
+      ],
       "parameters": {
         "method": "DELETE",
         "url": "={{ $env.SUPABASE_URL + '/rest/v1/school_fees?school_id=eq.' + $json.school_id }}",
@@ -183,19 +398,62 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" }
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "options": {}
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000012",
+      "id": "22222222-2222-2222-2222-000000000017",
+      "name": "IF Has Fees",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        440
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "c-fees",
+              "leftValue": "={{ $('Get School ID').first().json.fees_count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000018",
       "name": "Insert Fees",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2660, 160],
+      "position": [
+        3980,
+        340
+      ],
       "parameters": {
         "method": "POST",
         "url": "={{ $env.SUPABASE_URL + '/rest/v1/school_fees' }}",
@@ -203,10 +461,22 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "return=minimal" }
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
           ]
         },
         "sendBody": true,
@@ -217,57 +487,14 @@
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000013",
-      "name": "Delete Old Entry Points",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [2880, 160],
-      "parameters": {
-        "method": "DELETE",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/school_entry_points?school_id=eq.' + $('Get School ID').first().json.school_id }}",
-        "authentication": "none",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" }
-          ]
-        },
-        "options": {}
-      }
-    },
-    {
-      "id": "11111111-1111-1111-1111-000000000014",
-      "name": "Insert Entry Points",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [3100, 160],
-      "parameters": {
-        "method": "POST",
-        "url": "={{ $env.SUPABASE_URL + '/rest/v1/school_entry_points' }}",
-        "authentication": "none",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "return=minimal" }
-          ]
-        },
-        "sendBody": true,
-        "contentType": "raw",
-        "rawContentType": "application/json",
-        "body": "={{ JSON.stringify($('Get School ID').first().json.entry_points) }}",
-        "options": {}
-      }
-    },
-    {
-      "id": "11111111-1111-1111-1111-000000000015",
+      "id": "22222222-2222-2222-2222-000000000019",
       "name": "Mark Done",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [3320, 160],
+      "position": [
+        4200,
+        440
+      ],
       "parameters": {
         "method": "PATCH",
         "url": "={{ $env.SUPABASE_URL + '/rest/v1/scrape_queue?id=eq.' + $('Get School ID').first().json.scrape_queue_id }}",
@@ -275,24 +502,73 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
         "contentType": "raw",
         "rawContentType": "application/json",
-        "body": "={{ JSON.stringify({ status: 'done', school_id: $('Get School ID').first().json.school_id, processed_at: new Date().toISOString() }) }}",
+        "body": "={{ JSON.stringify({ status: 'done', school_id: $('Get School ID').first().json.school_id, last_etag: $('Get School ID').first().json.etag, last_hash: $('Get School ID').first().json.content_hash, processed_at: new Date().toISOString() }) }}",
         "options": {}
       }
     },
     {
-      "id": "11111111-1111-1111-1111-000000000016",
+      "id": "22222222-2222-2222-2222-000000000020",
+      "name": "Mark Done (Unchanged)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        180
+      ],
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/scrape_queue?id=eq.' + $('Split In Batches').first().json.id }}",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ status: 'done', processed_at: new Date().toISOString() }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000021",
       "name": "Mark Failed",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [2000, 460],
+      "position": [
+        3100,
+        700
+      ],
       "parameters": {
         "method": "PATCH",
         "url": "={{ $env.SUPABASE_URL + '/rest/v1/scrape_queue?id=eq.' + $json.scrape_queue_id }}",
@@ -300,9 +576,18 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" }
+            {
+              "name": "apikey",
+              "value": "={{ $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
           ]
         },
         "sendBody": true,
@@ -311,62 +596,283 @@
         "body": "={{ JSON.stringify({ status: 'failed', last_error: $json.error, processed_at: new Date().toISOString() }) }}",
         "options": {}
       }
+    },
+    {
+      "id": "22222222-2222-2222-2222-000000000022",
+      "name": "Notes",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        220,
+        560
+      ],
+      "parameters": {
+        "width": 620,
+        "height": 220,
+        "content": "## scrape-doris-school\nPulls pending URLs from `scrape_queue`, conditional-GETs each Doris page (ETag + MD5 change detection), extracts with **gpt-4o-mini** (temp 0, JSON mode), upserts `schools` on `slug`, and refreshes `school_fees`.\n\n- System prompt source of truth: `src/agents/prompts/school-extraction.txt` — copied into **Build Extraction Request**; keep in sync.\n- Requires env: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `OPENAI_API_KEY`.\n- MVP scope: `entry_points` not persisted (deferred to phase 2).\n- `extraction_confidence < 0.6` → school row flagged `needs_review` (queue still marked `done`)."
+      }
     }
   ],
   "connections": {
-    "Manual Trigger": {
-      "main": [[{ "node": "URL List", "type": "main", "index": 0 }]]
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Pending Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "URL List": {
-      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+    "Get Pending Queue": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Split In Batches": {
       "main": [
-        [{ "node": "Mark Processing", "type": "main", "index": 0 }],
+        [
+          {
+            "node": "Mark Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
         []
       ]
     },
     "Mark Processing": {
-      "main": [[{ "node": "Parse Queue Response", "type": "main", "index": 0 }]]
-    },
-    "Parse Queue Response": {
-      "main": [[{ "node": "GET Doris Page", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "GET Doris Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "GET Doris Page": {
-      "main": [[{ "node": "Extract JSON-LD", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "IF Not Modified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
-    "Extract JSON-LD": {
-      "main": [[{ "node": "IF Extraction OK", "type": "main", "index": 0 }]]
+    "IF Not Modified": {
+      "main": [
+        [
+          {
+            "node": "Mark Done (Unchanged)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare HTML": {
+      "main": [
+        [
+          {
+            "node": "Hash HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hash HTML": {
+      "main": [
+        [
+          {
+            "node": "IF Hash Unchanged",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Hash Unchanged": {
+      "main": [
+        [
+          {
+            "node": "Mark Done (Unchanged)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Build Extraction Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Extraction Request": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Extract": {
+      "main": [
+        [
+          {
+            "node": "Validate & Assemble",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate & Assemble": {
+      "main": [
+        [
+          {
+            "node": "IF Extraction OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "IF Extraction OK": {
       "main": [
-        [{ "node": "Upsert School", "type": "main", "index": 0 }],
-        [{ "node": "Mark Failed", "type": "main", "index": 0 }]
+        [
+          {
+            "node": "Upsert School",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Upsert School": {
-      "main": [[{ "node": "Get School ID", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Get School ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Get School ID": {
-      "main": [[{ "node": "Delete Old Fees", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Delete Old Fees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Delete Old Fees": {
-      "main": [[{ "node": "Insert Fees", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "IF Has Fees",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Has Fees": {
+      "main": [
+        [
+          {
+            "node": "Insert Fees",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Insert Fees": {
-      "main": [[{ "node": "Delete Old Entry Points", "type": "main", "index": 0 }]]
-    },
-    "Delete Old Entry Points": {
-      "main": [[{ "node": "Insert Entry Points", "type": "main", "index": 0 }]]
-    },
-    "Insert Entry Points": {
-      "main": [[{ "node": "Mark Done", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Mark Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Mark Done": {
-      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Done (Unchanged)": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Mark Failed": {
-      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
