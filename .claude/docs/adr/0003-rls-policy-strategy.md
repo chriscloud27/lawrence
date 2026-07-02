@@ -1,7 +1,8 @@
 # ADR-0003: RLS policy strategy for backend pipeline access
 
-**Status:** proposed  
-**Date:** 2026-06-27
+**Status:** accepted  
+**Date:** 2026-06-27  
+**Updated:** 2026-07-02 (decision resolved; see [ADR-0005](0005-chatbot-read-view-decoupling.md))
 
 ## Context
 
@@ -28,13 +29,25 @@ key by mistake) would silently fail with no schema-level safety net.
 
 ## Decision
 
-*To be decided after verifying n8n credential configuration.*
+Adopt **Option B (service-role bypass) for all writes**, with a narrow Option-A
+carve-out for public read access:
 
-- If n8n uses the service role key and the client-level bypass works end-to-end → accept Option B, document the credential requirement.
-- If bypass is unreliable or anon key access is needed → accept Option A, write explicit policies in a new migration.
+- Pipeline writes (n8n) authenticate with `SUPABASE_SERVICE_KEY` and the chatbot
+  connects via a direct superuser `DATABASE_URL` — both bypass RLS at the client
+  layer, so no write policies are required.
+- **Exception:** the chatbot reads school data through the `schools_chatbot` view
+  (`security_invoker=on`), which requires the caller to hold read rights on the
+  underlying tables. [ADR-0005](0005-chatbot-read-view-decoupling.md) therefore adds
+  explicit public-read (`anon`, `authenticated`) `SELECT` policies on `schools` and
+  `school_fees` only — justified because school directory data is public and
+  non-sensitive.
 
 ## Consequences
 
-- Option A: one migration file (`20260627_rls_service_role_policies.sql`) with four `CREATE POLICY` statements; append-only, auditable
-- Option B: no migration needed; risk of silent access failure if key is misconfigured
-- Either way: `anon` role must remain blocked on all pipeline tables
+- No `service_role` write-policy migration is needed; access depends on correct
+  credential configuration (documented in `.env.example`).
+- `schools` and `school_fees` are readable by `anon`/`authenticated` (public directory
+  data). This is a deliberate relaxation of the original "anon blocked everywhere"
+  stance.
+- `scrape_queue`, `leads`, and `messages` remain closed to `anon` — no read or write
+  policies, RLS enabled.
