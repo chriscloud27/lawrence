@@ -129,26 +129,31 @@ ingestion evolves underneath without breaking the app.
 
 ---
 
-## Step 4 — Provision DB + load example data
+## Step 4 — Provision DB + load example data ✅ (local)
 
-1. **Consolidate migrations** in `supabase/migrations/` (apply in order):
-   - `20260627_create_schools_schema.sql` (exists) — schools/fees/entry_points/scrape_queue.
-   - `20260702_create_chatbot_leads_messages.sql` (exists) — leads/messages.
-   - **New** `<ts>_create_schools_chatbot_view.sql` — the read view (Step 3).
-   - RLS: read-only policy for the chatbot role on `schools_chatbot`; confirm
-     insert policies on `leads`/`messages`.
-2. **Apply locally first:** `supabase db reset`, then `supabase db diff` to
-   confirm it matches `db-tables.md`. Use `/db-migrate` for staging.
-3. **Load example data (two sources):**
-   - Seed `schools/school_fees` from `sample-records/st-edwards-school.json`
-     (all fields populated) — smoke-tests the view.
-   - For volume, transform `thailand-schools-seed.csv` (54 rows) into
-     `scrape_queue`, then run the n8n MVP workflow to populate for real. Do
-     **not** hand-load the flat CSV into `schools` — that reintroduces the
-     denormalized shape.
-4. **Point the chatbot** `DATABASE_URL` at Supabase (`sslmode=require`), remap
-   its `schools` model to the view, test `/api/schools/search` and `/api/leads`.
-   Retire `better-sqlite3` + local `.db` (should not be committed).
+Done against local Supabase (`supabase start`); staging apply still pending.
+
+1. [x] **Migrations** in `supabase/migrations/` (apply in order):
+   - `20260627_create_schools_schema.sql` — schools/fees/entry_points/scrape_queue.
+   - `20260702_create_chatbot_leads_messages.sql` — leads/messages.
+   - `20260702120000_create_schools_chatbot_view.sql` — the read view (Step 3);
+     `security_invoker=on` + public-read policies on `schools`/`school_fees`
+     (see [ADR-0005](../adr/0005-chatbot-read-view-decoupling.md)).
+   - Note: the view was renamed from `20260702_…` to `20260702120000_…` to avoid
+     a duplicate migration-version collision with the leads/messages file.
+2. [x] **Applied locally:** all three migrations tracked clean on `supabase start`.
+   `supabase db diff` / staging (`/db-migrate`) still to do.
+3. [x] **Loaded example data:**
+   - Seeded `schools`/`school_fees` from `sample-records/st-edwards-school.json`;
+     `schools_chatbot` view verified (USD fee rollup, status filter, jsonb curricula).
+   - `scrape_queue` seeded with 64 pending URLs (10 UK + 54 Thailand) via
+     `scripts/seed-scrape-queue.mjs` → `supabase/seed_scrape_queue.sql`.
+   - Still pending: run the n8n workflow to populate `schools` for real (needs
+     `OPENAI_API_KEY` + live Doris pages).
+4. [x] **Chatbot wired to Supabase:** `DATABASE_URL` → local Supabase, `schools`
+   model rebound to the view, `/api/schools/search` + `/api/leads` tested green.
+   Fixed a jsonb `curricula` LIKE bug surfaced by the swap. `better-sqlite3`
+   retired; `.db` files untracked + git-ignored.
 
 ---
 
