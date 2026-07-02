@@ -18,7 +18,8 @@ export async function GET(request: Request) {
   if (country) conditions.push(like(schools.country, `%${country}%`));
   if (city) conditions.push(like(schools.city, `%${city}%`));
   if (curriculum && curriculum !== 'Any') {
-    conditions.push(like(schools.curricula, `%${curriculum}%`));
+    // curricula is jsonb (array); cast to text for a partial match, e.g. 'IB' → 'IB (DP)'
+    conditions.push(sql`${schools.curricula}::text ilike ${`%${curriculum}%`}`);
   }
   if (ageMin) conditions.push(lte(schools.ageFrom, parseInt(ageMin)));
   if (ageMax) conditions.push(gte(schools.ageTo, parseInt(ageMax)));
