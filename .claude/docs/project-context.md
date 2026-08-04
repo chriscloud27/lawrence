@@ -1,30 +1,95 @@
 # Project Context
 
+## What is Lawrence?
+
+Lawrence is a data ingestion platform that scrapes, validates, AI-enriches, and stores structured school data for external clients. It pulls school profiles from the Doris international school directory, extracts structured data via an OpenAI agent, and persists it to Supabase — where a Next.js chatbot (`src/Chatbot/`) surfaces the data to end-users as a conversational school-search experience.
+
+**Domain:** chat.mach2.cloud  
+**Stage:** Prototype
+
 ## Customer
 
-> Customer name / pseudonym and brief description.
+External clients and their end-users: families searching for international schools. The chatbot (`src/Chatbot/`) is the primary consumer of the ingested data. It allows users to query schools by budget, curriculum, location, age range, and admissions windows.
 
-## Background & Pain
+## Background & Goals
 
-> What problem prompted this migration? What was the before-state?
+**Problem:** There is no structured, queryable dataset of international school profiles — fees, curricula, admissions windows — accessible to families via a conversational interface.
 
-## Migration Goals
+**What Lawrence does:** Automates the scraping and structuring of school data at scale so the chatbot can answer real questions (e.g. "IB schools in London under £30k/year with boarding").
 
-- [ ] Goal 1
-- [ ] Goal 2
+**Prototype goal:** End-to-end pipeline running — scrape → extract → store → query via chatbot — with real school data for a demo-able slice of schools.
+
+**Success looks like:**
+- Scrape queue processes a batch of schools without manual intervention
+- Chatbot answers school-search queries from live Supabase data
+- Extraction confidence consistently above 0.6 (auto-flagging low-confidence records)
+
+## Current Scope
+
+**Active pipeline:** Doris School Directory → Supabase (`schools`, `school_fees`, `school_entry_points`)
+
+- Source: `https://www.doris.school/schools/{country}/{slug}`
+- Extraction: `gpt-4o-mini` at temperature 0 via `src/agents/prompts/school-extraction.txt`
+- Target: ~1,000+ schools, ~5–15 fee rows and ~1–5 entry point rows each
+- Change detection: ETag / MD5 hash — only re-scrapes changed pages
+- Weekly delta cost: ~$0.10–0.30 (gpt-4o-mini)
+
+## Architecture Overview
+
+```
+Doris School Directory
+        │
+        ▼
+n8n: scrape-doris-school workflow
+  - Pulls URLs from scrape_queue WHERE status = 'pending'
+  - ETag / MD5 change detection (skip unchanged pages)
+  - Truncates HTML to ~12,000 chars
+        │
+        ▼
+AI Extraction Agent (gpt-4o-mini, temp 0)
+  - Output: { school, fees[], entry_points[] }
+  - js_rendered error → headless browser fallback queue
+        │
+        ▼
+Validation (Zod)
+  - Confidence < 0.6 → scrape_status = 'needs_review'
+  - curricula / strengths / languages validated against enums
+        │
+        ▼
+Supabase (PostgreSQL)
+  - UPSERT schools ON CONFLICT (slug)
+  - DELETE + INSERT school_fees, school_entry_points
+  - UPDATE scrape_queue SET status = 'done'
+        │
+        ▼
+Next.js Chatbot (src/Chatbot/)
+  - Anthropic SDK + Drizzle ORM
+  - Reads from Supabase; answers school-search queries
+```
+
+Full pipeline details: `.claude/docs/data/pipeline-flow.md`  
+Table schemas: `.claude/docs/data/db-tables.md`  
+How to add a pipeline: `.claude/docs/pipeline-playbook.md`
+
+## Constraints & Trade-offs
+
+| Constraint | Decision |
+|---|---|
+| **Timeline** | Prototype speed is the priority. Defer hardening, observability, and polish. |
+| **Cost** | Default to `gpt-4o-mini` for extraction. Use `gpt-4o` only if extraction quality is demonstrably insufficient. |
+| **Data quality** | Low-confidence extractions (`< 0.6`) are flagged `needs_review` rather than rejected — keeps pipeline moving while allowing manual correction. |
+| **Immutability** | Records are not updated in-place; new scrape runs upsert on `slug` and delete/re-insert child rows (`school_fees`, `school_entry_points`). |
 
 ## Stakeholders
 
-| Role | Responsibility |
+| Role | Person |
 |---|---|
-| Project Lead | |
-| Architect | |
-| Customer Contact | |
+| Owner / builder | Chris (chrisallin24@gmail.com) |
+| External clients | TBD — fill in when onboarded |
 
-## Timeline
+## Open Questions
 
-> Key milestones and deadlines.
-
-## Constraints
-
-> Budget, compliance, technical, or organizational constraints.
+- Who are the first external clients? What slice of the Doris catalog do they need first?
+- What does the chatbot's user authentication model look like? (needed before public launch)
+- Headless browser fallback: build in-house or use a service (e.g. Browserless, Apify)?
+- Is there a target SLA for how fresh the school data needs to be (daily / weekly / on-demand)?
