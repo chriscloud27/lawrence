@@ -176,6 +176,13 @@
   .chat-send:hover { background: var(--dark-blue); }
   .chat-powered { text-align: center; font-size: 10px; color: #bbb; padding: 6px; background: #fff; }
 
+  /* BANT PRE-QUAL FLOW */
+  .prequal-options { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+  .prequal-option-btn { display: block; width: 100%; text-align: left; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; background: #fff; cursor: pointer; transition: .15s; font-size: 13px; color: var(--text); }
+  .prequal-option-btn:hover { border-color: var(--blue); background: var(--light-blue); }
+  .prequal-start-btn { display: inline-block; padding: 8px 16px; background: var(--blue); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 13px; margin-top: 8px; transition: .15s; }
+  .prequal-start-btn:hover { background: var(--dark-blue); }
+
   /* UTIL */
   .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
   .text-center { text-align: center; }
@@ -655,16 +662,12 @@
 
   <div class="chat-messages" id="chat-messages">
     <div class="msg msg-bot">
-      <div class="msg-bubble">Hi! 👋 I'm the ITS Education Assistant. I can help you find the right course, tutor, or school placement service. What are you looking for today?</div>
-      <div class="msg-time">Just now</div>
-    </div>
-    <div class="msg msg-bot">
-      <div class="msg-bubble">You can ask me about <strong>IGCSE</strong>, <strong>A-levels</strong>, <strong>IB</strong>, <strong>university admissions</strong>, or <strong>school placements</strong> in Hong Kong &amp; beyond.</div>
+      <div class="msg-bubble">Hi! 👋 I'm the ITS Education Assistant. To help you better, I'd like to learn a bit about what you're looking for. Shall we begin?</div>
       <div class="msg-time">Just now</div>
     </div>
   </div>
 
-  <div class="chat-input-wrap">
+  <div class="chat-input-wrap" id="chat-input-wrap" style="display:none;">
     <input class="chat-input" id="chat-input" type="text" placeholder="Type a message…" onkeydown="if(event.key==='Enter') sendMsg()">
     <button class="chat-send" onclick="sendMsg()">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
@@ -710,9 +713,163 @@
   }
 
   const sessionId = crypto.randomUUID();
+  let prequalStep = 0; // 0=intro, 1=Q1, 2=Q2, 3=Q3, 4=done
+  let prequalAnswers = { timeline: '', budget: '', authority: '' };
 
   function escapeHtml(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function addBotMessage(text, includeButtons = null) {
+    const msgs = document.getElementById('chat-messages');
+    const botDiv = document.createElement('div');
+    botDiv.className = 'msg msg-bot';
+    botDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(text)}${includeButtons || ''}</div><div class="msg-time">Just now</div>`;
+    msgs.appendChild(botDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function showStartButton() {
+    const msgs = document.getElementById('chat-messages');
+    const btnDiv = document.createElement('div');
+    btnDiv.className = 'msg msg-bot';
+    btnDiv.innerHTML = `<button class="prequal-start-btn" onclick="startPreQual()">Start</button>`;
+    msgs.appendChild(btnDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function startPreQual() {
+    prequalStep = 1;
+    showQuestion1();
+  }
+
+  function showQuestion1() {
+    addBotMessage("Q1. What's your timeline?", `
+      <div class="prequal-options">
+        <button class="prequal-option-btn" onclick="answerQ1('urgent next month')">Urgent / next month</button>
+        <button class="prequal-option-btn" onclick="answerQ1('few months')">Few months away</button>
+        <button class="prequal-option-btn" onclick="answerQ1('exploring')">Just exploring options</button>
+        <button class="prequal-option-btn" onclick="answerQ1('no specific timeline')">No specific timeline</button>
+      </div>
+    `);
+  }
+
+  function answerQ1(value) {
+    prequalAnswers.timeline = value;
+    const msgs = document.getElementById('chat-messages');
+    const userDiv = document.createElement('div');
+    userDiv.className = 'msg msg-user';
+    userDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(value)}</div><div class="msg-time">Just now</div>`;
+    msgs.appendChild(userDiv);
+    prequalStep = 2;
+    setTimeout(() => showQuestion2(), 300);
+  }
+
+  function showQuestion2() {
+    addBotMessage("Q2. What about budget?", `
+      <div class="prequal-options">
+        <button class="prequal-option-btn" onclick="answerQ2('premium private international')">Premium / private / international school</button>
+        <button class="prequal-option-btn" onclick="answerQ2('considering private')">Considering both private and public</button>
+        <button class="prequal-option-btn" onclick="answerQ2('public school')">Public school or budget-conscious</button>
+      </div>
+    `);
+  }
+
+  function answerQ2(value) {
+    prequalAnswers.budget = value;
+    const msgs = document.getElementById('chat-messages');
+    const userDiv = document.createElement('div');
+    userDiv.className = 'msg msg-user';
+    userDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(value)}</div><div class="msg-time">Just now</div>`;
+    msgs.appendChild(userDiv);
+    prequalStep = 3;
+    setTimeout(() => showQuestion3(), 300);
+  }
+
+  function showQuestion3() {
+    addBotMessage("Q3. Who's making the decision?", `
+      <div class="prequal-options">
+        <button class="prequal-option-btn" onclick="answerQ3('i decide')">I'm the lead decision-maker</button>
+        <button class="prequal-option-btn" onclick="answerQ3('joint decision with spouse')">Joint decision with spouse/partner</button>
+        <button class="prequal-option-btn" onclick="answerQ3('consulting with family')">Consulting with family members</button>
+      </div>
+    `);
+  }
+
+  function answerQ3(value) {
+    prequalAnswers.authority = value;
+    const msgs = document.getElementById('chat-messages');
+    const userDiv = document.createElement('div');
+    userDiv.className = 'msg msg-user';
+    userDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(value)}</div><div class="msg-time">Just now</div>`;
+    msgs.appendChild(userDiv);
+    prequalStep = 4;
+    document.getElementById('chat-input-wrap').style.display = 'flex';
+    submitPreQual();
+  }
+
+  async function submitPreQual() {
+    const combinedMsg = `Timeline: ${prequalAnswers.timeline}. Budget: ${prequalAnswers.budget}. Authority: ${prequalAnswers.authority}.`;
+    await postToWebhook(combinedMsg);
+  }
+
+  async function postToWebhook(text) {
+    const msgs = document.getElementById('chat-messages');
+    const sendBtn = document.querySelector('.chat-send');
+    const input = document.getElementById('chat-input');
+
+    // Disable input while waiting
+    if (input) input.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
+
+    // Typing indicator
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'msg msg-bot';
+    typingDiv.id = 'typing-indicator';
+    typingDiv.innerHTML = `<div class="msg-bubble" style="color:#aaa;font-style:italic">Thinking…</div>`;
+    msgs.appendChild(typingDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+      const res = await fetch(
+        'https://flow.mach2.cloud/webhook/chatbot',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chatInput: text, sessionId }),
+          signal: controller.signal
+        }
+      );
+      clearTimeout(timeoutId);
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const reply = data.output || data.text || data.message || "Thanks! How can I help you today?";
+
+      document.getElementById('typing-indicator')?.remove();
+      const botDiv = document.createElement('div');
+      botDiv.className = 'msg msg-bot';
+      botDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(reply)}</div><div class="msg-time">Just now</div>`;
+      msgs.appendChild(botDiv);
+      msgs.scrollTop = msgs.scrollHeight;
+    } catch (err) {
+      document.getElementById('typing-indicator')?.remove();
+      const errMsg = err.name === 'AbortError'
+        ? '⏱️ Request timed out. Please try again.'
+        : `⚠️ ${err.message || 'Couldn\'t reach the assistant.'}`;
+      const errDiv = document.createElement('div');
+      errDiv.className = 'msg msg-bot';
+      errDiv.innerHTML = `<div class="msg-bubble" style="color:#c00">${errMsg}</div>`;
+      msgs.appendChild(errDiv);
+      msgs.scrollTop = msgs.scrollHeight;
+    } finally {
+      if (input) input.disabled = false;
+      if (sendBtn) sendBtn.disabled = false;
+      if (input) input.focus();
+    }
   }
 
   async function sendMsg() {
@@ -730,49 +887,13 @@
     input.value = '';
     msgs.scrollTop = msgs.scrollHeight;
 
-    // Disable input while waiting
-    input.disabled = true;
-    sendBtn.disabled = true;
-
-    // Typing indicator
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'msg msg-bot';
-    typingDiv.id = 'typing-indicator';
-    typingDiv.innerHTML = `<div class="msg-bubble" style="color:#aaa;font-style:italic">Thinking…</div>`;
-    msgs.appendChild(typingDiv);
-    msgs.scrollTop = msgs.scrollHeight;
-
-    try {
-      const res = await fetch(
-        'https://flow.mach2.cloud/webhook/e5616171-e3b5-4c39-81d4-67409f9fa60a/chat',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chatInput: text, sessionId })
-        }
-      );
-      const data = await res.json();
-      const reply = data.output || data.text || data.message || "Sorry, I didn't get a response.";
-
-      document.getElementById('typing-indicator')?.remove();
-      const botDiv = document.createElement('div');
-      botDiv.className = 'msg msg-bot';
-      botDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(reply)}</div><div class="msg-time">Just now</div>`;
-      msgs.appendChild(botDiv);
-      msgs.scrollTop = msgs.scrollHeight;
-    } catch (err) {
-      document.getElementById('typing-indicator')?.remove();
-      const errDiv = document.createElement('div');
-      errDiv.className = 'msg msg-bot';
-      errDiv.innerHTML = `<div class="msg-bubble" style="color:#c00">⚠️ Couldn't reach the assistant. Please try again.</div>`;
-      msgs.appendChild(errDiv);
-      msgs.scrollTop = msgs.scrollHeight;
-    } finally {
-      input.disabled = false;
-      sendBtn.disabled = false;
-      input.focus();
-    }
+    postToWebhook(text);
   }
+
+  // Show Start button on init
+  window.addEventListener('load', function() {
+    showStartButton();
+  });
 </script>
 </body>
 </html>

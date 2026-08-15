@@ -1,0 +1,197 @@
+{
+  "version": "1.0",
+  "assessmentName": "Platform Compass",
+  "assessmentDescription": "AI-Native Cloud Architecture Readiness Assessment",
+  "webhookUrl": "https://flow.mach2.cloud/webhook/compass",
+  "questions": [
+    {
+      "id": "q1",
+      "label": "Engineering Velocity",
+      "prompt": "What percentage of your engineering capacity goes to platform/infrastructure vs. shipping features?",
+      "type": "scale",
+      "min": 1,
+      "max": 5,
+      "options": [
+        { "value": 1, "label": "1 — mostly firefighting" },
+        { "value": 2, "label": "2 — more infra than product" },
+        { "value": 3, "label": "3 — roughly equal" },
+        { "value": 4, "label": "4 — mostly feature work" },
+        { "value": 5, "label": "5 — mostly feature work" }
+      ]
+    },
+    {
+      "id": "q2",
+      "label": "Architecture Framework",
+      "prompt": "Do you have a clear, documented framework for architectural decisions?",
+      "type": "ypn",
+      "options": [
+        { "value": "Y", "label": "Y — yes, clear framework" },
+        { "value": "P", "label": "P — partially / informal" },
+        { "value": "N", "label": "N — no framework" }
+      ]
+    },
+    {
+      "id": "q3",
+      "label": "AI Production Readiness",
+      "prompt": "How consistent is your staging environment compared to production?",
+      "type": "scale",
+      "min": 1,
+      "max": 5,
+      "options": [
+        { "value": 1, "label": "1 — staging ≠ production" },
+        { "value": 2, "label": "2 — frequent gaps" },
+        { "value": 3, "label": "3 — mostly consistent" },
+        { "value": 4, "label": "4 — minor gaps" },
+        { "value": 5, "label": "5 — fully consistent" }
+      ]
+    },
+    {
+      "id": "q4",
+      "label": "Cloud Cost Visibility",
+      "prompt": "Do you have full visibility into your cloud cost drivers?",
+      "type": "ypn",
+      "options": [
+        { "value": "Y", "label": "Y — yes, full visibility" },
+        { "value": "P", "label": "P — partially visible" },
+        { "value": "N", "label": "N — cannot answer" }
+      ]
+    },
+    {
+      "id": "q5",
+      "label": "Architectural Debt",
+      "prompt": "How well does your platform match current business needs (vs. designed for an earlier stage)?",
+      "type": "scale",
+      "min": 1,
+      "max": 5,
+      "options": [
+        { "value": 1, "label": "1 — built to ship fast" },
+        { "value": 2, "label": "2 — mostly legacy" },
+        { "value": 3, "label": "3 — partially revisited" },
+        { "value": 4, "label": "4 — mostly current" },
+        { "value": 5, "label": "5 — designed for now" }
+      ]
+    },
+    {
+      "id": "q6",
+      "label": "System Reliability",
+      "prompt": "Are production incidents usually known risks or surprising failures?",
+      "type": "ksu",
+      "options": [
+        { "value": "K", "label": "K — always known risk" },
+        { "value": "S", "label": "S — sometimes a surprise" },
+        { "value": "U", "label": "U — usually a surprise" }
+      ]
+    },
+    {
+      "id": "q7",
+      "label": "System Thinking",
+      "prompt": "When making infrastructure decisions, how much system-wide context do your teams have?",
+      "type": "scale",
+      "min": 1,
+      "max": 5,
+      "options": [
+        { "value": 1, "label": "1 — each team for itself" },
+        { "value": 2, "label": "2 — mostly local" },
+        { "value": 3, "label": "3 — some system awareness" },
+        { "value": 4, "label": "4 — mostly whole-system" },
+        { "value": 5, "label": "5 — whole-system thinking" }
+      ]
+    },
+    {
+      "id": "q8",
+      "label": "Architectural Ownership",
+      "prompt": "Is there a clear owner or DRI for architectural decisions?",
+      "type": "ypn",
+      "options": [
+        { "value": "Y", "label": "Y — clear owner" },
+        { "value": "P", "label": "P — partial / shared" },
+        { "value": "N", "label": "N — no owner" }
+      ]
+    },
+    {
+      "id": "q9",
+      "label": "AI Implementation Level",
+      "prompt": "What is your current AI implementation level?",
+      "type": "scale",
+      "min": 1,
+      "max": 5,
+      "options": [
+        { "value": 1, "label": "1 — Chatbots" },
+        { "value": 2, "label": "2 — Reasoners" },
+        { "value": 3, "label": "3 — Agents" },
+        { "value": 4, "label": "4 — Innovators" },
+        { "value": 5, "label": "5 — Organizations" }
+      ]
+    },
+    {
+      "id": "q10",
+      "label": "AI Infrastructure Footprint",
+      "prompt": "How many distinct AI models/providers are in production?",
+      "type": "scale",
+      "min": 0,
+      "max": 4,
+      "options": [
+        { "value": 0, "label": "0 — none in production" },
+        { "value": 1, "label": "1 — one provider" },
+        { "value": 2, "label": "2 — multi-model same provider" },
+        { "value": 3, "label": "3 — multi-provider" },
+        { "value": 4, "label": "4 — custom / fine-tuned" }
+      ]
+    },
+    {
+      "id": "q11",
+      "label": "Provider Independence",
+      "prompt": "How locked in are you to your cloud/AI providers?",
+      "type": "scale",
+      "min": 1,
+      "max": 5,
+      "options": [
+        { "value": 1, "label": "1 — fully locked in" },
+        { "value": 2, "label": "2 — significant lock-in" },
+        { "value": 3, "label": "3 — partial flexibility" },
+        { "value": 4, "label": "4 — mostly portable" },
+        { "value": 5, "label": "5 — cloud-agnostic" }
+      ]
+    },
+    {
+      "id": "q12",
+      "label": "Open Standards",
+      "prompt": "Do you use open standards (Kubernetes, CNCF, etc.) throughout your stack?",
+      "type": "ypn",
+      "options": [
+        { "value": "Y", "label": "Y — open standards throughout" },
+        { "value": "P", "label": "P — mixed" },
+        { "value": "N", "label": "N — vendor-specific throughout" }
+      ]
+    },
+    {
+      "id": "q13",
+      "label": "Team AI Adoption",
+      "prompt": "What percentage of your engineering team uses AI tools in daily workflow?",
+      "type": "scale",
+      "min": 1,
+      "max": 4,
+      "options": [
+        { "value": 1, "label": "1 — less than 25%" },
+        { "value": 2, "label": "2 — 25 to 50%" },
+        { "value": 3, "label": "3 — 50 to 75%" },
+        { "value": 4, "label": "4 — more than 75%" }
+      ]
+    },
+    {
+      "id": "q14",
+      "label": "AI Ownership",
+      "prompt": "Who owns AI tooling and architecture decisions?",
+      "type": "scale",
+      "min": 1,
+      "max": 5,
+      "options": [
+        { "value": 1, "label": "1 — no one owns it" },
+        { "value": 2, "label": "2 — distributed / everyone" },
+        { "value": 3, "label": "3 — CTO directly" },
+        { "value": 4, "label": "4 — senior eng alongside product" },
+        { "value": 5, "label": "5 — dedicated AI/ML lead" }
+      ]
+    }
+  ]
+}

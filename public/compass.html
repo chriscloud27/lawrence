@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platform Compass Assessment</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #066ebd;
+      --dark: #04508a;
+      --gold: #f5a623;
+      --bg: #f8f9fa;
+      --border: #ddd;
+      --text: #333;
+      --muted: #666;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #04508a, #066ebd);
+      color: white;
+      border-radius: 0 0 12px 12px;
+      margin-bottom: 40px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    form {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .form-section {
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-section:last-of-type {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .form-section label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-section .question-prompt {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+
+    .form-section .question-id {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    /* Radio / checkbox styles */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .option {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .option:hover {
+      background: var(--bg);
+      border-color: var(--primary);
+    }
+
+    .option input[type="radio"],
+    .option input[type="checkbox"] {
+      margin-right: 12px;
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+    }
+
+    .option label {
+      margin: 0;
+      font-weight: 500;
+      font-size: 13px;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .option input:checked + label {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* Contact fields */
+    .contact-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--bg);
+      border-radius: 6px;
+    }
+
+    .contact-fields input {
+      grid-column: span 2;
+    }
+
+    .contact-fields input:nth-last-child(2) {
+      grid-column: span 1;
+    }
+
+    .contact-fields input:nth-last-child(1) {
+      grid-column: span 1;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(6, 110, 189, 0.1);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--dark);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .error {
+      background: #fee;
+      color: #c00;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+      border-left: 4px solid #c00;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .progress {
+      margin-bottom: 30px;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 8px;
+    }
+
+    @media (max-width: 600px) {
+      .container { padding: 12px; }
+      form { padding: 20px; }
+      header { padding: 30px 20px; }
+      header h1 { font-size: 22px; }
+      .contact-fields { grid-template-columns: 1fr; }
+      .contact-fields input { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Platform Compass</h1>
+    <p>AI-Native Cloud Architecture Readiness Assessment</p>
+  </header>
+
+  <div class="container">
+    <div class="error" id="error-box"></div>
+
+    <form id="compass-form">
+      <div class="progress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+        </div>
+        <div class="progress-text"><span id="progress-text">0</span> / <span id="total-questions">14</span> questions</div>
+      </div>
+
+      <div id="questions-container"></div>
+
+      <fieldset style="border: none; padding: 0; margin: 30px 0 0 0;">
+        <legend style="font-size: 14px; font-weight: 700; margin-bottom: 16px; display: block;">Your Details</legend>
+        <div class="contact-fields">
+          <input type="text" name="name_first" placeholder="First name" required>
+          <input type="text" name="name_family" placeholder="Last name" required>
+          <input type="email" name="email" placeholder="Email address" required>
+          <input type="text" name="website" placeholder="Company website (optional)">
+          <input type="text" name="github" placeholder="GitHub URL (optional)">
+        </div>
+      </fieldset>
+
+      <div class="button-group">
+        <button type="button" class="btn-secondary" onclick="resetForm()">Clear All</button>
+        <button type="submit" class="btn-primary" id="submit-btn">Get Your Assessment</button>
+      </div>
+
+      <div class="loading" id="loading">Analyzing your responses...</div>
+    </form>
+  </div>
+
+  <script>
+    let configData = null;
+    let currentQuestion = 0;
+
+    // Load config and render form
+    async function initForm() {
+      try {
+        const res = await fetch('./compass-questions-config.json');
+        configData = await res.json();
+        document.getElementById('total-questions').textContent = configData.questions.length;
+        renderQuestions();
+        setupFormTracking();
+      } catch (err) {
+        showError('Failed to load assessment configuration: ' + err.message);
+      }
+    }
+
+    function renderQuestions() {
+      const container = document.getElementById('questions-container');
+      container.innerHTML = '';
+
+      configData.questions.forEach((q, idx) => {
+        const section = document.createElement('div');
+        section.className = 'form-section';
+
+        let optionsHtml = '';
+
+        if (q.type === 'scale') {
+          optionsHtml = q.options.map(opt => `
+            <div class="option">
+              <input type="radio" id="${q.id}" name="${q.id}" value="${opt.value}" required>
+              <label for="${q.id}" style="margin:0">${opt.label}</label>
+            </div>
+          `).join('');
+        } else if (q.type === 'ypn' || q.type === 'ksu') {
+          optionsHtml = q.options.map(opt => `
+            <div class="option">
+              <input type="radio" id="${q.id}-${opt.value}" name="${q.id}" value="${opt.value}" required>
+              <label for="${q.id}-${opt.value}">${opt.label}</label>
+            </div>
+          `).join('');
+        }
+
+        section.innerHTML = `
+          <div class="question-id">Q${idx + 1}</div>
+          <label>${q.label}</label>
+          <div class="question-prompt">${q.prompt}</div>
+          <div class="options">${optionsHtml}</div>
+        `;
+
+        container.appendChild(section);
+      });
+    }
+
+    function setupFormTracking() {
+      const form = document.getElementById('compass-form');
+      const inputs = form.querySelectorAll('input[type="radio"]');
+
+      inputs.forEach(input => {
+        input.addEventListener('change', updateProgress);
+      });
+    }
+
+    function updateProgress() {
+      const form = document.getElementById('compass-form');
+      const answered = document.querySelectorAll('input[type="radio"]:checked').length;
+      const total = configData.questions.length;
+      const percent = Math.round((answered / total) * 100);
+
+      document.getElementById('progress-fill').style.width = percent + '%';
+      document.getElementById('progress-text').textContent = answered;
+    }
+
+    function resetForm() {
+      document.getElementById('compass-form').reset();
+      updateProgress();
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('error-box');
+      box.textContent = msg;
+      box.classList.add('show');
+      setTimeout(() => box.classList.remove('show'), 5000);
+    }
+
+    function showLoading(show) {
+      document.getElementById('loading').classList.toggle('show', show);
+      document.getElementById('submit-btn').disabled = show;
+    }
+
+    // Form submission
+    document.getElementById('compass-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const form = document.getElementById('compass-form');
+      const formData = new FormData(form);
+
+      // Build answers object matching n8n expectations
+      const answers = {
+        name_first: formData.get('name_first'),
+        name_family: formData.get('name_family'),
+        email: formData.get('email'),
+        website: formData.get('website') || '',
+        github: formData.get('github') || '',
+        stage: 'a' // Default; could be made user-selectable
+      };
+
+      // Add question answers
+      configData.questions.forEach(q => {
+        answers[q.id] = formData.get(q.id);
+      });
+
+      showLoading(true);
+
+      try {
+        const res = await fetch(configData.webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answers })
+        });
+
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // Success: show result or redirect
+        // For now, log and show a simple message
+        console.log('Assessment submitted:', data);
+
+        // Redirect to results or show confirmation
+        alert('Thank you! Your assessment has been submitted. Check your email for detailed results.');
+        window.location.href = '/';
+
+      } catch (err) {
+        showError('Failed to submit assessment: ' + err.message);
+        showLoading(false);
+      }
+    });
+
+    // Initialize on load
+    window.addEventListener('load', initForm);
+  </script>
+</body>
+</html>
