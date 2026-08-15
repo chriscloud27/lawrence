@@ -42,16 +42,20 @@ All secrets, API keys, and configuration live in a **single `init-secrets` SET n
 ```
 Key                     Value                               Example
 ─────────────────────── ────────────────────────────────── ──────────────────
-OPENAI_API_KEY          [real OpenAI API key]              sk-proj-xxx
 OPENAI_MODEL            gpt-4o                             gpt-4o
 GMAIL_ADDRESS           admissions@lawrence-project.com     admissions@...
-GMAIL_APP_PASSWORD      [Gmail app-specific password]      abcd-efgh-ijkl-mnop
 SUPABASE_URL            https://xxx.supabase.co             https://xxx.supabase.co
-SUPABASE_KEY            [service role key]                 eyJhbGciOi...
 BOOKING_LINK            https://calendly.com/...           https://calendly.com/...
 BANT_HOT_THRESHOLD      75                                 75
 BANT_MEDIUM_THRESHOLD   50                                 50
 ```
+
+### Stored Credentials in n8n (Community Edition)
+- Gmail test account ("chrisallin24@gmail.com") connected
+- Supabase cloud account ("supabase-lawrence") connected
+- Google sheet account ("mach2-google-sheets") connected
+- OpenAI developer platform ("OpenAi account") connected
+
 
 ### Referencing in Downstream Nodes
 

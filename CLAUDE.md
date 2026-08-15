@@ -11,6 +11,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Pipeline flow:** External source → n8n → validation → AI agent (optional) → Supabase → Chatbot (read)
 
+## Architectural Principles
+
+1. **Qualification by listening, not interrogation** — BANT signals harvested passively through empathetic conversation; one question per turn maximum; scoring hidden from parent.
+2. **Two-stage scoring** — Stage 1: JS pre-qual (0–75 pts) → Stage 2: AI agent (35–50 band only) → refined score (0–100 pts) → routing tier.
+3. **Architecture before implementation** — Discuss decisions first, validate against spec, then build. Open questions are blockers only.
+4. **v1/v2 boundary is a scope guard** — Anything not in v1 spec (dashboard, retry logic, adaptive flow, multi-channel) is explicitly deferred to v2.
+5. **Doris uses JSON-LD** — Structured data embedded in page `<head>`; no LLM extraction needed for v1.
+
+See `.claude/projects/.../memory/architectural-principles.md` for full rationale.
+
 ## Skills
 
 - `/adr-new` — create a numbered ADR
