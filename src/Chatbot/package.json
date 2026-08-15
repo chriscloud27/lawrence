@@ -18,13 +18,9 @@
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.21.0",
     "nanoid": "^5.1.16",
-<<<<<<< HEAD
-    "next": "16.2.9",
+    "next": "16.2.11",
     "next-themes": "^0.4.6",
     "postgres": "^3.4.5",
-=======
-    "next": "16.2.11",
->>>>>>> 5936a5ee0c551b3ef51d337dd4c0a9d4f931b956
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "shadcn": "^4.12.0",
