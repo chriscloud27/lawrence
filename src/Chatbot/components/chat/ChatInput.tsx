@@ -38,7 +38,7 @@ export default function ChatInput({ onSend, disabled, placeholder = 'Type a mess
   };
 
   return (
-    <div className="flex items-end gap-2 px-4 py-3 border-t border-gray-100 bg-white">
+    <div className="flex items-end gap-2 px-4 py-3 border-t border-border bg-card">
       <textarea
         ref={textareaRef}
         value={value}
@@ -48,7 +48,7 @@ export default function ChatInput({ onSend, disabled, placeholder = 'Type a mess
         disabled={disabled}
         placeholder={placeholder}
         rows={1}
-        className="flex-1 resize-none rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#712B13]/30 focus:border-[#712B13] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex-1 resize-none rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#712B13]/30 focus:border-[#712B13] disabled:opacity-50 disabled:cursor-not-allowed"
         style={{ height: '40px', maxHeight: '120px' }}
       />
       <button

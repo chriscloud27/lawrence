@@ -159,7 +159,7 @@ export default function ChatWidget() {
 
       {/* Chat panel */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[380px] h-[600px] bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col overflow-hidden">
+        <div className="fixed bottom-24 right-6 z-50 w-[380px] h-[600px] bg-card rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden">
           {/* Header */}
           <div className="px-4 py-3 bg-[#712B13] text-white flex items-center gap-3 flex-shrink-0">
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -182,11 +182,11 @@ export default function ChatWidget() {
             ))}
             {isLoading && messages[messages.length - 1]?.role !== 'assistant' && (
               <div className="flex justify-start mb-3">
-                <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3">
+                <div className="bg-muted rounded-2xl rounded-tl-sm px-4 py-3">
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>

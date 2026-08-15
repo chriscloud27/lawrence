@@ -1,0 +1,213 @@
+{
+  "name": "chat-agent",
+  "nodes": [
+    {
+      "id": "33333333-3333-3333-3333-000000000001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 400],
+      "webhookId": "chat-agent",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat-agent",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-000000000002",
+      "name": "Prep Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 400],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Split the incoming conversation into: the latest user turn (agent input)\n// and the prior turns (chat history the AI Agent node replays for context).\nconst body = $json.body || $json;\nconst messages = Array.isArray(body.messages) ? body.messages : [];\nconst leadId = body.leadId || null;\nconst calendlyUrl = body.calendlyUrl || $env.CALENDLY_URL || '';\n\nconst lastUser = [...messages].reverse().find(m => m.role === 'user');\nconst history = messages.filter(m => m !== lastUser);\nconst turnCount = messages.filter(m => m.role === 'user').length;\n\n// Flatten prior turns into a text block the agent can read as context.\nconst historyText = history\n  .map(m => `${m.role === 'user' ? 'Parent' : 'Sarah'}: ${m.content}`)\n  .join('\\n');\n\nreturn [{ json: {\n  chatInput: lastUser ? lastUser.content : '',\n  historyText,\n  messages,\n  leadId,\n  calendlyUrl,\n  turnCount\n} }];"
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-000000000003",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [720, 400],
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.historyText ? ($json.historyText + '\\n\\nParent: ' + $json.chatInput) : $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are Sarah, a warm and knowledgeable admissions agent helping parents find the right K-12 international school for their family. You work on behalf of Sarah at ITS Education Asia, specialising in international school placement across Asia. Your role is to understand each family's situation and guide them toward the school that genuinely fits — not to sell, but to help.\n\n## Your goal\n\nYou have a two-phase conversation with each parent:\n- Phase 1: understand their situation through up to five light questions\n- Phase 2: either book them onto Sarah's calendar (if they're a serious buyer) or recommend schools from the directory\n\nYou never feel like a form. You feel like a knowledgeable friend over coffee — warm, helpful, never sales-y.\n\n## Phase 1 — Qualification (up to 5 questions)\n\nAsk these in order, adapting based on what the parent volunteers:\n\n1. WHERE the child will go to school (open text only — they may volunteer location + relocation + timeline all at once)\n2. WHEN they'd ideally start (Within 6 months / 6–18 months / 18 months or more / Not sure yet)\n3. THE CHILD: age + current school situation (open text)\n4. SCHOOL TYPE: British / IB / American / Boarding / Open\n5. BUDGET: range or scholarship-friendly framing (open text; skip if clearly Cold)\n\nReact warmly to every answer. Never say \"got it, next question.\"\n\n## Classification (re-evaluate every turn)\n\n- HOT: At least 2 intent signals (one must be Timeline OR Forcing Function) AND at least 1 capability signal.\n- WARM: Some intent OR capability confirmed, but not both.\n- COLD: Vague throughout, no urgency.\n\n## When HOT — offer the calendar, never push\n\nAfter turn 3 minimum, when classification reaches Hot, call the offer_calendar tool and say a direct chat with Sarah would be more useful than more questions. If they decline or ignore it, do NOT push — pivot to school discovery. Never mention the calendar again unless re-qualification fires.\n\n## When WARM or COLD — recommend schools\n\nCall search_schools with the captured criteria and recommend 3–4 schools with name, location, curriculum, fees, and what makes each distinct. Lighter framing when Cold.\n\n## Re-qualification during Phase 2\n\nListen for new urgency (a specific date, a new forcing function, strong commitment, or a direct request to talk). If detected and only 1 calendar offer has been made, re-offer once, gently.\n\n## Hard rules\n\n- Never invent schools, fees, or facts. Use search_schools — if data is missing, say so honestly.\n- Never offer the calendar before turn 3.\n- Never offer the calendar more than twice in one conversation.\n- Default to Warm if ambiguous.\n- Don't penalise scholarship-only framing.\n- If the parent is emotional or anxious, prioritise warmth over qualification.\n- Keep messages short and conversational. No bullet lists unless comparing schools.",
+          "returnIntermediateSteps": true
+        }
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-000000000004",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [640, 660],
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-000000000005",
+      "name": "search_schools",
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [860, 660],
+      "parameters": {
+        "toolDescription": "Query the school directory. Use when recommending schools. All filters optional: country, city, curriculum (IB|British|American|Australian|Any), age_min, age_max, fees_max_usd, boarding (true|false), limit (default 4).",
+        "method": "GET",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/schools_chatbot",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_KEY }}" }
+          ]
+        },
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "queryParameters": {
+          "parameters": [
+            { "name": "select", "value": "*" },
+            { "name": "country", "valueProvider": "modelOptional", "value": "" },
+            { "name": "city", "valueProvider": "modelOptional", "value": "" },
+            { "name": "age_from", "valueProvider": "modelOptional", "value": "" },
+            { "name": "age_to", "valueProvider": "modelOptional", "value": "" },
+            { "name": "fees_min_usd", "valueProvider": "modelOptional", "value": "" },
+            { "name": "boarding", "valueProvider": "modelOptional", "value": "" },
+            { "name": "limit", "valueProvider": "modelOptional", "value": "4" }
+          ]
+        },
+        "placeholderDefinitions": {
+          "values": [
+            { "name": "country", "description": "PostgREST filter, e.g. ilike.*Thailand*", "type": "string" },
+            { "name": "city", "description": "PostgREST filter, e.g. ilike.*Bangkok*", "type": "string" },
+            { "name": "age_from", "description": "PostgREST filter on min intake age, e.g. lte.10", "type": "string" },
+            { "name": "age_to", "description": "PostgREST filter on max age, e.g. gte.10", "type": "string" },
+            { "name": "fees_min_usd", "description": "PostgREST filter on fees, e.g. lte.30000", "type": "string" },
+            { "name": "boarding", "description": "PostgREST filter, e.g. eq.true", "type": "string" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-000000000006",
+      "name": "offer_calendar",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [1080, 660],
+      "parameters": {
+        "name": "offer_calendar",
+        "description": "Surface Sarah's booking calendar link inline in the chat. Use only when the lead is Hot and at least turn 3 has passed. Input: a brief reason this lead qualifies for a call.",
+        "language": "javaScript",
+        "jsCode": "// Returns the Calendly link. The workflow surfaces it to the UI by parsing\n// the agent's intermediate steps for this tool's observation.\nreturn $env.CALENDLY_URL || '';"
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-000000000007",
+      "name": "Extract Structured",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 400],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Pull the agent reply, plus structured schools/calendar from intermediateSteps.\n// The search_schools observation is Supabase PostgREST JSON (snake_case) — map it\n// to the camelCase shape the chatbot UI (SchoolCard) expects.\nconst prep = $('Prep Input').item.json;\nconst agent = $json;\nconst reply = agent.output || agent.text || '';\nconst steps = agent.intermediateSteps || [];\n\nfunction toCamel(row) {\n  return {\n    id: row.id,\n    slug: row.slug,\n    name: row.name,\n    city: row.city,\n    country: row.country,\n    website: row.website,\n    curricula: row.curricula,\n    ageFrom: row.age_from,\n    ageTo: row.age_to,\n    feesMinUsd: row.fees_min_usd,\n    feesMaxUsd: row.fees_max_usd,\n    boarding: row.boarding,\n    day: row.day,\n    description: row.description,\n    heroImageUrl: row.hero_image_url,\n  };\n}\n\nfunction parseObs(obs) {\n  if (obs == null) return null;\n  if (typeof obs === 'object') return obs;\n  try { return JSON.parse(obs); } catch { return obs; }\n}\n\nlet schools = null;\nlet calendlyUrl = null;\n\nfor (const step of steps) {\n  const action = step.action || step;\n  const tool = action.tool || action.toolName;\n  const obs = parseObs(step.observation);\n  if (tool === 'search_schools' && Array.isArray(obs)) {\n    // Curriculum partial-match (e.g. 'IB' -> 'IB (DP)') is done here because\n    // PostgREST can't filter a jsonb array partial in a query param.\n    const want = (action.toolInput && action.toolInput.curriculum) || null;\n    let rows = obs;\n    if (want && want !== 'Any') {\n      const w = String(want).toLowerCase();\n      rows = rows.filter(r => JSON.stringify(r.curricula || '').toLowerCase().includes(w));\n    }\n    schools = rows.slice(0, 4).map(toCamel);\n  } else if (tool === 'offer_calendar') {\n    calendlyUrl = (typeof obs === 'string' ? obs : (obs && obs.url)) || prep.calendlyUrl || '';\n  }\n}\n\nreturn [{ json: {\n  reply,\n  schools,\n  calendlyUrl,\n  leadId: prep.leadId,\n  messages: prep.messages\n} }];"
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-000000000008",
+      "name": "Score Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1220, 400],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.OPENAI_API_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ model: 'gpt-4.1-mini', temperature: 0, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: 'Score this parent lead. Return ONLY valid JSON: {\"timeline\":<0|10|20|30>,\"forcing_function\":<0|25>,\"commitment\":<0|10|15|20>,\"location\":<0|15|20>,\"budget\":<0|5|10>,\"location_text\":\"<city>\",\"timeline_text\":\"<when>\",\"forcing_function_text\":\"<reason>\",\"curriculum_text\":\"<pref>\",\"child_age_text\":\"<age>\"}' }, { role: 'user', content: ($json.messages || []).map(m => (m.role === 'user' ? 'Parent' : 'Sarah') + ': ' + m.content).join('\\n') } ] }) }}"
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-000000000009",
+      "name": "Build Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 400],
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Combine the agent reply/structured data with the scoring result, then\n// classify (mirrors src/Chatbot/lib/scoring.ts: >=70 hot, >=40 warm, else cold).\nconst structured = $('Extract Structured').item.json;\n\nlet parsed = {};\ntry {\n  const content = $json.choices && $json.choices[0] && $json.choices[0].message.content;\n  parsed = JSON.parse(content || '{}');\n} catch { parsed = {}; }\n\nconst timeline = parsed.timeline || 0;\nconst forcing_function = parsed.forcing_function || 0;\nconst commitment = parsed.commitment || 0;\nconst location = parsed.location || 0;\nconst budget = parsed.budget || 0;\nconst total = timeline + forcing_function + commitment + location + budget;\nconst classification = total >= 70 ? 'hot' : total >= 40 ? 'warm' : 'cold';\n\nconst breakdown = { timeline, forcing_function, commitment, location, budget, total };\n\nreturn [{ json: {\n  reply: structured.reply,\n  schools: structured.schools,\n  calendlyUrl: structured.calendlyUrl,\n  leadId: structured.leadId,\n  score: {\n    total,\n    classification,\n    breakdown,\n    location_text: parsed.location_text || null,\n    timeline_text: parsed.timeline_text || null,\n    forcing_function_text: parsed.forcing_function_text || null,\n    curriculum_text: parsed.curriculum_text || null,\n    child_age_text: parsed.child_age_text || null\n  }\n} }];"
+      }
+    },
+    {
+      "id": "33333333-3333-3333-3333-00000000000a",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1660, 400],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Prep Input", "type": "main", "index": 0 }]]
+    },
+    "Prep Input": {
+      "main": [[{ "node": "AI Agent", "type": "main", "index": 0 }]]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [[{ "node": "AI Agent", "type": "ai_languageModel", "index": 0 }]]
+    },
+    "search_schools": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "offer_calendar": {
+      "ai_tool": [[{ "node": "AI Agent", "type": "ai_tool", "index": 0 }]]
+    },
+    "AI Agent": {
+      "main": [[{ "node": "Extract Structured", "type": "main", "index": 0 }]]
+    },
+    "Extract Structured": {
+      "main": [[{ "node": "Score Lead", "type": "main", "index": 0 }]]
+    },
+    "Score Lead": {
+      "main": [[{ "node": "Build Response", "type": "main", "index": 0 }]]
+    },
+    "Build Response": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": ""
+}

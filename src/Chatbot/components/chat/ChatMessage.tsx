@@ -27,7 +27,7 @@ export default function ChatMessage({ message, onCalendlyBooked }: ChatMessagePr
             <div className="w-6 h-6 rounded-full bg-[#712B13] flex items-center justify-center">
               <span className="text-white text-xs">✦</span>
             </div>
-            <span className="text-xs text-gray-500 font-medium">Assistant</span>
+            <span className="text-xs text-muted-foreground font-medium">Assistant</span>
           </div>
         )}
 
@@ -36,7 +36,7 @@ export default function ChatMessage({ message, onCalendlyBooked }: ChatMessagePr
             className={`rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
               isUser
                 ? 'bg-[#712B13] text-white rounded-tr-sm'
-                : 'bg-gray-100 text-gray-800 rounded-tl-sm'
+                : 'bg-muted text-foreground rounded-tl-sm'
             } ${message.isStreaming ? 'after:content-["▋"] after:animate-pulse after:ml-0.5' : ''}`}
           >
             {message.content}
