@@ -1,0 +1,681 @@
+{
+  "name": "bant-prequalify",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-640, -432],
+      "id": "2710b975-e3e1-4694-b697-d87604359118",
+      "name": "chatbot-webhook",
+      "webhookId": "f2a93316-10bb-47dd-a047-2f97c374e7c0"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000001",
+              "name": "SCHOOL_SEARCH_URL",
+              "value": "https://lawrence-project.com/schools",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000002",
+              "name": "ARTICLE_LIBRARY_URL",
+              "value": "https://lawrence-project.com/articles",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000003",
+              "name": "CONSULTATION_URL",
+              "value": "https://lawrence-project.com/consult",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000004",
+              "name": "BOOKING_LINK",
+              "value": "https://cal.com/liammcgrath-director-of-admissions/15min",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000005",
+              "name": "GMAIL_ADDRESS",
+              "value": "admissions@lawrence-project.com",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000006",
+              "name": "OPENAI_MODEL",
+              "value": "gpt-4o-mini",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000007",
+              "name": "BANT_LOW_THRESHOLD",
+              "value": 50,
+              "type": "number"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000008",
+              "name": "BANT_MEDIUM_THRESHOLD",
+              "value": 75,
+              "type": "number"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000008b",
+              "name": "BANT_HOT_THRESHOLD",
+              "value": 75,
+              "type": "number"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000009",
+              "name": "SUPABASE_URL",
+              "value": "https://<project-ref>.supabase.co",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0001-4a1a-9a1a-000000000010",
+              "name": "SUPABASE_SERVICE_KEY",
+              "value": "<your-service-role-key>",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-528, -432],
+      "id": "b6c5d4e3-0001-4a1a-9a1a-init0secrets1",
+      "name": "init-secrets"
+    },
+    {
+      "parameters": {
+        "jsCode": "// BANT Pre-Qualification Scoring (Phase 1)\n// Body may optionally include `previousBreakdown: {timeline, budget, authority}`\n// (whatever this node itself returned on the prior turn) so score accumulates\n// across a conversation instead of resetting on every call.\nconst input = $input.item.json.body;\nconst mediumThreshold = $input.item.json.BANT_MEDIUM_THRESHOLD;\nconst hotThreshold = $input.item.json.BANT_HOT_THRESHOLD;\nconst previousBreakdown = input.previousBreakdown || {};\nconst text = (input.chatInput || '').toLowerCase();\n\nconst scores = {\n  timeline: 0,\n  budget: 0,\n  authority: 0\n};\n\n// ===== TIMELINE SCORING (0-25) =====\nif (/urgent|next month|soon|week|semester starts|september|january/.test(text)) {\n  scores.timeline = 23;\n} else if (/few months|spring|next term|end of year|before next year/.test(text)) {\n  scores.timeline = 15;\n} else if (/exploring|sometime|eventually|not sure/.test(text)) {\n  scores.timeline = 8;\n} else if (/just researching|just looking/.test(text)) {\n  scores.timeline = 2;\n} else {\n  scores.timeline = 3;\n}\n\n// ===== BUDGET SCORING (0-25) =====\nif (/premium|international school|boarding|selective|top-tier/.test(text)) {\n  scores.budget = 22;\n} else if (/private/.test(text) && !/(considering|both)/.test(text)) {\n  scores.budget = 22;\n} else if (/considering private|looking at both|open to options/.test(text)) {\n  scores.budget = 14;\n} else if (/public school|state school|cost-conscious|budget matters|budget-conscious/.test(text)) {\n  scores.budget = 8;\n} else if (/very budget-limited|cannot afford|budget-limited/.test(text)) {\n  scores.budget = 2;\n} else {\n  scores.budget = 3;\n}\n\n// ===== AUTHORITY SCORING (0-25) =====\nif (/i decide|i'm looking|i want|my decision|i lead/.test(text)) {\n  scores.authority = 22;\n} else if (/we decide|with.*spouse|partner and i|family consensus|joint decision/.test(text)) {\n  scores.authority = 16;\n} else if (/consulting with|discussing with|getting input from|consulting with family/.test(text)) {\n  scores.authority = 9;\n} else if (/spouse decides|partner is leading|not my decision/.test(text)) {\n  scores.authority = 2;\n} else {\n  scores.authority = 3;\n}\n\n// ===== MERGE WITH PRIOR TURNS (accumulate, never decrease) =====\nconst breakdown = {\n  timeline: Math.max(scores.timeline, previousBreakdown.timeline || 0),\n  budget: Math.max(scores.budget, previousBreakdown.budget || 0),\n  authority: Math.max(scores.authority, previousBreakdown.authority || 0)\n};\n\n// ===== CALCULATE TOTAL SCORE & TIER =====\nconst prequalScore = breakdown.timeline + breakdown.budget + breakdown.authority;\n\nconst tier = prequalScore < mediumThreshold\n  ? 'low'\n  : prequalScore <= hotThreshold\n  ? 'medium'\n  : 'high';\n\nreturn {\n  score: prequalScore,\n  breakdown: breakdown,\n  tier: tier,\n  message: `Pre-qual score: ${prequalScore}/75 (${tier} tier)`,\n  chatInput: input.chatInput,\n  sessionId: input.sessionId\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-416, -432],
+      "id": "75c4c7e5-838e-4407-a173-8de5de397edf",
+      "name": "pre-qualifyJS"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": "={{ $('init-secrets').item.json.BANT_LOW_THRESHOLD }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    },
+                    "id": "55b8ac7e-d6cb-4691-9701-eb99b59c5568"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "<50-standard-info"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "557ddcf5-3368-4c1f-80d6-870f30f7e028",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": "={{ $('init-secrets').item.json.BANT_LOW_THRESHOLD }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  },
+                  {
+                    "id": "8f6c3a1a-6d1a-4b2a-9f5b-7a0d2e3c4b5a",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": "={{ $('init-secrets').item.json.BANT_MEDIUM_THRESHOLD }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "lte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "50-75-ai-agent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1e6f1402-0c99-4fd2-b681-bce2a19f15f8",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": "={{ $('init-secrets').item.json.BANT_MEDIUM_THRESHOLD }}",
+                    "operator": {
+                      "type": "number",
+                      "operation": "gt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "75+booking+inform"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [-16, -448],
+      "id": "6e1f370d-cb86-48d2-95c0-f96229d476f6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b2a1e5e0-1a2b-4c3d-9e4f-5a6b7c8d9e0f",
+              "name": "reply",
+              "value": "=Thanks so much for sharing that with me. Based on what you've told me, here are a few resources that might help while you're exploring your options:\n\n- School Search Database: {{ $('init-secrets').item.json.SCHOOL_SEARCH_URL }}\n- Article Library: {{ $('init-secrets').item.json.ARTICLE_LIBRARY_URL }}\n- Free Consultation Offer: {{ $('init-secrets').item.json.CONSULTATION_URL }}\n\nFeel free to come back any time if you'd like to dig deeper — I'm happy to help whenever you're ready.",
+              "type": "string"
+            },
+            {
+              "id": "c3b2f6f1-2b3c-5d4e-af5a-6b7c8d9e0f1a",
+              "name": "tier",
+              "value": "={{ $json.tier }}",
+              "type": "string"
+            },
+            {
+              "id": "d4c3a7a2-3c4d-6e5f-ba6b-7c8d9e0f1a2b",
+              "name": "score",
+              "value": "={{ $json.score }}",
+              "type": "number"
+            },
+            {
+              "id": "d4c3a7a2-3c4d-6e5f-ba6b-7c8d9e0f1a2c",
+              "name": "breakdown",
+              "value": "={{ $json.breakdown }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [240, -672],
+      "id": "e5d4b8b3-4d5e-7f6a-cb7c-8d9e0f1a2b3c",
+      "name": "send-standard-info"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a warm, experienced education advisor for Project Lawrence.\n\nThis lead scored 50-75 on initial qualification.\nAsk 2-3 focused BANT follow-up questions to clarify:\n- Budget: what's your budget for tutoring services? (link context if helpful)\n- Need: what specific challenge are you trying to solve? (IGCSE, admissions, relocation, etc.)\n- Timeline: is there a specific deadline we're working toward?\n\nBe conversational, not interrogative. One question per turn.\nAfter 2-3 exchanges, provide a brief summary of refined signals.\n\nKeep it under 3 turns; handoff decision to JavaScript re-scoring.",
+          "returnIntermediateSteps": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [240, -448],
+      "id": "f6e5c9c4-5e6f-8a7b-dc8d-9e0f1a2b3c4d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f0a9dfea-0f1a-6c5d-af6f-7a8b9c0d1e2f",
+              "name": "reply",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "f1a9efeb-1a2b-7d6e-bf7a-8b9c0d1e2f3a",
+              "name": "tier",
+              "value": "={{ $('pre-qualifyJS').item.json.tier }}",
+              "type": "string"
+            },
+            {
+              "id": "f2a9ffec-2b3c-8e7f-cf8b-9c0d1e2f3a4b",
+              "name": "score",
+              "value": "={{ $('pre-qualifyJS').item.json.score }}",
+              "type": "number"
+            },
+            {
+              "id": "f3a9aefd-3c4d-9f8a-df9c-0d1e2f3a4b5c",
+              "name": "breakdown",
+              "value": "={{ $('pre-qualifyJS').item.json.breakdown }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [400, -448],
+      "id": "a4b9bfae-4d5e-0a9b-ea0d-1e2f3a4b5c6d",
+      "name": "AI Agent Reply"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $('init-secrets').item.json.OPENAI_MODEL }}"
+        },
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [200, -240],
+      "id": "a7f6dad5-6f7a-9b8c-ed9e-0f1a2b3c4d5e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_OPENAI_CREDENTIAL_ID",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8a7ebe6-7a8b-0c9d-fe0f-1a2b3c4d5e6f",
+              "name": "reply",
+              "value": "=Based on everything you've shared, I think you'd really benefit from a deeper conversation with one of our advisors.\n\nBook a 30-min consultation: {{ $('init-secrets').item.json.BOOKING_LINK }}\n\nOr, I can send you an email with recommended packages — would that be helpful?",
+              "type": "string"
+            },
+            {
+              "id": "c9b8fcf7-8b9c-1d0e-af1a-2b3c4d5e6f7a",
+              "name": "booking_link",
+              "value": "={{ $('init-secrets').item.json.BOOKING_LINK }}",
+              "type": "string"
+            },
+            {
+              "id": "d0c9adb8-9c0d-2e1f-ba2b-3c4d5e6f7a8b",
+              "name": "tier",
+              "value": "={{ $json.tier }}",
+              "type": "string"
+            },
+            {
+              "id": "e1d0bec9-0d1e-3f2a-cb3c-4d5e6f7a8b9c",
+              "name": "score",
+              "value": "={{ $json.score }}",
+              "type": "number"
+            },
+            {
+              "id": "e1d0bec9-0d1e-3f2a-cb3c-4d5e6f7a8b9d",
+              "name": "breakdown",
+              "value": "={{ $json.breakdown }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [240, -240],
+      "id": "f2e1cfda-1e2f-4a3b-dc4d-5e6f7a8b9c0d",
+      "name": "offer-booking-link"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('init-secrets').item.json.GMAIL_ADDRESS }}",
+        "subject": "=🔥 Hot Lead: Score {{ $json.score }}",
+        "message": "=Score: {{ $json.score }} / 75\nBreakdown:\n- Timeline: {{ $json.breakdown?.timeline }} / 25\n- Budget: {{ $json.breakdown?.budget }} / 25\n- Authority: {{ $json.breakdown?.authority }} / 25\n\nOriginal message:\n{{ $json.chatInput }}\n\nSession: {{ $json.sessionId }}\n\nNext action: assign to counsellor within 2 hours.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [240, -80],
+      "id": "a3f2d0eb-2f3a-5b4c-ed5e-6f7a8b9c0d1e",
+      "name": "inform-agent",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_GMAIL_CREDENTIAL_ID",
+          "name": "chrisallin24@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('init-secrets').item.json.SUPABASE_URL }}/rest/v1/leads?on_conflict=session_id",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "resolution=merge-duplicates,return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{ \"id\": {{ JSON.stringify($('pre-qualifyJS').item.json.sessionId) }}, \"session_id\": {{ JSON.stringify($('pre-qualifyJS').item.json.sessionId) }}, \"score\": {{ $('pre-qualifyJS').item.json.score }}, \"score_breakdown\": {{ JSON.stringify($('pre-qualifyJS').item.json.breakdown) }}, \"classification\": \"hot\" }]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [240, 80],
+      "id": "b1c2d3e4-5f6a-7b8c-9d0e-1f2a3b4c5d6e",
+      "name": "upsert-lead"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Phase 2b: Re-Score to 0-100 based on AI Agent response\nconst aiReply = $json.reply.toLowerCase();\nconst originalBreakdown = $('pre-qualifyJS').item.json.breakdown;\n\nconst refinedBreakdown = { ...originalBreakdown };\n\n// Boost Budget based on AI signals\nif (/premium|invest|afford|cost-effective|worth/.test(aiReply)) {\n  refinedBreakdown.budget = Math.min(25, originalBreakdown.budget + 8);\n}\n\n// Boost Timeline based on AI signals\nif (/september|exam|deadline|start.*term|next.*year|semester/.test(aiReply)) {\n  refinedBreakdown.timeline = Math.min(25, originalBreakdown.timeline + 10);\n}\n\n// Boost Authority based on AI signals\nif (/i decide|my decision|we.?decided|i.?want/.test(aiReply)) {\n  refinedBreakdown.authority = Math.min(25, originalBreakdown.authority + 8);\n}\n\n// NEW DIMENSION: Need (0-25)\nlet needScore = 0;\nif (/exam|entrance|entrance exam|igcse|a-level|boarding|admissions|test prep/.test(aiReply)) {\n  needScore = 20;\n} else if (/help|support|advice|guidance/.test(aiReply)) {\n  needScore = 12;\n} else {\n  needScore = 5;\n}\n\nconst refinedScore = refinedBreakdown.timeline + refinedBreakdown.budget + refinedBreakdown.authority + needScore;\n\nreturn {\n  score: Math.min(100, refinedScore),\n  breakdown: { ...refinedBreakdown, need: needScore },\n  aiResponse: aiReply,\n  originalScore: $('pre-qualifyJS').item.json.score,\n  reply: $json.reply,\n  sessionId: $('pre-qualifyJS').item.json.sessionId\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [560, -448],
+      "id": "re-score-node-id",
+      "name": "re-scoreJS"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "refined-low-rule",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 50,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "refined_low"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "refined-booking-rule",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 50,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  },
+                  {
+                    "id": "refined-booking-rule-2",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 75,
+                    "operator": {
+                      "type": "number",
+                      "operation": "lt"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "refined_booking"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "refined-hot-rule",
+                    "leftValue": "={{ $json.score }}",
+                    "rightValue": 75,
+                    "operator": {
+                      "type": "number",
+                      "operation": "gte"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "refined_hot"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [720, -448],
+      "id": "switch2-tier2-id",
+      "name": "Switch2-tier2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ reply: $json.reply, score: $json.score, breakdown: $json.breakdown, tier: 'refined_low', originalScore: $json.originalScore }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [880, -576],
+      "id": "respond-refined-low-id",
+      "name": "Respond - Refined Low Tier"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ reply: $json.reply, score: $json.score, breakdown: $json.breakdown, tier: 'refined_booking', bookingLink: $('init-secrets').item.json.BOOKING_LINK, originalScore: $json.originalScore }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [880, -432],
+      "id": "respond-refined-booking-id",
+      "name": "Respond - Refined Booking Tier"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ reply: $json.reply, score: $json.score, breakdown: $json.breakdown, tier: 'refined_hot', bookingLink: $('init-secrets').item.json.BOOKING_LINK, originalScore: $json.originalScore, escalated: true }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [880, -288],
+      "id": "respond-refined-hot-id",
+      "name": "Respond - Refined Hot Lead"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ reply: $json.reply, score: $json.score, breakdown: $json.breakdown, tier: $json.tier }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [560, -448],
+      "id": "d63df1ba-85da-4dab-9cdf-30b917c9dbbe",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "chatbot-webhook": {
+      "main": [
+        [
+          { "node": "init-secrets", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "init-secrets": {
+      "main": [
+        [
+          { "node": "pre-qualifyJS", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "pre-qualifyJS": {
+      "main": [
+        [
+          { "node": "Switch", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          { "node": "send-standard-info", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "AI Agent", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "offer-booking-link", "type": "main", "index": 0 },
+          { "node": "inform-agent", "type": "main", "index": 0 },
+          { "node": "upsert-lead", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "send-standard-info": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          { "node": "AI Agent Reply", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "AI Agent Reply": {
+      "main": [
+        [
+          { "node": "re-scoreJS", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "re-scoreJS": {
+      "main": [
+        [
+          { "node": "Switch2-tier2", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Switch2-tier2": {
+      "main": [
+        [
+          { "node": "Respond - Refined Low Tier", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Respond - Refined Booking Tier", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Respond - Refined Hot Lead", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Respond - Refined Low Tier": {
+      "main": [[]]
+    },
+    "Respond - Refined Booking Tier": {
+      "main": [[]]
+    },
+    "Respond - Refined Hot Lead": {
+      "main": [[]]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          { "node": "AI Agent", "type": "ai_languageModel", "index": 0 }
+        ]
+      ]
+    },
+    "offer-booking-link": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "inform-agent": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "upsert-lead": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": ""
+}
