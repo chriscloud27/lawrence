@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "description": "Extracted from a user-provided saved HTML page (JSON-LD structured data), not a live scrape. See .claude/docs/data/sources/html-saved/.",
+    "source": "https://www.doris.school/schools/thailand/lycee-francais-international-de-bangkok",
+    "source_file": "Lycée Français International de Bangkok in Bangkok.html",
+    "extracted_at": "2026-08-16T00:00:00Z"
+  },
+
+  "school": {
+    "id": "b1e2a3c4-1111-4a2b-8c3d-000000000003",
+    "slug": "lycee-francais-international-de-bangkok",
+    "name": "Lycée Français International de Bangkok",
+    "source_url": "https://www.doris.school/schools/thailand/lycee-francais-international-de-bangkok",
+    "official_url": "https://lfib.ac.th",
+    "founded_year": null,
+
+    "address_street": null,
+    "address_city": "Bangkok",
+    "address_region": null,
+    "address_country": "Thailand",
+    "address_postcode": null,
+    "lat": 13.7703,
+    "lng": 100.60186,
+
+    "description": "LFIB is a French international school in Bangkok serving ages 3 to 18, combining the French national curriculum (AEFE) with a British framework and Cambridge IGCSE options.",
+    "school_type": "International",
+    "governance": null,
+    "religious_affiliation": null,
+    "gender_policy": "Co-educational",
+    "boarding_available": false,
+    "day_available": true,
+    "student_count": 1030,
+    "age_min": 3,
+    "age_max": 18,
+
+    "curricula": ["French Curriculum", "British Curriculum", "Cambridge IGCSE"],
+    "languages_instruction": ["French", "English"],
+    "languages_offered": ["Thai", "Mandarin", "Spanish", "German"],
+
+    "strengths": [],
+
+    "sen_learning_support": null,
+    "sen_behaviour_support": null,
+
+    "instagram_url": "https://www.instagram.com/lyceefrancaisbkk/",
+    "linkedin_url": "https://www.linkedin.com/company/lfib-lycee-francais-international-de-bangkok-",
+    "facebook_url": "https://www.facebook.com/LFIBofficial/",
+
+    "content_hash": "7bb1563230c5d21fa0cdd24eef4f8bb5",
+    "last_scraped_at": "2026-08-16T00:00:00Z",
+    "last_modified_at": "2026-08-04T22:10:17.526Z",
+    "extraction_confidence": 0.75,
+    "scrape_status": "needs_review"
+  },
+
+  "fees": [
+    { "year_group": null, "fee_type": "yearly_fee", "label": "Annual tuition (range across year groups)", "amount": 297000, "currency": "THB", "notes": "Minimum of published range; see 'Annual tuition (max)' for upper end" },
+    { "year_group": null, "fee_type": "yearly_fee", "label": "Annual tuition (max)", "amount": 527700, "currency": "THB", "notes": "Maximum of published range" }
+  ],
+
+  "entry_points": []
+}

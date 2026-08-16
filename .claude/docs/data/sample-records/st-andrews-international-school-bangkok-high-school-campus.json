@@ -1,0 +1,72 @@
+{
+  "_meta": {
+    "description": "Extracted from a user-provided saved HTML page (JSON-LD structured data), not a live scrape. See .claude/docs/data/sources/html-saved/.",
+    "source": "https://www.doris.school/schools/thailand/st-andrews-international-school-bangkok-high-school-campus",
+    "source_file": "St Andrews International School Bangkok - High School Campus.html",
+    "extracted_at": "2026-08-16T00:00:00Z"
+  },
+
+  "school": {
+    "id": "b1e2a3c4-1111-4a2b-8c3d-000000000004",
+    "slug": "st-andrews-international-school-bangkok-high-school-campus",
+    "name": "St Andrews International School Bangkok - High School Campus",
+    "source_url": "https://www.doris.school/schools/thailand/st-andrews-international-school-bangkok-high-school-campus",
+    "official_url": "https://www.nordangliaeducation.com/sta-bangkok",
+    "founded_year": 2017,
+
+    "address_street": "1020 Sukhumvit Road",
+    "address_city": "Bangkok",
+    "address_region": null,
+    "address_country": "Thailand",
+    "address_postcode": null,
+    "lat": 13.71791998144315,
+    "lng": 100.58756757116409,
+
+    "description": "The High School campus of St Andrews International School Bangkok (part of Nord Anglia Education) teaches the English National Curriculum through IGCSE, then the IB Diploma Programme or IB Career-related Programme with BTEC options, for ages 11 to 18.",
+    "school_type": "International",
+    "governance": "Part of Nord Anglia Education",
+    "religious_affiliation": "None",
+    "gender_policy": "Co-educational",
+    "boarding_available": false,
+    "day_available": true,
+    "student_count": 1100,
+    "age_min": 11,
+    "age_max": 18,
+
+    "curricula": ["British Curriculum", "Cambridge IGCSE", "IB (DP)", "IBCP (International Baccalaureate Career-related Programme)", "BTEC Qualification"],
+    "languages_instruction": ["English"],
+    "languages_offered": ["Thai", "French", "German", "Spanish", "Korean", "Mandarin", "Japanese"],
+
+    "strengths": ["Performing Arts", "STEM", "Sport"],
+
+    "sen_learning_support": "Advanced",
+    "sen_behaviour_support": null,
+
+    "instagram_url": "https://www.instagram.com/standrewsbangkok/",
+    "linkedin_url": "https://www.linkedin.com/school/standrewsbangkok/",
+    "facebook_url": "https://www.facebook.com/standrewsbangkok/",
+
+    "content_hash": "69a370d5480769de614a22e58f3a6a4a",
+    "last_scraped_at": "2026-08-16T00:00:00Z",
+    "last_modified_at": "2026-08-04T22:21:13.518Z",
+    "extraction_confidence": 0.92,
+    "scrape_status": "ok"
+  },
+
+  "fees": [
+    { "year_group": "Year 7", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 735700, "currency": "THB", "notes": null },
+    { "year_group": "Year 8", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 735700, "currency": "THB", "notes": null },
+    { "year_group": "Year 9", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 735700, "currency": "THB", "notes": null },
+    { "year_group": "Year 10", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 800400, "currency": "THB", "notes": null },
+    { "year_group": "Year 11", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 710300, "currency": "THB", "notes": null },
+    { "year_group": "Year 12", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 849100, "currency": "THB", "notes": null },
+    { "year_group": "Year 13", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 746100, "currency": "THB", "notes": null },
+    { "year_group": null, "fee_type": "application_fee", "label": "Application fee", "amount": 6500, "currency": "THB", "notes": "One-time, non-refundable, payable upon acceptance of an offer" },
+    { "year_group": null, "fee_type": "enrollment_fee", "label": "Enrollment fee", "amount": 90000, "currency": "THB", "notes": "One-time, non-refundable; THB 35,000/term for 3-term installment option" }
+  ],
+
+  "entry_points": [
+    { "label": "Year 7 entry", "year_group": "Year 7", "places_available": null, "open_date": null, "deadline_date": null, "rolling_admissions": true, "notes": "Main secondary entry point into Key Stage 3" },
+    { "label": "Year 12 entry", "year_group": "Year 12", "places_available": null, "open_date": null, "deadline_date": null, "rolling_admissions": true, "notes": "Entry into IB Diploma or IB Career-related Programme" }
+  ]
+}

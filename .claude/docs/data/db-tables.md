@@ -17,6 +17,8 @@ Enum values: `.claude/docs/data/schemas/schools-enums.json`
 | `school_fees` | One row per fee line item. Linked to school. | ~5–15 per school |
 | `school_entry_points` | One row per admissions window/cohort. | ~1–5 per school |
 | `scrape_queue` | Pipeline control. Tracks scrape status, ETag, hash. | ~1,000+ |
+| `leads` | One row per chatbot BANT lead. See "Chatbot Leads" below. | ~10s–100s |
+| `messages` | One row per chat message, linked to a lead. | ~10 per lead |
 
 ## Relationships
 
@@ -146,6 +148,68 @@ schools (1) ──< scrape_queue (1)
 | last_error | TEXT | YES | | |
 | queued_at | TIMESTAMPTZ | NO | NOW() | |
 | processed_at | TIMESTAMPTZ | YES | | |
+
+---
+
+## Chatbot Leads
+
+**Purpose:** BANT-qualified leads captured by the `src/Chatbot` widget (ADR-0006, ADR-0007,
+ADR-0008). Distinct from the `schools`/`school_fees`/etc. scraping-pipeline tables above —
+these are chatbot/qualification data, owned by the chatbot's read-write boundary
+(`.claude/rules/chatbot.md`: chatbot reads only, all writes go through n8n).
+
+**Canonical source:** `supabase/migrations/` — specifically
+`20260702_create_chatbot_leads_messages.sql` (base tables) and
+`20260816121024_add_lead_auth_linking.sql` (`user_id`/`session_id`/RLS policy). **Do not**
+treat `db/migrations/001_init_postgres.sql` as authoritative — it's a stale duplicate from an
+earlier Drizzle/SQLite translation with a diverging schema (enum types, UUID keys) and should
+not be edited further (see ADR-0008).
+
+**Primary key:** `id` (TEXT — not UUID; the chatbot's `sessionId`, generated client-side via
+`crypto.randomUUID()`, is written here as-is on first hot-tier write)
+
+### leads
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| id | TEXT | NO | | Chatbot's `sessionId` |
+| created_at | TIMESTAMPTZ | NO | NOW() | |
+| status | TEXT | NO | `new` | `new` \| `contacted` \| `booked` \| `nurture` \| `closed` |
+| classification | TEXT | YES | | `hot` \| `warm` \| `cold` |
+| score | INTEGER | NO | 0 | 0–100, from BANT scoring (`.claude/rules/bant-scoring.md`) |
+| score_breakdown | JSONB | YES | | `{timeline, budget, authority}` (+ `need` post-refinement) |
+| captured_name | TEXT | YES | | Not currently captured by the widget (future field) |
+| captured_email | TEXT | YES | | Not currently captured by the widget (future field) |
+| location | TEXT | YES | | |
+| timeline | TEXT | YES | | |
+| forcing_function | TEXT | YES | | |
+| child_age | INTEGER | YES | | |
+| current_school | TEXT | YES | | |
+| curriculum | TEXT | YES | | |
+| budget_range_usd | TEXT | YES | | |
+| user_id | UUID | YES | | FK → `auth.users.id`. Set by the `link-lead` n8n workflow after Google sign-in (ADR-0008) |
+| session_id | TEXT | YES | | UNIQUE. Bridges the browser's localStorage session to this row before/without auth |
+
+RLS: enabled. `leads_owner_select` policy scopes `SELECT` to `auth.uid() = user_id`. Writes
+happen only via the `service_role` key (n8n), which bypasses RLS — no write policy needed.
+
+### messages
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| id | TEXT | NO | | |
+| lead_id | TEXT | NO | | FK → `leads.id` |
+| role | TEXT | NO | | `user` \| `assistant` |
+| content | TEXT | NO | | |
+| created_at | TIMESTAMPTZ | NO | NOW() | |
+
+RLS: enabled (no policies defined yet — no read path exists for `messages` today).
+
+### Write paths
+
+- `n8n/workflows/bant-prequalify.json` — `upsert-lead` node, hot-tier branch only. Upserts on
+  `session_id` conflict.
+- `n8n/workflows/link-lead.json` — sets `leads.user_id` by `session_id` after Google sign-in.
 
 ---
 

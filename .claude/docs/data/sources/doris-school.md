@@ -21,6 +21,17 @@ Doris is an international school directory. Each school page contains:
 - Use HTTP `ETag` header for change detection where available; fall back to MD5 of the body (`content_hash`).
 - Truncate HTML to ~12,000 characters before passing to the extraction agent (≈3,000 tokens for gpt-4o-mini).
 - JSON-LD `dateModified` field, if present, maps to `schools.last_modified_at`.
+- **Live automated fetch is blocked (confirmed 2026-08-16).** `doris.school` sits behind a
+  Cloudflare bot challenge ("Just a moment..." interstitial) that returns HTTP 403 to both a
+  plain HTTP fetch and a patchright/Playwright headless browser — this is active bot detection,
+  not the JS-rendering case above, and a headless-browser fallback does not get past it.
+- **Manual-import fallback:** save the rendered page as HTML from a real browser (Cmd+S /
+  "Webpage, Complete") into `.claude/docs/data/sources/html-saved/`, then extract the
+  `<script type="application/ld+json">` block — Doris embeds full structured data there
+  (name, address, geo, fees as `makesOffer`, `dateModified`, etc.), which maps directly onto
+  the `schools`/`school_fees` schema without needing the rest of the HTML. Compute `content_hash`
+  as the MD5 of the saved HTML file. See `.claude/docs/data/sample-records/` for five records
+  built this way from real Bangkok school pages.
 
 ## Extraction Agent
 

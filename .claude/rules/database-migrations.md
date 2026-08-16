@@ -22,3 +22,8 @@ globs: ["database/migrations/**/*.sql"]
 ## Testing
 - Run `supabase db diff` before committing to confirm the migration matches intent
 - Test rollback with `supabase db reset` on a local instance before pushing
+
+## Before Altering `leads`, `messages`, or `schools`
+Read `.claude/docs/data/db-tables.md` first — it is the maintained schema spec. Migration
+files are the history, not the reference doc. (Exception: `db/migrations/001_init_postgres.sql`
+is a stale, unmaintained duplicate — see ADR-0008 — do not treat it as a source of truth.)

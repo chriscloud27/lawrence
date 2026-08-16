@@ -1,0 +1,74 @@
+{
+  "_meta": {
+    "description": "Extracted from a user-provided saved HTML page (JSON-LD structured data), not a live scrape. See .claude/docs/data/sources/html-saved/.",
+    "source": "https://www.doris.school/schools/thailand/st-andrews-international-school-bangkok-primary-school-campus",
+    "source_file": "St Andrews International School Bangkok - Primary School Campus.html",
+    "extracted_at": "2026-08-16T00:00:00Z"
+  },
+
+  "school": {
+    "id": "b1e2a3c4-1111-4a2b-8c3d-000000000005",
+    "slug": "st-andrews-international-school-bangkok-primary-school-campus",
+    "name": "St Andrews International School Bangkok - Primary School Campus",
+    "source_url": "https://www.doris.school/schools/thailand/st-andrews-international-school-bangkok-primary-school-campus",
+    "official_url": "https://www.nordangliaeducation.com/sta-bangkok",
+    "founded_year": 1997,
+
+    "address_street": "Soi Pridi Banomyong 20/1, Sukhumvit 71",
+    "address_city": "Bangkok",
+    "address_region": "Watthana District",
+    "address_country": "Thailand",
+    "address_postcode": null,
+    "lat": 13.724566991760422,
+    "lng": 100.59677937931824,
+
+    "description": "The Primary School campus of St Andrews International School Bangkok (part of Nord Anglia Education) teaches the English National Curriculum (EYFS through Key Stage 2) for ages 2 to 11.",
+    "school_type": "International",
+    "governance": "Part of Nord Anglia Education",
+    "religious_affiliation": "None",
+    "gender_policy": "Co-educational",
+    "boarding_available": false,
+    "day_available": true,
+    "student_count": 1100,
+    "age_min": 2,
+    "age_max": 11,
+
+    "curricula": ["British Curriculum", "IEYC (International Early Years Curriculum)"],
+    "languages_instruction": ["English"],
+    "languages_offered": ["Thai", "French", "German", "Japanese", "Korean", "Mandarin", "Spanish"],
+
+    "strengths": ["Performing Arts", "Languages"],
+
+    "sen_learning_support": "Advanced",
+    "sen_behaviour_support": null,
+
+    "instagram_url": "https://www.instagram.com/standrewsbangkok/",
+    "linkedin_url": "https://www.linkedin.com/school/standrewsbangkok/",
+    "facebook_url": "https://www.facebook.com/standrewsbangkok",
+
+    "content_hash": "c1eb531664eb45561e23dfa193634b70",
+    "last_scraped_at": "2026-08-16T00:00:00Z",
+    "last_modified_at": "2026-08-04T22:21:09.430Z",
+    "extraction_confidence": 0.92,
+    "scrape_status": "ok"
+  },
+
+  "fees": [
+    { "year_group": "Foundation Stage 1", "fee_type": "yearly_fee", "label": "Annual tuition (half day)", "amount": 400700, "currency": "THB", "notes": null },
+    { "year_group": "Foundation Stage 2", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 607200, "currency": "THB", "notes": null },
+    { "year_group": "Foundation Stage 3", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 636200, "currency": "THB", "notes": null },
+    { "year_group": "Year 1", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 607200, "currency": "THB", "notes": null },
+    { "year_group": "Year 2", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 636200, "currency": "THB", "notes": null },
+    { "year_group": "Year 3", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 662700, "currency": "THB", "notes": null },
+    { "year_group": "Year 4", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 662700, "currency": "THB", "notes": null },
+    { "year_group": "Year 5", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 662700, "currency": "THB", "notes": null },
+    { "year_group": "Year 6", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 662700, "currency": "THB", "notes": null },
+    { "year_group": null, "fee_type": "application_fee", "label": "Application fee", "amount": 6500, "currency": "THB", "notes": "Non-refundable" },
+    { "year_group": null, "fee_type": "enrollment_fee", "label": "Enrollment fee", "amount": 160000, "currency": "THB", "notes": "Non-refundable; for Year 1 onwards" }
+  ],
+
+  "entry_points": [
+    { "label": "Foundation Stage entry", "year_group": "Foundation Stage 1", "places_available": null, "open_date": null, "deadline_date": null, "rolling_admissions": true, "notes": "Main early-years entry point" },
+    { "label": "Year 1 entry", "year_group": "Year 1", "places_available": null, "open_date": null, "deadline_date": null, "rolling_admissions": true, "notes": null }
+  ]
+}

@@ -1,33 +1,29 @@
 import { Heart, Tag, Users, GraduationCap, ChevronRight } from 'lucide-react';
-import type { School } from '@/db/schema';
+import type { School } from '@/lib/schools';
 
 interface SchoolCardProps {
   school: School;
 }
 
 export default function SchoolCard({ school }: SchoolCardProps) {
-  const curricula: string[] = Array.isArray(school.curricula)
-    ? school.curricula
-    : school.curricula
-    ? JSON.parse(school.curricula as unknown as string)
-    : [];
+  const curricula: string[] = school.curricula ?? [];
 
-  const feeRange = school.feesMinUsd && school.feesMaxUsd
-    ? `$${school.feesMinUsd.toLocaleString()} - ${school.feesMaxUsd.toLocaleString()}`
-    : school.feesMinUsd
-    ? `From $${school.feesMinUsd.toLocaleString()}`
+  const feeRange = school.fees_min_usd && school.fees_max_usd
+    ? `$${school.fees_min_usd.toLocaleString()} - ${school.fees_max_usd.toLocaleString()}`
+    : school.fees_min_usd
+    ? `From $${school.fees_min_usd.toLocaleString()}`
     : 'Fees on request';
 
-  const ageRange = school.ageFrom && school.ageTo
-    ? `Ages ${school.ageFrom} to ${school.ageTo} years`
+  const ageRange = school.age_from && school.age_to
+    ? `Ages ${school.age_from} to ${school.age_to} years`
     : '';
 
   return (
     <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col">
       <div className="relative h-44">
-        {school.heroImageUrl ? (
+        {school.hero_image_url ? (
           <img
-            src={school.heroImageUrl}
+            src={school.hero_image_url}
             alt={school.name}
             className="w-full h-full object-cover"
           />

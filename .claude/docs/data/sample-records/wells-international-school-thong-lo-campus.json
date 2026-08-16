@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "description": "Extracted from a user-provided saved HTML page (JSON-LD structured data), not a live scrape. See .claude/docs/data/sources/html-saved/.",
+    "source": "https://www.doris.school/schools/thailand/wells-international-school-thong-lo-campus",
+    "source_file": "Wells International School - Thong Lo Campus in Bangkok.html",
+    "extracted_at": "2026-08-16T00:00:00Z"
+  },
+
+  "school": {
+    "id": "b1e2a3c4-1111-4a2b-8c3d-000000000002",
+    "slug": "wells-international-school-thong-lo-campus",
+    "name": "Wells International School - Thong Lo Campus",
+    "source_url": "https://www.doris.school/schools/thailand/wells-international-school-thong-lo-campus",
+    "official_url": "https://wellsnewwebsite.com/",
+    "founded_year": 2003,
+
+    "address_street": "6 Sukhumvit Soi 51",
+    "address_city": "Bangkok",
+    "address_region": null,
+    "address_country": "Thailand",
+    "address_postcode": null,
+    "lat": 13.727546181023028,
+    "lng": 100.57697119814871,
+
+    "description": "Wells International School's Thong Lo campus is an early-years and lower-primary campus in Bangkok's Thong Lo district, teaching an American-based kindergarten curriculum for children from Nursery to Grade 2 under Thai Ministry of Education licensing.",
+    "school_type": "International",
+    "governance": "Branch of EverClever Education Group, Ltd.",
+    "religious_affiliation": "None",
+    "gender_policy": "Co-educational",
+    "boarding_available": false,
+    "day_available": true,
+    "student_count": 150,
+    "age_min": 2,
+    "age_max": 7,
+
+    "curricula": ["American Curriculum"],
+    "languages_instruction": ["English"],
+    "languages_offered": [],
+
+    "strengths": [],
+
+    "sen_learning_support": null,
+    "sen_behaviour_support": null,
+
+    "instagram_url": "https://www.instagram.com/wellsschool/",
+    "linkedin_url": "https://www.linkedin.com/company/wells-international-school/",
+    "facebook_url": "https://www.facebook.com/wellsschool",
+
+    "content_hash": "02a70e7be67cd12a6896587a5784791a",
+    "last_scraped_at": "2026-08-16T00:00:00Z",
+    "last_modified_at": "2026-08-04T22:27:05.644Z",
+    "extraction_confidence": 0.85,
+    "scrape_status": "ok"
+  },
+
+  "fees": [
+    { "year_group": "Nursery (N)", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 239000, "currency": "THB", "notes": null },
+    { "year_group": "Kindergarten 1 (K1)", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 259000, "currency": "THB", "notes": null },
+    { "year_group": "Kindergarten 2 (K2)", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 269000, "currency": "THB", "notes": null },
+    { "year_group": "Kindergarten 3 (K3)", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 281000, "currency": "THB", "notes": null },
+    { "year_group": "Grade 1", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 373200, "currency": "THB", "notes": null },
+    { "year_group": "Grade 2", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 373200, "currency": "THB", "notes": null },
+    { "year_group": null, "fee_type": "application_fee", "label": "Application fee", "amount": 70000, "currency": "THB", "notes": "New students, non-refundable" },
+    { "year_group": null, "fee_type": "additional_fee", "label": "Registration fee", "amount": 4500, "currency": "THB", "notes": "Starting Kindergarten 3 (K3) and above" },
+    { "year_group": null, "fee_type": "additional_fee", "label": "Damage deposit", "amount": 30000, "currency": "THB", "notes": "Refundable if claimed within two years of withdrawal" },
+    { "year_group": null, "fee_type": "additional_fee", "label": "Campus development fee", "amount": 70000, "currency": "THB", "notes": "New students, non-refundable" }
+  ],
+
+  "entry_points": []
+}

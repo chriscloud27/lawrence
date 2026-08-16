@@ -1,0 +1,111 @@
+{
+  "name": "link-lead",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "link-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-640, -432],
+      "id": "c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f",
+      "name": "link-lead-webhook",
+      "webhookId": "d2e3f4a5-b6c7-4d8e-9f0a-1b2c3d4e5f6a"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d3e4f5a6-0001-4b1b-9b1b-000000000001",
+              "name": "SUPABASE_URL",
+              "value": "https://<project-ref>.supabase.co",
+              "type": "string"
+            },
+            {
+              "id": "d3e4f5a6-0001-4b1b-9b1b-000000000002",
+              "name": "SUPABASE_SERVICE_KEY",
+              "value": "<your-service-role-key>",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-528, -432],
+      "id": "e4f5a6b7-0002-4c2c-9c2c-init0secrets2",
+      "name": "init-secrets"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $json.SUPABASE_URL }}/rest/v1/leads?session_id=eq.{{ encodeURIComponent($json.body.sessionId) }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $json.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Authorization", "value": "=Bearer {{ $json.SUPABASE_SERVICE_KEY }}" },
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "Prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ user_id: $json.body.userId }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-320, -432],
+      "id": "f5a6b7c8-0003-4d3d-9d3d-linkleadpatch",
+      "name": "link-lead-patch"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ ({ linked: true }) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [-112, -432],
+      "id": "a6b7c8d9-0004-4e4e-9e4e-respondlink",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "link-lead-webhook": {
+      "main": [
+        [
+          { "node": "init-secrets", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "init-secrets": {
+      "main": [
+        [
+          { "node": "link-lead-patch", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "link-lead-patch": {
+      "main": [
+        [
+          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": ""
+}

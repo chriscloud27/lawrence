@@ -1,0 +1,82 @@
+{
+  "_meta": {
+    "description": "Extracted from a user-provided saved HTML page (JSON-LD structured data), not a live scrape. See .claude/docs/data/sources/html-saved/.",
+    "source": "https://www.doris.school/schools/thailand/berkeley-international-school",
+    "source_file": "Berkeley International School in Bangkok.html",
+    "extracted_at": "2026-08-16T00:00:00Z"
+  },
+
+  "school": {
+    "id": "b1e2a3c4-1111-4a2b-8c3d-000000000001",
+    "slug": "berkeley-international-school",
+    "name": "Berkeley International School",
+    "source_url": "https://www.doris.school/schools/thailand/berkeley-international-school",
+    "official_url": "https://www.berkeley.ac.th/",
+    "founded_year": 2010,
+
+    "address_street": null,
+    "address_city": "Bangkok",
+    "address_region": null,
+    "address_country": "Thailand",
+    "address_postcode": null,
+    "lat": 13.673549,
+    "lng": 100.614422,
+
+    "description": "Berkeley International School is a private, co-educational day school in the Bangna area of Bangkok, teaching an American-style curriculum from Pre-Kindergarten through Grade 12 with Advanced Placement courses in high school.",
+    "school_type": "International",
+    "governance": null,
+    "religious_affiliation": "None",
+    "gender_policy": "Co-educational",
+    "boarding_available": false,
+    "day_available": true,
+    "student_count": 400,
+    "age_min": 2,
+    "age_max": 18,
+
+    "curricula": ["American Curriculum", "Advanced Placement (AP)"],
+    "languages_instruction": ["English"],
+    "languages_offered": ["Mandarin", "Thai"],
+
+    "strengths": ["Sport", "Academic Enrichment"],
+
+    "sen_learning_support": "Moderate",
+    "sen_behaviour_support": null,
+
+    "instagram_url": "https://www.instagram.com/berkeleyinternationalschool",
+    "linkedin_url": null,
+    "facebook_url": "https://www.facebook.com/BerkeleyBangkok",
+
+    "content_hash": "a95a6ef992fe5e0f8183ba9a0c900d83",
+    "last_scraped_at": "2026-08-16T00:00:00Z",
+    "last_modified_at": "2026-08-04T21:53:38.970Z",
+    "extraction_confidence": 0.9,
+    "scrape_status": "ok"
+  },
+
+  "fees": [
+    { "year_group": "Pre-K", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 519200, "currency": "THB", "notes": null },
+    { "year_group": "K1", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 545300, "currency": "THB", "notes": null },
+    { "year_group": "K2", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 623550, "currency": "THB", "notes": null },
+    { "year_group": "K3", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 623550, "currency": "THB", "notes": null },
+    { "year_group": "Grade 1", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 685350, "currency": "THB", "notes": null },
+    { "year_group": "Grade 2", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 685350, "currency": "THB", "notes": null },
+    { "year_group": "Grade 3", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 685350, "currency": "THB", "notes": null },
+    { "year_group": "Grade 4", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 685350, "currency": "THB", "notes": null },
+    { "year_group": "Grade 5", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 685350, "currency": "THB", "notes": null },
+    { "year_group": "Grade 6", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 774712, "currency": "THB", "notes": null },
+    { "year_group": "Grade 7", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 774712, "currency": "THB", "notes": null },
+    { "year_group": "Grade 8", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 774712, "currency": "THB", "notes": null },
+    { "year_group": "Grade 9", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 865412, "currency": "THB", "notes": null },
+    { "year_group": "Grade 10", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 865412, "currency": "THB", "notes": null },
+    { "year_group": "Grade 11", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 865412, "currency": "THB", "notes": null },
+    { "year_group": "Grade 12", "fee_type": "yearly_fee", "label": "Annual tuition", "amount": 833112, "currency": "THB", "notes": null },
+    { "year_group": null, "fee_type": "application_fee", "label": "Application fee", "amount": 3000, "currency": "THB", "notes": "Non-refundable" },
+    { "year_group": null, "fee_type": "enrollment_fee", "label": "Enrollment fee", "amount": 200000, "currency": "THB", "notes": "Non-refundable" },
+    { "year_group": null, "fee_type": "additional_fee", "label": "School bus fee (1–5 km)", "amount": 61750, "currency": "THB", "notes": "Per term" },
+    { "year_group": null, "fee_type": "additional_fee", "label": "School bus fee (6 km and up)", "amount": 70000, "currency": "THB", "notes": "Per term" },
+    { "year_group": null, "fee_type": "additional_fee", "label": "Lunch fee (Pre-K to Grade 5)", "amount": 11970, "currency": "THB", "notes": "Per term" },
+    { "year_group": null, "fee_type": "additional_fee", "label": "Lunch fee (Grade 6 to 12)", "amount": 13106, "currency": "THB", "notes": "Per term" }
+  ],
+
+  "entry_points": []
+}

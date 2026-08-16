@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import ChatMessage from "./ChatMessage";
 import { getChatbotConfig } from "@/lib/chatbot-config";
+import { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } from "@/lib/env";
+import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import {
   getOrCreateSessionId,
   loadHistory,
@@ -15,6 +17,10 @@ import {
   type BantScoreState,
   type PrequalState,
 } from "@/lib/session";
+
+// Google sign-in (ADR-0008) is optional — only offered when Supabase auth env
+// vars are configured, so the feature degrades cleanly in dev/local setups.
+const authEnabled = Boolean(NEXT_PUBLIC_SUPABASE_URL && NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 const config = getChatbotConfig();
 
@@ -46,6 +52,7 @@ export default function ChatWidget() {
   );
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const prequalDone = prequal.stepIndex >= config.prequalQuestions.length;
@@ -53,6 +60,40 @@ export default function ChatWidget() {
   useEffect(() => {
     if (isOpen) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen, prequal.stepIndex]);
+
+  useEffect(() => {
+    if (!authEnabled) return;
+    const supabase = getSupabaseBrowserClient();
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user) setUserId(data.session.user.id);
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!userId || !sessionId) return;
+    // Best-effort: links this device's session to the signed-in user via n8n
+    // (ADR-0008). A no-op if no `leads` row exists yet for this session_id.
+    fetch("/api/lead/link", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId, userId }),
+    }).catch(() => {});
+  }, [userId, sessionId]);
+
+  const signInWithGoogle = () => {
+    const supabase = getSupabaseBrowserClient();
+    supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+  };
 
   const appendMessage = (message: ChatMessageData) => {
     setMessages(prev => {
@@ -158,9 +199,19 @@ export default function ChatWidget() {
 
       {isOpen && (
         <div className="fixed bottom-24 right-6 z-50 w-[380px] h-[560px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
-          <div className="px-4 py-3 bg-blue-600 text-white flex-shrink-0">
-            <p className="text-sm font-semibold">{config.agentName}</p>
-            <p className="text-xs text-white/70">Ask me anything</p>
+          <div className="px-4 py-3 bg-blue-600 text-white flex-shrink-0 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">{config.agentName}</p>
+              <p className="text-xs text-white/70">Ask me anything</p>
+            </div>
+            {authEnabled && prequalDone && !userId && (
+              <button
+                onClick={signInWithGoogle}
+                className="text-xs bg-white/10 hover:bg-white/20 rounded-full px-3 py-1.5 whitespace-nowrap"
+              >
+                Sign in with Google
+              </button>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2">
