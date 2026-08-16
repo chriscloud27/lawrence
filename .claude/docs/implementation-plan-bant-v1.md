@@ -3,7 +3,7 @@
 **Status:** v1 pre-qualification system + AI agent routing  
 **Owner:** Chris Weber  
 **Timeline:** 3 weeks to pilot deployment  
-**Scope:** JavaScript pre-qual scoring (0–75 pts) + n8n Switch routing + AI agent for 35–50 band
+**Scope:** JavaScript pre-qual scoring (0–75 pts) + n8n Switch routing + AI agent for 50–75 band
 
 ---
 
@@ -17,10 +17,9 @@ Convert n8n workflow into **two-stage qualification**:
 | **Further-qual** | Conversational probes | AI Agent + JS re-score | 0–100 pts → Lead action |
 
 **Routing Tiers (Post-Scoring):**
-- `< 35 pts` → Standard info (no counsellor contact)
-- `35–50 pts` → AI consulting path (further-qualification)
-- `50–75 pts` → Booking link + email option
-- `75+ pts` → Hot lead flag + agent notification
+- `< 50 pts` → Standard info (no counsellor contact)
+- `50–75 pts` → AI consulting path (further-qualification)
+- `> 75 pts` → Hot lead flag + agent notification (direct, skips AI Agent)
 
 ---
 
@@ -41,12 +40,11 @@ User Message (Webhook)
     ║ TIER 1 SWITCH: Score-based Routing    ║
     ╚═══════════════════════════════════════╝
         ↓
-    ├─ < 35? ──────→ [send-standard-info] ──→ End
-    ├─ 35–50? ─────→ [AI Agent] ──────────→ Further-qualification
-    ├─ 50–75? ─────→ [send-booking-link] ──→ End (with email option)
-    └─ 75+? ───────→ [send-booking-link] ──→ [inform-agent] ──→ End
+    ├─ < 50? ──────→ [send-standard-info] ──→ End
+    ├─ 50–75? ─────→ [AI Agent] ──────────→ Further-qualification
+    └─ > 75? ──────→ [send-booking-link] ──→ [inform-agent] ──→ End
         
-    [AI Agent Path: 35–50 only]
+    [AI Agent Path: 50–75 only]
         ↓
     Conversational BANT follow-ups (2–3 Qs)
         ↓
@@ -58,7 +56,7 @@ User Message (Webhook)
         ↓
     ├─ < 50? ──────→ [send-standard-info] ──→ End
     ├─ 50–75? ─────→ [send-booking-link] ──→ End
-    └─ 75+? ───────→ [send-booking-link] ──→ [inform-agent] ──→ End
+    └─ > 75? ──────→ [send-booking-link] ──→ [inform-agent] ──→ End
 ```
 
 ---
@@ -78,10 +76,9 @@ chatbot-webhook
 [pre-qualifyJS] ← NEW: JavaScript node
     ↓
 [Switch1-tier1] ← NEW: Switch on score band
-    ├─ output1 (<35): send-standard-info
-    ├─ output2 (35–50): AI Agent node
-    ├─ output3 (50–75): offer-booking-link
-    └─ output4 (75+): offer-booking-link + [inform-agent]
+    ├─ output1 (<50): send-standard-info
+    ├─ output2 (50–75): AI Agent node
+    └─ output3 (>75): offer-booking-link + [inform-agent]
     
 [AI Agent] ← EXISTING, repurposed
     ↓
@@ -90,7 +87,7 @@ chatbot-webhook
 [Switch2-tier2] ← NEW: Final routing on refined score
     ├─ output1 (<50): send-standard-info
     ├─ output2 (50–75): offer-booking-link
-    └─ output3 (75+): offer-booking-link + [inform-agent]
+    └─ output3 (>75): offer-booking-link + [inform-agent]
     
 [send-standard-info] ← MODIFIED: setOutput with tier <50 message
 [offer-booking-link] ← NEW: setOutput with booking CTA
@@ -158,7 +155,7 @@ const prequalScore = scores.timeline + scores.budget + scores.authority;
 return {
   score: prequalScore,
   breakdown: scores,
-  tier: prequalScore < 35 ? "low" : prequalScore <= 50 ? "medium" : "medium_high"
+  tier: prequalScore < 50 ? "low" : prequalScore <= 75 ? "medium" : "high"
 };
 ```
 
@@ -174,10 +171,9 @@ return {
 
 | Condition | Output | Destination |
 |-----------|--------|-------------|
-| `score < 35` | output1 | `send-standard-info` |
-| `score >= 35 AND score <= 50` | output2 | `AI Agent` |
-| `score > 50 AND score < 75` | output3 | `offer-booking-link` |
-| `score >= 75` | output4 | `offer-booking-link` + `inform-agent` |
+| `score < 50` | output1 | `send-standard-info` |
+| `score >= 50 AND score <= 75` | output2 | `AI Agent` |
+| `score > 75` | output3 | `offer-booking-link` + `inform-agent` |
 
 ---
 
@@ -187,14 +183,14 @@ return {
 
 **Sub-node:** OpenAI Chat Model (via `ai_languageModel` connection type)
 
-**Trigger:** Only when `Switch1-tier1` outputs output2 (score 35–50)
+**Trigger:** Only when `Switch1-tier1` outputs output2 (score 50–75)
 
 **System Message:**
 
 ```
 You are a warm, experienced education advisor for Project Lawrence.
 
-This lead scored 35–50 on initial qualification. 
+This lead scored 50–75 on initial qualification. 
 Ask 2–3 focused BANT follow-up questions to clarify:
 - Budget: "What's your budget for tutoring services?" (link context if helpful)
 - Need: "What specific challenge are you trying to solve?" (IGCSE, admissions, relocation, etc.)
@@ -269,8 +265,8 @@ return {
 | Condition | Output | Destination |
 |-----------|--------|-------------|
 | `score < 50` | output1 | `send-standard-info` |
-| `score >= 50 AND score < 75` | output2 | `offer-booking-link` |
-| `score >= 75` | output3 | `offer-booking-link` + `inform-agent` |
+| `score >= 50 AND score <= 75` | output2 | `offer-booking-link` |
+| `score > 75` | output3 | `offer-booking-link` + `inform-agent` |
 
 ---
 
@@ -303,7 +299,7 @@ Or, I can send you an email with recommended packages — would you like that? (
 If Yes → trigger [inform-agent] with lead data + booking preference
 ```
 
-**Connection:** From `Switch1-tier1` (output3, output4) and `Switch2-tier2` (output2, output3)
+**Connection:** From `Switch1-tier1` (output3) and `Switch2-tier2` (output2, output3)
 
 ---
 
@@ -330,7 +326,7 @@ Booking Status: {{bookingPreference}}
 Next Action: Assign to counsellor within 2 hours
 ```
 
-**Connection:** From `Switch1-tier1` (output4) and `Switch2-tier2` (output3)
+**Connection:** From `Switch1-tier1` (output3) and `Switch2-tier2` (output3)
 
 ---
 
@@ -353,16 +349,16 @@ Add columns:
 
 | Scenario | Expected Pre-Qual | Expected Refined | Expected Route |
 |----------|----------|-----------|----------|
-| Parent relocating to HK, premium school, urgent | 72 | 82 | Hot lead → agent |
-| Exploring IGCSE, no timeline, budget unclear | 28 | 35 | Standard info |
-| A-level tuition in 6 weeks, good budget, joint decision | 42 | 58 | Booking link |
-| Spouse leads decision, weak budget signal, exploratory | 35 | 44 | AI agent → standard |
-| UK boarding school, premium budget, urgent | 68 | 88 | Hot lead → agent |
-| Uncertain about private vs public, 2+ years | 24 | 32 | Standard info |
-| Premium school, joint decision, timeline unclear | 50 | 62 | Booking link |
-| Urgent need but budget-constrained | 38 | 48 | AI agent → standard |
-| Clear premium + urgent + authority, needs exam help | 78 | 92 | Hot lead → agent |
-| Just researching, exploring options | 12 | 20 | Standard info |
+| Parent relocating to HK, premium school, urgent | 72 | 82 | AI agent → Hot lead → agent |
+| Exploring IGCSE, no timeline, budget unclear | 28 | n/a (skips AI) | Standard info |
+| A-level tuition, decent budget, joint decision, no urgency | 42 | n/a (skips AI) | Standard info |
+| Spouse leads decision, weak budget signal, exploratory | 35 | n/a (skips AI) | Standard info |
+| UK boarding school, premium budget, urgent | 68 | 88 | AI agent → Hot lead → agent |
+| Uncertain about private vs public, 2+ years | 24 | n/a (skips AI) | Standard info |
+| Premium school, joint decision, timeline unclear | 55 | 62 | AI agent → Booking link |
+| Urgent need but budget-constrained | 38 | n/a (skips AI) | Standard info |
+| Clear premium + urgent + authority, needs exam help | 78 | n/a (skips AI) | Hot lead → agent (direct) |
+| Just researching, exploring options | 12 | n/a (skips AI) | Standard info |
 
 ### Acceptance Criteria
 
@@ -371,7 +367,7 @@ Add columns:
 - [ ] Email notifications send to admissions@
 - [ ] Booking links in outbound messages are clickable
 - [ ] Google Sheet captures all lead data
-- [ ] AI agent only triggers for 35–50 pre-qual band
+- [ ] AI agent only triggers for 50–75 pre-qual band
 - [ ] No duplicate messages sent
 - [ ] Pre-qual score distribution: not all high, not all low
 
@@ -408,15 +404,15 @@ Add columns:
 
 ### v1 Acceptance
 - Workflow processes messages without error
-- Scores distribute across all 4 tiers
-- AI agent triggers only for 35–50 band
+- Scores distribute across all 3 tiers
+- AI agent triggers only for 50–75 band
 - Email notifications land correctly
 - Avg time-to-score: <2 sec per message
 
 ### Pilot Validation
 - 75+ leads convert at >60% rate (booking → call scheduled)
-- <35 leads rarely return (acceptable churn)
-- 35–50 leads benefit from AI probe (per feedback)
+- <50 leads rarely return (acceptable churn)
+- 50–75 leads benefit from AI probe (per feedback)
 
 ### Operational Health
 - No workflow crashes or hangs

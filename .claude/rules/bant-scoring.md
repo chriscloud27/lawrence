@@ -2,7 +2,7 @@
 
 **Framework:** Budget, Authority, Need, Timeline  
 **Scale:** 0–100 points (two stages)  
-**Purpose:** Route parents to the right tier (standard resources, AI consulting path, booking link, or agent escalation)
+**Purpose:** Route parents to the right tier (standard resources, AI consulting path, or booking link + agent escalation)
 
 ---
 
@@ -42,16 +42,15 @@ Three lightweight pre-qual questions scored via keyword matching in JavaScript C
 
 | Tier | Score | Routing | Action |
 |------|-------|---------|--------|
-| Low-fit | < 35 | Standard resources tier | Send information article + resource links; no agent contact |
-| Medium-fit | 35–50 | AI consulting path | Trigger AI Agent node for 2–3 BANT follow-ups; re-score to 0–100 |
-| Medium-high-fit | 50–75 | Booking link tier | Offer calendar booking link + email option |
-| High-fit | 75+ | Hot lead + escalation | Booking link + notify admissions team via Gmail |
+| Low-fit | < 50 | Standard resources tier | Send information article + resource links; no agent contact |
+| Medium-fit | 50–75 | AI consulting path | Trigger AI Agent node for 2–3 BANT follow-ups; re-score to 0–100 |
+| High-fit | > 75 | Hot lead + escalation | Booking link + notify admissions team via Gmail |
 
 ---
 
 ## Stage 2: Refined Scoring (0–100 pts via AI Agent)
 
-**Trigger:** Only for 35–50 pre-qual band.
+**Trigger:** Only for 50–75 pre-qual band.
 
 **Process:** AI Agent asks 2–3 conversational follow-ups targeting BANT gaps. JavaScript re-scoring node evaluates AI response and accumulates refined score.
 
@@ -71,9 +70,9 @@ Three lightweight pre-qual questions scored via keyword matching in JavaScript C
 | Scenario | Pre-qual | AI Adds | Refined | Route |
 |----------|----------|---------|---------|-------|
 | Relocating to HK, premium school, urgent | 72 | +10 | 82 | Hot lead |
-| Exploring IGCSE, no timeline, budget unclear | 28 | +5 | 33 | Standard resources |
-| A-level tuition, 6-week timeline, good budget, joint decision | 42 | +18 | 60 | Booking link |
-| Spouse leads, weak budget signal, exploratory | 35 | +12 | 47 | Standard resources |
+| Exploring IGCSE, no timeline, budget unclear | 28 | — | 28 | Standard resources |
+| A-level tuition, 6-week timeline, good budget, joint decision | 60 | +18 | 78 | Hot lead |
+| Spouse leads, weak budget signal, exploratory | 47 | — | 47 | Standard resources |
 | UK boarding school, premium budget, urgent | 68 | +22 | 90 | Hot lead |
 
 ### Re-Scoring Logic (JavaScript)
@@ -112,7 +111,7 @@ const refinedScore = Object.values(refinedBreakdown).reduce((a, b) => a + b, 0) 
 return {
   score: Math.min(100, refinedScore),
   breakdown: { ...refinedBreakdown, need: needScore },
-  escalated: refinedScore >= 75
+  escalated: refinedScore > 75
 };
 ```
 
@@ -123,8 +122,8 @@ return {
 | Score | Route | Action |
 |-------|-------|--------|
 | < 50 | Standard resources | Send information + resource links; no escalation |
-| 50–75 | Booking link | Offer calendar booking + email option |
-| 75+ | Hot lead + escalation | Booking link + Gmail to admissions team |
+| 50–75 | Booking link | Offer calendar booking + email option (AI Agent already engaged) |
+| > 75 | Hot lead + escalation | Booking link + Gmail to admissions team |
 
 ---
 
@@ -132,7 +131,7 @@ return {
 
 ```
 User: "Hi, we're thinking about boarding school for our daughter."
-System Score: Timeline=8, Budget=20, Authority=0 (no authority signal) → Tier=Medium (35)
+System Score: Timeline=8, Budget=20, Authority=0 (no authority signal) → Tier=Low (28)
 
 AI: "That's wonderful. Boarding school is such an important decision. 
      Are you leading the school search, or are you and your partner exploring together?"
@@ -144,10 +143,10 @@ AI: "That's great — having both perspectives usually leads to better decisions
     When are you hoping to make a move to boarding school?"
 
 User: "Probably next September for the new term. She's currently in Year 6."
-System Score: Timeline=23, Budget=20, Authority=18 → Tier=Medium-High (61)
-→ Route: Booking link (no AI Agent for 61; above 50-75 range)
+System Score: Timeline=23, Budget=20, Authority=18 → Tier=Medium (61)
+→ Route: AI Agent (50–75 pre-qual band, further-qualification)
 
-Response: "That's a clear timeline — gives you about 8 months. Here's our booking link for a chat with an advisor..."
+Response: "That's a clear timeline — gives you about 8 months. Tell me a bit more about what you're hoping she'll get out of the move..."
 ```
 
 ---
