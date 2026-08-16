@@ -27,6 +27,9 @@ See `.claude/projects/.../memory/architectural-principles.md` for full rationale
 - `/run-pipeline <name>` — trigger pipeline, tail logs, verify DB
 - `/deploy-staging` — build, push, migrate, health-check
 - `/db-migrate [staging|production]` — apply Supabase migrations
+- `/feature-log add` / `/feature-log summary` — log completed feature requests, roll up into an executive summary
+
+**Feature log:** after completing a feature request (not a trivial one-liner or pure discovery task), run `/feature-log add` to append an entry to `.claude/docs/feature-log.md`. Use judgment on what counts — a shipped feature, fix, or notable chore/refactor qualifies; mid-task edits, exploration, and plan iterations do not.
 
 ## ADRs
 

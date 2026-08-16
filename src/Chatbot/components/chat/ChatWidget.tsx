@@ -5,6 +5,8 @@ import ChatMessage from "./ChatMessage";
 import { getChatbotConfig } from "@/lib/chatbot-config";
 import { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } from "@/lib/env";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
+import { fetchLatestLeadRecap, type LeadRecap } from "@/lib/lead-history";
+import { composeWelcomeBackMessage } from "@/lib/greeting";
 import {
   getOrCreateSessionId,
   loadHistory,
@@ -53,6 +55,7 @@ export default function ChatWidget() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
+  const [recap, setRecap] = useState<LeadRecap | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const prequalDone = prequal.stepIndex >= config.prequalQuestions.length;
@@ -86,6 +89,26 @@ export default function ChatWidget() {
       body: JSON.stringify({ sessionId, userId }),
     }).catch(() => {});
   }, [userId, sessionId]);
+
+  useEffect(() => {
+    if (!authEnabled || !userId || recap) return;
+    // Only fetch and show recap if the local conversation is genuinely fresh
+    // (not mid-conversation). A fresh state is exactly [INITIAL_MESSAGE].
+    if (!(messages.length === 1 && messages[0].id === "initial")) return;
+
+    fetchLatestLeadRecap().then(r => {
+      if (!r) return; // No prior lead found, keep the generic INITIAL_MESSAGE
+      setRecap(r);
+      // Replace the initial message with the personalized welcome-back greeting
+      const welcomeMsg: ChatMessageData = {
+        id: "welcome-back",
+        role: "assistant",
+        content: composeWelcomeBackMessage(r),
+      };
+      setMessages([welcomeMsg]);
+      saveHistory([welcomeMsg]);
+    });
+  }, [userId]);
 
   const signInWithGoogle = () => {
     const supabase = getSupabaseBrowserClient();

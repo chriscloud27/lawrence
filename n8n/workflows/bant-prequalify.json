@@ -10,7 +10,10 @@
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
-      "position": [-640, -432],
+      "position": [
+        -640,
+        -432
+      ],
       "id": "2710b975-e3e1-4694-b697-d87604359118",
       "name": "chatbot-webhook",
       "webhookId": "f2a93316-10bb-47dd-a047-2f97c374e7c0"
@@ -92,7 +95,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [-528, -432],
+      "position": [
+        -528,
+        -432
+      ],
       "id": "b6c5d4e3-0001-4a1a-9a1a-init0secrets1",
       "name": "init-secrets"
     },
@@ -102,7 +108,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [-416, -432],
+      "position": [
+        -416,
+        -432
+      ],
       "id": "75c4c7e5-838e-4407-a173-8de5de397edf",
       "name": "pre-qualifyJS"
     },
@@ -197,7 +206,10 @@
       },
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
-      "position": [-16, -448],
+      "position": [
+        -16,
+        -448
+      ],
       "id": "6e1f370d-cb86-48d2-95c0-f96229d476f6",
       "name": "Switch"
     },
@@ -208,7 +220,7 @@
             {
               "id": "b2a1e5e0-1a2b-4c3d-9e4f-5a6b7c8d9e0f",
               "name": "reply",
-              "value": "=Thanks so much for sharing that with me. Based on what you've told me, here are a few resources that might help while you're exploring your options:\n\n- School Search Database: {{ $('init-secrets').item.json.SCHOOL_SEARCH_URL }}\n- Article Library: {{ $('init-secrets').item.json.ARTICLE_LIBRARY_URL }}\n- Free Consultation Offer: {{ $('init-secrets').item.json.CONSULTATION_URL }}\n\nFeel free to come back any time if you'd like to dig deeper — I'm happy to help whenever you're ready.",
+              "value": "=Thanks so much for sharing that with me. Based on what you've told me, here are a few resources that might help while you're exploring your options:\n\n- School Search Database: {{ $('init-secrets').item.json.SCHOOL_SEARCH_URL }}\n- Article Library: {{ $('init-secrets').item.json.ARTICLE_LIBRARY_URL }}\n- Free Consultation Offer: {{ $('init-secrets').item.json.CONSULTATION_URL }}\n\nFeel free to come back any time if you'd like to dig deeper \u2014 I'm happy to help whenever you're ready.",
               "type": "string"
             },
             {
@@ -235,7 +247,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [240, -672],
+      "position": [
+        240,
+        -672
+      ],
       "id": "e5d4b8b3-4d5e-7f6a-cb7c-8d9e0f1a2b3c",
       "name": "send-standard-info"
     },
@@ -250,7 +265,10 @@
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
-      "position": [240, -448],
+      "position": [
+        240,
+        -448
+      ],
       "id": "f6e5c9c4-5e6f-8a7b-dc8d-9e0f1a2b3c4d",
       "name": "AI Agent"
     },
@@ -288,7 +306,10 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [400, -448],
+      "position": [
+        400,
+        -448
+      ],
       "id": "a4b9bfae-4d5e-0a9b-ea0d-1e2f3a4b5c6d",
       "name": "AI Agent Reply"
     },
@@ -305,7 +326,10 @@
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
-      "position": [200, -240],
+      "position": [
+        200,
+        -240
+      ],
       "id": "a7f6dad5-6f7a-9b8c-ed9e-0f1a2b3c4d5e",
       "name": "OpenAI Chat Model",
       "credentials": {
@@ -322,7 +346,7 @@
             {
               "id": "b8a7ebe6-7a8b-0c9d-fe0f-1a2b3c4d5e6f",
               "name": "reply",
-              "value": "=Based on everything you've shared, I think you'd really benefit from a deeper conversation with one of our advisors.\n\nBook a 30-min consultation: {{ $('init-secrets').item.json.BOOKING_LINK }}\n\nOr, I can send you an email with recommended packages — would that be helpful?",
+              "value": "=Based on everything you've shared, I think you'd really benefit from a deeper conversation with one of our advisors.\n\nBook a 30-min consultation: {{ $('init-secrets').item.json.BOOKING_LINK }}\n\nOr, I can send you an email with recommended packages \u2014 would that be helpful?",
               "type": "string"
             },
             {
@@ -355,20 +379,26 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [240, -240],
+      "position": [
+        240,
+        -240
+      ],
       "id": "f2e1cfda-1e2f-4a3b-dc4d-5e6f7a8b9c0d",
       "name": "offer-booking-link"
     },
     {
       "parameters": {
         "sendTo": "={{ $('init-secrets').item.json.GMAIL_ADDRESS }}",
-        "subject": "=🔥 Hot Lead: Score {{ $json.score }}",
+        "subject": "=\ud83d\udd25 Hot Lead: Score {{ $json.score }}",
         "message": "=Score: {{ $json.score }} / 75\nBreakdown:\n- Timeline: {{ $json.breakdown?.timeline }} / 25\n- Budget: {{ $json.breakdown?.budget }} / 25\n- Authority: {{ $json.breakdown?.authority }} / 25\n\nOriginal message:\n{{ $json.chatInput }}\n\nSession: {{ $json.sessionId }}\n\nNext action: assign to counsellor within 2 hours.",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
-      "position": [240, -80],
+      "position": [
+        240,
+        -80
+      ],
       "id": "a3f2d0eb-2f3a-5b4c-ed5e-6f7a8b9c0d1e",
       "name": "inform-agent",
       "credentials": {
@@ -385,20 +415,35 @@
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            { "name": "apikey", "value": "={{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Authorization", "value": "=Bearer {{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}" },
-            { "name": "Content-Type", "value": "application/json" },
-            { "name": "Prefer", "value": "resolution=merge-duplicates,return=minimal" }
+            {
+              "name": "apikey",
+              "value": "={{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "=[{ \"id\": {{ JSON.stringify($('pre-qualifyJS').item.json.sessionId) }}, \"session_id\": {{ JSON.stringify($('pre-qualifyJS').item.json.sessionId) }}, \"score\": {{ $('pre-qualifyJS').item.json.score }}, \"score_breakdown\": {{ JSON.stringify($('pre-qualifyJS').item.json.breakdown) }}, \"classification\": \"hot\" }]",
+        "jsonBody": "=[{ \"id\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.sessionId) }}, \"session_id\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.sessionId) }}, \"score\": {{ $(\"pre-qualifyJS\").item.json.score }}, \"score_breakdown\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.breakdown) }}, \"classification\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.score < 50 ? \"cold\" : $(\"pre-qualifyJS\").item.json.score <= 75 ? \"warm\" : \"hot\") }} }]",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [240, 80],
+      "position": [
+        240,
+        80
+      ],
       "id": "b1c2d3e4-5f6a-7b8c-9d0e-1f2a3b4c5d6e",
       "name": "upsert-lead"
     },
@@ -408,7 +453,10 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [560, -448],
+      "position": [
+        560,
+        -448
+      ],
       "id": "re-score-node-id",
       "name": "re-scoreJS"
     },
@@ -503,7 +551,10 @@
       },
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
-      "position": [720, -448],
+      "position": [
+        720,
+        -448
+      ],
       "id": "switch2-tier2-id",
       "name": "Switch2-tier2"
     },
@@ -515,7 +566,10 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [880, -576],
+      "position": [
+        880,
+        -576
+      ],
       "id": "respond-refined-low-id",
       "name": "Respond - Refined Low Tier"
     },
@@ -527,7 +581,10 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [880, -432],
+      "position": [
+        880,
+        -432
+      ],
       "id": "respond-refined-booking-id",
       "name": "Respond - Refined Booking Tier"
     },
@@ -539,7 +596,10 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [880, -288],
+      "position": [
+        880,
+        -288
+      ],
       "id": "respond-refined-hot-id",
       "name": "Respond - Refined Hot Lead"
     },
@@ -551,123 +611,535 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
-      "position": [560, -448],
+      "position": [
+        560,
+        -448
+      ],
       "id": "d63df1ba-85da-4dab-9cdf-30b917c9dbbe",
       "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build message array for low-tier response\nconst sessionId = $('pre-qualifyJS').item.json.sessionId;\nconst userMessage = $('pre-qualifyJS').item.json.chatInput;\nconst assistantMessage = $('send-standard-info').item.json.reply;\nconst crypto = require('crypto');\n\nreturn {\n  messages: [\n    {\n      id: crypto.randomUUID(),\n      lead_id: sessionId,\n      role: 'user',\n      content: userMessage\n    },\n    {\n      id: crypto.randomUUID(),\n      lead_id: sessionId,\n      role: 'assistant',\n      content: assistantMessage\n    }\n  ],\n  sessionId: sessionId\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -576
+      ],
+      "id": "build-messages-lowtier-9a0435f1-9617-4b6a-9e17-a25667c86d57",
+      "name": "build-messages-lowtier"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('init-secrets').item.json.SUPABASE_URL }}/rest/v1/leads?on_conflict=session_id",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{ \"id\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.sessionId) }}, \"session_id\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.sessionId) }}, \"score\": {{ $(\"pre-qualifyJS\").item.json.score }}, \"score_breakdown\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.breakdown) }}, \"classification\": \"cold\" }]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        360,
+        -576
+      ],
+      "id": "upsert-lead-lowtier-ba871645-611f-476f-9b74-e124b971b101",
+      "name": "upsert-lead-lowtier"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('init-secrets').item.json.SUPABASE_URL }}/rest/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.messages) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        -576
+      ],
+      "id": "insert-messages-lowtier-7225dd70-1a24-4180-b5e2-e9d178e12ab7",
+      "name": "insert-messages-lowtier"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build message array for medium-tier response (post-refinement)\nconst sessionId = $('pre-qualifyJS').item.json.sessionId;\nconst userMessage = $('pre-qualifyJS').item.json.chatInput;\nconst assistantMessage = $json.reply;\nconst crypto = require('crypto');\n\nreturn {\n  messages: [\n    {\n      id: crypto.randomUUID(),\n      lead_id: sessionId,\n      role: 'user',\n      content: userMessage\n    },\n    {\n      id: crypto.randomUUID(),\n      lead_id: sessionId,\n      role: 'assistant',\n      content: assistantMessage\n    }\n  ],\n  sessionId: sessionId,\n  score: $json.score,\n  breakdown: $json.breakdown\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        -448
+      ],
+      "id": "build-messages-midtier-ad86fbc7-dbdd-4b87-b052-c2c2fa10a825",
+      "name": "build-messages-midtier"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('init-secrets').item.json.SUPABASE_URL }}/rest/v1/leads?on_conflict=session_id",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[{ \"id\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.sessionId) }}, \"session_id\": {{ JSON.stringify($(\"pre-qualifyJS\").item.json.sessionId) }}, \"score\": {{ $json.score }}, \"score_breakdown\": {{ JSON.stringify($json.breakdown) }}, \"classification\": {{ JSON.stringify($json.score < $(\"init-secrets\").item.json.BANT_MEDIUM_THRESHOLD ? \"cold\" : $json.score < $(\"init-secrets\").item.json.BANT_HOT_THRESHOLD ? \"warm\" : \"hot\") }} }]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        520,
+        -448
+      ],
+      "id": "upsert-lead-midtier-f6b7cb49-39ff-4ffe-a15d-f4c7d0929f98",
+      "name": "upsert-lead-midtier"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('init-secrets').item.json.SUPABASE_URL }}/rest/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.messages) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -448
+      ],
+      "id": "insert-messages-midtier-eeb91a3c-f400-4400-866e-fff32e42fda7",
+      "name": "insert-messages-midtier"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build message array for hot-tier response\nconst sessionId = $('pre-qualifyJS').item.json.sessionId;\nconst userMessage = $('pre-qualifyJS').item.json.chatInput;\nconst assistantMessage = $('offer-booking-link').item.json.reply;\nconst crypto = require('crypto');\n\nreturn {\n  messages: [\n    {\n      id: crypto.randomUUID(),\n      lead_id: sessionId,\n      role: 'user',\n      content: userMessage\n    },\n    {\n      id: crypto.randomUUID(),\n      lead_id: sessionId,\n      role: 'assistant',\n      content: assistantMessage\n    }\n  ],\n  sessionId: sessionId\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        360,
+        80
+      ],
+      "id": "build-messages-hottier-ce4e91ed-0897-42c6-909c-7dc5e848eb05",
+      "name": "build-messages-hottier"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('init-secrets').item.json.SUPABASE_URL }}/rest/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('init-secrets').item.json.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=minimal"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.messages) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        80
+      ],
+      "id": "insert-messages-hottier-936c9bd2-5775-49fe-9ed4-bd7dc21febaa",
+      "name": "insert-messages-hottier"
     }
   ],
   "connections": {
     "chatbot-webhook": {
       "main": [
         [
-          { "node": "init-secrets", "type": "main", "index": 0 }
+          {
+            "node": "init-secrets",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "init-secrets": {
       "main": [
         [
-          { "node": "pre-qualifyJS", "type": "main", "index": 0 }
+          {
+            "node": "pre-qualifyJS",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "pre-qualifyJS": {
       "main": [
         [
-          { "node": "Switch", "type": "main", "index": 0 }
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Switch": {
       "main": [
         [
-          { "node": "send-standard-info", "type": "main", "index": 0 }
+          {
+            "node": "send-standard-info",
+            "type": "main",
+            "index": 0
+          }
         ],
         [
-          { "node": "AI Agent", "type": "main", "index": 0 }
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
         ],
         [
-          { "node": "offer-booking-link", "type": "main", "index": 0 },
-          { "node": "inform-agent", "type": "main", "index": 0 },
-          { "node": "upsert-lead", "type": "main", "index": 0 }
+          {
+            "node": "offer-booking-link",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "inform-agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "upsert-lead",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "build-messages-hottier",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "send-standard-info": {
       "main": [
         [
-          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+          {
+            "node": "build-messages-lowtier",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "AI Agent": {
       "main": [
         [
-          { "node": "AI Agent Reply", "type": "main", "index": 0 }
+          {
+            "node": "AI Agent Reply",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "AI Agent Reply": {
       "main": [
         [
-          { "node": "re-scoreJS", "type": "main", "index": 0 }
+          {
+            "node": "re-scoreJS",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "re-scoreJS": {
       "main": [
         [
-          { "node": "Switch2-tier2", "type": "main", "index": 0 }
+          {
+            "node": "build-messages-midtier",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Switch2-tier2": {
       "main": [
         [
-          { "node": "Respond - Refined Low Tier", "type": "main", "index": 0 }
+          {
+            "node": "Respond - Refined Low Tier",
+            "type": "main",
+            "index": 0
+          }
         ],
         [
-          { "node": "Respond - Refined Booking Tier", "type": "main", "index": 0 }
+          {
+            "node": "Respond - Refined Booking Tier",
+            "type": "main",
+            "index": 0
+          }
         ],
         [
-          { "node": "Respond - Refined Hot Lead", "type": "main", "index": 0 }
+          {
+            "node": "Respond - Refined Hot Lead",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "Respond - Refined Low Tier": {
-      "main": [[]]
+      "main": [
+        []
+      ]
     },
     "Respond - Refined Booking Tier": {
-      "main": [[]]
+      "main": [
+        []
+      ]
     },
     "Respond - Refined Hot Lead": {
-      "main": [[]]
+      "main": [
+        []
+      ]
     },
     "OpenAI Chat Model": {
       "ai_languageModel": [
         [
-          { "node": "AI Agent", "type": "ai_languageModel", "index": 0 }
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
         ]
       ]
     },
     "offer-booking-link": {
       "main": [
         [
-          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "inform-agent": {
       "main": [
         [
-          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
     "upsert-lead": {
       "main": [
         [
-          { "node": "Respond to Webhook", "type": "main", "index": 0 }
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "build-messages-lowtier": {
+      "main": [
+        [
+          {
+            "node": "upsert-lead-lowtier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upsert-lead-lowtier": {
+      "main": [
+        [
+          {
+            "node": "insert-messages-lowtier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insert-messages-lowtier": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "build-messages-midtier": {
+      "main": [
+        [
+          {
+            "node": "upsert-lead-midtier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upsert-lead-midtier": {
+      "main": [
+        [
+          {
+            "node": "insert-messages-midtier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insert-messages-midtier": {
+      "main": [
+        [
+          {
+            "node": "Switch2-tier2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "build-messages-hottier": {
+      "main": [
+        [
+          {
+            "node": "insert-messages-hottier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insert-messages-hottier": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }

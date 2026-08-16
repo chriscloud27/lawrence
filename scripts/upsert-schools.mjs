@@ -85,13 +85,24 @@ const YEAR_GROUP_RE = /^(Pre-K|Nursery|Reception|K\d+|Grade\s?\d+|Year\s?\d+|Six
 function toFeeRows(ld) {
   return (ld.makesOffer ?? []).map((offer) => {
     const [label, feeType] = offer.name.split(/\s+–\s+/);
+    const spec = offer.priceSpecification;
+    let amount = offer.price;
+    let notes = offer.description ?? null;
+    if (amount == null && spec) {
+      // Some pages give a min/max range instead of a flat price — use the low
+      // end as `amount` (schema has no range column) and record the range in notes.
+      amount = spec.minPrice ?? spec.maxPrice;
+      if (spec.minPrice != null && spec.maxPrice != null && spec.minPrice !== spec.maxPrice) {
+        notes = `Range: ${spec.minPrice}–${spec.maxPrice} ${spec.priceCurrency ?? offer.priceCurrency ?? ''}`.trim();
+      }
+    }
     return {
       year_group: label && YEAR_GROUP_RE.test(label.trim()) ? label.trim() : null,
       fee_type: feeType ?? 'additional_fee',
       label: label ?? offer.name,
-      amount: offer.price,
-      currency: offer.priceCurrency,
-      notes: offer.description ?? null,
+      amount,
+      currency: offer.priceCurrency ?? spec?.priceCurrency,
+      notes,
     };
   });
 }

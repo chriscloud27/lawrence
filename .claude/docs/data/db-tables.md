@@ -174,6 +174,7 @@ not be edited further (see ADR-0008).
 |--------|------|----------|---------|-------|
 | id | TEXT | NO | | Chatbot's `sessionId` |
 | created_at | TIMESTAMPTZ | NO | NOW() | |
+| updated_at | TIMESTAMPTZ | NO | NOW() | Auto-stamped by trigger on every row modification (ADR-0009) |
 | status | TEXT | NO | `new` | `new` \| `contacted` \| `booked` \| `nurture` \| `closed` |
 | classification | TEXT | YES | | `hot` \| `warm` \| `cold` |
 | score | INTEGER | NO | 0 | 0–100, from BANT scoring (`.claude/rules/bant-scoring.md`) |
@@ -203,13 +204,25 @@ happen only via the `service_role` key (n8n), which bypasses RLS — no write po
 | content | TEXT | NO | | |
 | created_at | TIMESTAMPTZ | NO | NOW() | |
 
-RLS: enabled (no policies defined yet — no read path exists for `messages` today).
+RLS: enabled. `messages_owner_select` policy (ADR-0009) scopes `SELECT` to `lead_id IN (SELECT id FROM leads WHERE user_id = auth.uid())`, allowing signed-in users to read their own message history. Writes happen only via the `service_role` key (n8n).
 
 ### Write paths
 
-- `n8n/workflows/bant-prequalify.json` — `upsert-lead` node, hot-tier branch only. Upserts on
-  `session_id` conflict.
-- `n8n/workflows/link-lead.json` — sets `leads.user_id` by `session_id` after Google sign-in.
+- `n8n/workflows/bant-prequalify.json` — every tier (low, medium, hot) now writes:
+  - `upsert-lead-*` node: upserts a `leads` row keyed by `session_id`, with tier-appropriate classification (`cold`/`warm`/`hot`).
+  - `insert-messages-*` node: inserts a 2-row batch (user message + assistant reply) into `messages` for that lead.
+  - Low tier: after `send-standard-info`.
+  - Medium tier: after `re-scoreJS` (post-refinement), upstream of the 3-way `Switch2-tier2` split.
+  - Hot tier: in parallel with existing `offer-booking-link`/`inform-agent` nodes.
+- `n8n/workflows/link-lead.json` — sets `leads.user_id` by `session_id` after Google sign-in (ADR-0008).
+
+### Read paths (ADR-0009)
+
+- Authenticated users can read their own `leads` row via the RLS-scoped browser client (`lib/supabase-browser.ts`), 
+  filtered by `auth.uid() = user_id` (automatic via RLS policy `leads_owner_select`).
+- Authenticated users can read their own `messages` rows via the RLS-scoped browser client, 
+  filtered by the `messages_owner_select` policy (subquery: `lead_id IN (SELECT id FROM leads WHERE user_id = auth.uid())`).
+- Used by `src/Chatbot/lib/lead-history.ts::fetchLatestLeadRecap()` to populate cross-device conversation recap on sign-in.
 
 ---
 
