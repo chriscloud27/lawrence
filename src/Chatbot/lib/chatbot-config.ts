@@ -30,7 +30,7 @@ export const defaultChatbotConfig: ChatbotConfig = {
   prequalQuestions: [
     {
       id: "timeline",
-      question: "What's your timeline?",
+      question: "When are you looking to start studying?",
       options: [
         { label: "Urgent / next month", value: "urgent next month" },
         { label: "Few months away", value: "few months" },
@@ -40,7 +40,7 @@ export const defaultChatbotConfig: ChatbotConfig = {
     },
     {
       id: "budget",
-      question: "What about budget?",
+      question: "What annual school fee range are you considering, and are extras like extracurriculars or transportation important to you?",
       options: [
         { label: "Premium / private / international school", value: "premium private international" },
         { label: "Considering both private and public", value: "considering private" },
@@ -49,7 +49,7 @@ export const defaultChatbotConfig: ChatbotConfig = {
     },
     {
       id: "authority",
-      question: "Who's making the decision?",
+      question: "Who would you like to bring into the conversation around deciding on a school for your child?",
       options: [
         { label: "I'm the lead decision-maker", value: "i decide" },
         { label: "Joint decision with spouse/partner", value: "joint decision with spouse" },
