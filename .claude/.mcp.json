@@ -9,11 +9,6 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/christianweber/Documents/Github/lawrence"],
       "description": "Local filesystem access scoped to project root"
-    },
-    "docker": {
-      "command": "npx",
-      "args": ["-y", "@docker/mcp-server"],
-      "description": "Docker MCP — inspect containers, logs, volumes"
     }
   }
 }
