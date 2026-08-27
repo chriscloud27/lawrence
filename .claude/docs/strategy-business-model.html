@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lawrence Business Model</title>
+<style>
+:root {
+  --bg: #FAFAF8;
+  --text: #1A1A1A;
+  --text-light: #4A4945;
+  --accent: #0D7377;
+  --risk: #C85A17;
+  --divider: #D5D3CF;
+  --table-bg: #F5F3F1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F0E0D;
+    --text: #F5F3F1;
+    --text-light: #B8B6B1;
+    --accent: #2DB8C3;
+    --risk: #E89B4B;
+    --divider: #2A2925;
+    --table-bg: #1A1915;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0F0E0D;
+  --text: #F5F3F1;
+  --text-light: #B8B6B1;
+  --accent: #2DB8C3;
+  --risk: #E89B4B;
+  --divider: #2A2925;
+  --table-bg: #1A1915;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 3rem 2rem;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 2rem 1.5rem;
+    font-size: 15px;
+  }
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+  border-bottom: 2px solid var(--divider);
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+p {
+  margin-bottom: 1rem;
+  max-width: 65ch;
+  color: var(--text);
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-light);
+  margin-bottom: 3rem;
+  font-style: italic;
+}
+
+.callout {
+  background: var(--table-bg);
+  border-left: 4px solid var(--accent);
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border-radius: 4px;
+}
+
+.callout-risk {
+  border-left-color: var(--risk);
+}
+
+.callout h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--risk);
+  margin-bottom: 0.5rem;
+}
+
+.callout p {
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+
+.moat-block {
+  background: var(--table-bg);
+  padding: 2rem;
+  margin: 2rem 0;
+  border-radius: 4px;
+  border: 1px solid var(--divider);
+}
+
+.moat-block h3 {
+  margin-top: 0;
+  color: var(--accent);
+  font-size: 1.15rem;
+}
+
+.moat-block ul {
+  margin: 1rem 0 0 1.5rem;
+  list-style: none;
+}
+
+.moat-block li {
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.moat-block li:before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+ul, ol {
+  margin: 1rem 0 1rem 1.5rem;
+  color: var(--text);
+}
+
+li {
+  margin-bottom: 0.75rem;
+}
+
+strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+em {
+  font-style: italic;
+  color: var(--text-light);
+}
+
+.trap-section {
+  margin: 3rem 0;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--table-bg) 0%, transparent 100%);
+  border-radius: 4px;
+}
+
+.trap-section h2 {
+  border-bottom: 2px solid var(--risk);
+  color: var(--text);
+  margin-top: 0;
+}
+
+.divider {
+  height: 1px;
+  background: var(--divider);
+  margin: 3rem 0;
+}
+
+footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--divider);
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.highlight {
+  color: var(--accent);
+  font-weight: 600;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Lawrence: Business Model</h1>
+  <p class="subtitle">Why this model combination gets from MVP to €50K/month without the Jasper trap</p>
+
+  <section>
+    <h2>The Model Stack</h2>
+    <p><strong>B2B2C + Hybrid Subscription/Outcome Pricing + Vertical-Agent Moat</strong></p>
+
+    <p>Lawrence sits between two customers with inverted incentives: agencies pay subscription, parents see agency branding. This flips the typical SaaS pyramid (one payer, many users) into a better one: agencies are the decision-maker payers; parents are the qualitative signal that routing works.</p>
+
+    <p>The hybrid pricing—base SaaS subscription + per-hot-lead outcome fee—ties revenue to what actually matters: <strong>BANT accuracy</strong>. A bad qualification engine costs the agency nothing extra (fixed costs absorb it). A good one means more hot leads = more outcome fees + subscription renewal. This structure protects against commodity pressure: you're not selling "AI chat" (a wrapper), you're selling "hot-lead accuracy."</p>
+
+    <p>The moat is <strong>not</strong> the LLM call—that commoditizes in 18 months. The moat is:</p>
+
+    <div class="moat-block">
+      <h3>Three-Layer Moat</h3>
+      <ul>
+        <li><strong>BANT scoring methodology</strong> proven on your data (not theory)</li>
+        <li><strong>Agency relationship data</strong> locked in via multi-year contracts and network density</li>
+        <li><strong>Placement feedback loop</strong> (which leads actually converted → tighten the classifier)</li>
+      </ul>
+      <p style="margin-top: 1rem; font-size: 0.95rem; color: var(--text-light);">By 2029, when competitors release their own AI-education tools, Lawrence owns the prediction layer: you know which parents close. They don't. That's defensible.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="trap-section">
+    <h2>Why This Avoids the Jasper Trap</h2>
+
+    <p><strong>Jasper's story:</strong> Build prompt templates as a product. When GPT-4 arrives, templates become worthless—customers realize they can prompt GPT themselves. Revenue collapses 50% because there's no moat underneath.</p>
+
+    <p><strong>Lawrence's defense—three layers:</strong></p>
+
+    <h3>1. You're Not the Customer's Product</h3>
+    <p>Agencies sell advisory, not chatbots. You're their operational backbone. They could theoretically build this themselves, but it costs 3+ engineers and takes 9 months—so they don't. The switching cost isn't just "pick a new vendor"; it's "rebuild the entire qualification pipeline in-house."</p>
+
+    <h3>2. Vertical Economics Lock You In</h3>
+    <p>Education agencies have <em>specific</em> pain: complex BANT (parents make emotional decisions, not rational), high stakes (wrong recommendation = reputation damage), regulatory constraints (GDPR, agency compliance). A horizontal "AI chat" product doesn't solve this. Your product solves exactly this, and it gets better every time an agency uses it (feedback loop compounds).</p>
+
+    <h3>3. Data Is the Moat, Not the Model</h3>
+    <p>By 2028, you'll have interaction logs from thousands of parent conversations. That dataset is worth more than the LLM. A competitor launching in 2029 with GPT-5 still starts from zero data and loses to you for 2–3 years while they build it. You've already trained 50K parent-agency interactions; they're at zero.</p>
+
+    <div class="callout callout-risk">
+      <h4>The Fragile Transition</h4>
+      <p>Jasper's collapse wasn't inevitable—it was a choice to never build a moat. Lawrence avoids this by making the moat explicit: outcome data > model. If you skip the outcome feedback loop (Phase 2) or treat it as a "nice-to-have feature," you're making Jasper's mistake in slow motion.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>Founder Psychology</h2>
+    <p>You're building a <span class="highlight">vertical-motion-enabled business</span>, not a startup that trades on hype. That means: boring growth (3–5 agencies per quarter, not hockey-stick), predictable margins (65–70%), and clear unit economics from day one. It's the opposite of "move fast and break things"—it's <em>move deliberately and own the relationship data</em>. This is unsexy, but it compounds into $10M+ net worth without needing a $100M Series B.</p>
+
+    <p>The hardest part won't be building the chatbot. It will be staying disciplined enough to invest heavily in outcome instrumentation and feedback loops when everyone is asking "why aren't you adding more features?" The answer is: because the moat is the data, not the feature list.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2>The Concentration Decision Point</h2>
+    <p>The roadmap below flags the moment—likely Q3 2028, when you cross $20K MRR—where you decide: is Lawrence a "one of two micro-SaaS products" (Marc Lou's playbook) or does it deserve full concentration?</p>
+
+    <div class="callout">
+      <h4>Threshold Metrics</h4>
+      <p><strong>NRR >110%</strong> (agencies expanding + new logos offsetting churn)<br>
+      <strong>Churn <5%</strong> (annual cohort retention)<br>
+      <strong>Gross margin 65%+</strong></p>
+      <p style="margin-top: 1rem;">If all three: concentrate. If any fail: optimize for profitability across two products.</p>
+    </div>
+
+    <p>This isn't a guess. It's the point where Lawrence has proven defensible unit economics and product-market fit. Before that, you're still validating. After that, you're just grinding.</p>
+  </section>
+
+  <footer>
+    <p><strong>Bottom line:</strong> You're not building another Jasper. You're building Vanta-for-education: vertical SaaS with regulatory sensitivity, multi-year contracts, and defensible outcomes. The model works if you execute the feedback loop (years 0–2: get the BANT logic right; years 2–3: lock in 10+ agencies; years 3+: let data compounding become your moat).</p>
+  </footer>
+</div>
+</body>
+</html>

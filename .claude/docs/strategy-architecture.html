@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lawrence Architecture Overview</title>
+<style>
+:root {
+  --bg: #FAFAF8;
+  --text: #1A1A1A;
+  --text-light: #4A4945;
+  --accent: #0D7377;
+  --risk: #C85A17;
+  --divider: #D5D3CF;
+  --table-bg: #F5F3F1;
+  --code-bg: #E8E6E1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F0E0D;
+    --text: #F5F3F1;
+    --text-light: #B8B6B1;
+    --accent: #2DB8C3;
+    --risk: #E89B4B;
+    --divider: #2A2925;
+    --table-bg: #1A1915;
+    --code-bg: #1F1D1A;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0F0E0D;
+  --text: #F5F3F1;
+  --text-light: #B8B6B1;
+  --accent: #2DB8C3;
+  --risk: #E89B4B;
+  --divider: #2A2925;
+  --table-bg: #1A1915;
+  --code-bg: #1F1D1A;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 3rem 2rem;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 2rem 1.5rem;
+    font-size: 15px;
+  }
+}
+
+.container {
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-light);
+  margin-bottom: 3rem;
+  font-style: italic;
+}
+
+h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid var(--accent);
+}
+
+h2.stage {
+  margin-top: 4rem;
+  color: var(--text);
+}
+
+h2.stage span {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+em {
+  font-style: italic;
+  color: var(--text-light);
+}
+
+.stage-intro {
+  background: var(--table-bg);
+  padding: 1.5rem;
+  border-left: 5px solid var(--accent);
+  margin-bottom: 2rem;
+  border-radius: 4px;
+}
+
+.diagram {
+  background: var(--code-bg);
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+table th {
+  background: var(--table-bg);
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 2px solid var(--divider);
+}
+
+table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--divider);
+  color: var(--text);
+}
+
+table tr:last-child td {
+  border-bottom: none;
+}
+
+table td:first-child {
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.callout {
+  background: var(--table-bg);
+  border-left: 4px solid var(--accent);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 4px;
+}
+
+.callout-risk {
+  border-left-color: var(--risk);
+}
+
+.callout h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--risk);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.callout p {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.moat-stages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.moat-stage {
+  background: var(--table-bg);
+  padding: 1.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--divider);
+}
+
+.moat-stage h4 {
+  margin-top: 0;
+  color: var(--accent);
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.moat-stage p {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.moat-stage p:last-child {
+  margin-bottom: 0;
+}
+
+.moat-list {
+  list-style: none;
+  margin: 0.75rem 0 0 0;
+  padding: 0;
+}
+
+.moat-list li {
+  padding-left: 1.5rem;
+  position: relative;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.moat-list li:before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.architecture-layer {
+  background: var(--table-bg);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 4px;
+  border-left: 4px solid var(--accent);
+}
+
+.architecture-layer h4 {
+  margin-top: 0;
+  color: var(--text);
+}
+
+.architecture-layer table {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.architecture-layer table th {
+  background: rgba(0,0,0,0.05);
+}
+
+.founder-note {
+  font-style: italic;
+  color: var(--text-light);
+  margin: 1.25rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--divider);
+}
+
+ul, ol {
+  margin: 1rem 0 1rem 1.5rem;
+  color: var(--text);
+}
+
+li {
+  margin-bottom: 0.75rem;
+}
+
+.divider {
+  height: 1px;
+  background: var(--divider);
+  margin: 3rem 0;
+}
+
+.summary-visual {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+  .summary-visual {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  background: var(--table-bg);
+  padding: 1.5rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.summary-card .emoji {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.summary-card h4 {
+  margin-top: 0;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.summary-card p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--divider);
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.org-chart {
+  background: var(--code-bg);
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  color: var(--text);
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Lawrence: Architecture Overview</h1>
+  <p class="subtitle">How the product, data, and moat evolve from MVP through platform</p>
+
+  <section>
+    <h2>High-Level Thesis</h2>
+    <p>Lawrence's architecture must evolve to support three business-model shifts:</p>
+    <ol>
+      <li><strong>MVP → Single Agency (2026–2027):</strong> Prove BANT logic works. Architecture is simple because you're validating the concept.</li>
+      <li><strong>Multi-Agency Scale (2028–2029):</strong> Multi-tenant data isolation; outcome feedback loops drive refinement. Moat shifts from execution to <em>data quality</em>.</li>
+      <li><strong>Platform & Ecosystem (2030–2031):</strong> Network effects between agencies, schools, and parents. Data becomes the product. Moat is <em>predictive accuracy</em>.</li>
+    </ol>
+    <p><strong>Critical insight:</strong> Each stage's technical architecture enables the business model. Skip a stage and the moat never forms.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Stage 1 -->
+  <section>
+    <h2 class="stage"><span>Stage 1</span>MVP (Q3 2026 – Q4 2027)</h2>
+    <div class="stage-intro">
+      <strong>Business Model:</strong> 1–5 pilot agencies, free/cost-plus pricing (€500–1K/month)<br>
+      <strong>Moat Status:</strong> None yet. Moat is <em>execution speed + early trust</em>
+    </div>
+
+    <h3>Data Architecture</h3>
+    <div class="diagram">Parent Chat
+     ↓
+[Chatbot] → Supabase (leads, messages, schools)
+     ↓
+[n8n Workflow] → Email → Agency
+     ↓
+Manual feedback ("yes, this was a hot lead")</div>
+
+    <h3>What Lawrence Owns</h3>
+    <ul>
+      <li>Conversation logs (parent queries, AI responses)</li>
+      <li>BANT scores (computed locally, visible only to agency)</li>
+      <li>Email handoff (Gmail integration)</li>
+      <li>Basic school data (seed CSV, manual updates)</li>
+    </ul>
+
+    <h3>What Lawrence Does NOT Own</h3>
+    <ul>
+      <li>Outcome data (which leads actually converted) — no feedback yet</li>
+      <li>School relationship data (agencies have their own networks)</li>
+      <li>Historical lead patterns (year 1 = no baseline)</li>
+    </ul>
+
+    <h3>Key Technical Choices & Why They Matter</h3>
+    <table>
+      <tr>
+        <th>Choice</th>
+        <th>Moat Implication</th>
+      </tr>
+      <tr>
+        <td><strong>Next.js + Anthropic SDK</strong></td>
+        <td>Speed of iteration. Tweak prompts weekly based on agency feedback. First-mover + feedback advantage.</td>
+      </tr>
+      <tr>
+        <td><strong>Supabase (PostgreSQL + RLS)</strong></td>
+        <td>Enables multi-tenancy in Phase 2 without rearchitecture. Single-agency now, but RLS policies prep for scale.</td>
+      </tr>
+      <tr>
+        <td><strong>n8n self-hosted</strong></td>
+        <td>Full data control. When outcome data flows back (Phase 2), you own the pipeline. No third-party silos.</td>
+      </tr>
+      <tr>
+        <td><strong>Manual feedback loops</strong></td>
+        <td>Looks like a bottleneck, but strategic. You talk to agencies about scoring accuracy. That conversation is where trust (early moat) begins.</td>
+      </tr>
+    </table>
+
+    <div class="moat-stages">
+      <div class="moat-stage">
+        <h4>Moat Status</h4>
+        <p><strong>Defense:</strong> Low (any AI shop can replicate)</p>
+        <p><strong>Lock-in:</strong> Minimal (free/cheap, no switching costs)</p>
+        <p><strong>Compounding:</strong> Weak (no feedback loop yet)</p>
+      </div>
+      <div class="moat-stage">
+        <h4>How to Strengthen</h4>
+        <p>Get outcome data back from agencies. That single data point (did this lead close?) unlocks everything in Phase 2.</p>
+      </div>
+    </div>
+
+    <p class="founder-note">At this stage, you cannot prove BANT works. You're running on faith. This is the biggest risk phase. But it's also the phase where the foundation for the moat is laid.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Stage 2 -->
+  <section>
+    <h2 class="stage"><span>Stage 2</span>Multi-Agency Scale (2028)</h2>
+    <div class="stage-intro">
+      <strong>Business Model:</strong> 12–15 agencies, €1.5K–4K/month base + €5–20 per hot lead<br>
+      <strong>Moat Status:</strong> Shifting from execution to <em>data quality</em>. Outcome feedback loop is live.
+    </div>
+
+    <h3>Data Architecture (Critical Change)</h3>
+    <div class="diagram">Agency 1: Parent Chat
+         ↓
+Agency 2: Parent Chat ──→ [Multi-tenant Chatbot]
+         ↓                      ↓
+Agency N: Parent Chat      Supabase (RLS: agency_id)
+         ↓                      ↓
+         ←─ [Outcome Feedback Pipeline] ←─ Agency: "Lead #123 closed ✓"
+              ↓
+         [Scoring Refinement Engine]
+              ↓
+         Update model weights
+         (which BANT signals predict close?)</div>
+
+    <h3>What Lawrence Now Owns</h3>
+    <ul>
+      <li>Conversation logs (ALL agencies, isolated by RLS)</li>
+      <li>BANT scores (computed AND validated against outcomes)</li>
+      <li><strong>Outcome data</strong> (which leads closed, which didn't) ← <strong>NEW &amp; CRITICAL</strong></li>
+      <li>Aggregate patterns (e.g., "parents who mention 'September' + 'premium school' close 78% of the time")</li>
+    </ul>
+
+    <h3>Key Technical Choices & Moat Implications</h3>
+    <table>
+      <tr>
+        <th>Choice</th>
+        <th>Why It Matters for Moat</th>
+      </tr>
+      <tr>
+        <td><strong>Outcome feedback pipeline</strong></td>
+        <td>Every closed lead teaches the model. Competitors see your product is good but can't see <em>why</em>—data is proprietary. By end of 2028: 50K+ labeled interactions. Competitor starting in 2029: zero.</td>
+      </tr>
+      <tr>
+        <td><strong>BANT scoring refinement</strong></td>
+        <td>Monthly updates to algorithm based on outcome data. If August data shows timeline signals are 30% more predictive, you update. Agencies see better accuracy. Churn drops.</td>
+      </tr>
+      <tr>
+        <td><strong>Multi-tenant RLS</strong></td>
+        <td>Each agency sees only its own data. Switching cost emerges: lose access to historical data. Not a hard lock-in, but it's friction.</td>
+      </tr>
+      <tr>
+        <td><strong>Outcome tracking APIs</strong></td>
+        <td>Agencies integrate outcome signals (Salesforce, HubSpot). Dependency builds. Leaving means losing that integration + reworking their workflow.</td>
+      </tr>
+    </table>
+
+    <div class="moat-stages">
+      <div class="moat-stage">
+        <h4>Moat Status</h4>
+        <p><strong>Defense:</strong> Medium. You have outcome data; competitors don't. Catch-up takes 12+ months.</p>
+        <p><strong>Lock-in:</strong> Medium. Agencies depend on outcome APIs, dashboards, historical data.</p>
+        <p><strong>Compounding:</strong> Strong. Models improve weekly with outcome data.</p>
+      </div>
+      <div class="moat-stage">
+        <h4>Critical Risk</h4>
+        <p>If your model's accuracy plateaus or churn spikes, moat collapses because you haven't yet built <em>predictive advantage</em> (predicting closes, not scoring retrospectively).</p>
+      </div>
+    </div>
+
+    <div class="callout callout-risk">
+      <h4>The Fragile Transition</h4>
+      <p>This is the riskiest moment: Q4 2028–Q1 2029. You're betting on outcome data quality. If agencies stop sending signals (too much work to integrate), feedback loop breaks and moat collapses.</p>
+      <p><strong>Mitigation:</strong> In 2028, make outcome instrumentation so easy agencies can't ignore it. "Click a button in your CRM to mark lead as closed." If you nail this, Phase 3 is inevitable.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Stage 3 -->
+  <section>
+    <h2 class="stage"><span>Stage 3</span>Platform & Ecosystem (2029–2031)</h2>
+    <div class="stage-intro">
+      <strong>Business Model:</strong> 50+ agencies + schools + test-prep partners, tiered SaaS + outcome fees + API usage<br>
+      <strong>Moat Status:</strong> Full shift to <em>predictive data advantage</em>. You know which leads close before they close.
+    </div>
+
+    <h3>Data Architecture (Ecosystem Layer)</h3>
+    <div class="diagram">┌─────────────────── Lawrence Ecosystem ──────────────────┐
+│                                                           │
+│  Agency 1         Agency 2          Agency N            │
+│    ├─ Parents       ├─ Parents        ├─ Parents        │
+│    └─ Outcomes      └─ Outcomes       └─ Outcomes       │
+│         ↓                ↓                 ↓             │
+│    [Multi-tenant Chatbot + Outcome Model]               │
+│         ↓                                                │
+│    [Predictive Engine: "Which leads close in 45 days?"] │
+│         ↑                                                │
+│         └─ Trained on 500K+ interactions               │
+│                                                           │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │ School Directory                                  │  │
+│  │ ├─ Can be recommended by AI agent                │  │
+│  │ └─ Schools pay to list themselves                │  │
+│  └───────────────────────────────────────────────────┘  │
+│                                                           │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │ Parent App (Authenticated)                        │  │
+│  │ └─ Track journey, applications, offers           │  │
+│  └───────────────────────────────────────────────────┘  │
+│                                                           │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │ Partner API Marketplace                           │  │
+│  │ ├─ Test-prep, visa consultants, school mgmt      │  │
+│  │ └─ Partners integrate with Lawrence              │  │
+│  └───────────────────────────────────────────────────┘  │
+│                                                           │
+└───────────────────────────────────────────────────────────┘</div>
+
+    <h3>Key Technical Choices & Why They Matter</h3>
+    <table>
+      <tr>
+        <th>Choice</th>
+        <th>Moat Implication</th>
+      </tr>
+      <tr>
+        <td><strong>Predictive scoring (ML models)</strong></td>
+        <td>Move from classification ("is this hot?") to prediction ("when will this close?"). No one else can. You've trained 18+ months of data; competitors start at zero.</td>
+      </tr>
+      <tr>
+        <td><strong>Data warehouse (BigQuery/Snowflake)</strong></td>
+        <td>Expensive but essential. Traditional OLTP DB isn't efficient for analytics + ML. Competitors without this can't build predictive models. This is the infrastructure moat.</td>
+      </tr>
+      <tr>
+        <td><strong>Parent app + authentication</strong></td>
+        <td>Network effect trigger. Parents see "your conversation led to these offers." They refer friends. Agencies see viral loops. Schools see Lawrence parents convert better.</td>
+      </tr>
+      <tr>
+        <td><strong>Open API + marketplace</strong></td>
+        <td>Not a product; a platform. Test-prep, visa consultants, school systems integrate with Lawrence. Each integration stickier for agencies.</td>
+      </tr>
+      <tr>
+        <td><strong>Outcome data monetization</strong></td>
+        <td>Anonymized outcome data becomes a product. Schools pay for "what do admitted students have in common?" Only you have this data. Revenue stream separate from SaaS subscriptions.</td>
+      </tr>
+    </table>
+
+    <div class="moat-stages">
+      <div class="moat-stage">
+        <h4>Moat Status</h4>
+        <p><strong>Defense:</strong> Very High. 18+ months outcome data on 500K+ interactions. Competitors need 2–3 years to catch up.</p>
+        <p><strong>Lock-in:</strong> Very High. Outcome APIs, dashboards, school directory, parent app. Leaving means losing all of it.</p>
+        <p><strong>Compounding:</strong> Exceptional. Models improve weekly. You outpace competitors exponentially.</p>
+      </div>
+      <div class="moat-stage">
+        <h4>Why This Avoids Jasper</h4>
+        <p>You're not a "prompt wrapper." You're a <em>data company with proprietary predictive models</em>. LLM is just the interface; moat is the data + algorithms.</p>
+      </div>
+    </div>
+
+    <h3>Organizational Evolution</h3>
+    <div class="org-chart">
+Stage 1 (MVP):        Stage 2 (Scale):       Stage 3 (Platform):
+2–3 people            5–6 people             12–15 people
+
+Chris                 Chris (founder)        Chris (founder/investor)
+├─ Engineer           ├─ Eng Lead            ├─ VP Eng
+└─ Ops/Sales          ├─ Engineer #2         │  ├─ Backend Lead
+                      ├─ Product/Data        │  ├─ Frontend Lead
+                      ├─ Sales               │  ├─ Data Eng (warehouse)
+                      └─ Operations          │  └─ Engineers
+                                             ├─ VP Product
+                                             │  ├─ PM (Core)
+                                             │  ├─ PM (Ecosystem)
+                                             │  └─ Data Scientist
+                                             ├─ VP Sales
+                                             ├─ Ops/CS
+                                             └─ Finance/Partnerships
+    </div>
+
+    <p class="founder-note"><strong>Key hire in mid-2028:</strong> VP of Engineering who understands data pipelines and ML infrastructure. This person is your force-multiplier for the moat layer.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Summary -->
+  <section>
+    <h2>Moat Across Stages: Visual Summary</h2>
+
+    <div class="summary-visual">
+      <div class="summary-card">
+        <div class="emoji">⚖️</div>
+        <h4>Stage 1 (MVP)</h4>
+        <p>Moat = Execution + Trust</p>
+        <p style="font-size: 0.85rem; margin-top: 0.75rem; color: var(--text-light);">Easy to copy, fades in 18 months</p>
+      </div>
+      <div class="summary-card">
+        <div class="emoji">📊</div>
+        <h4>Stage 2 (Scale)</h4>
+        <p>Moat = Data Quality</p>
+        <p style="font-size: 0.85rem; margin-top: 0.75rem; color: var(--text-light);">Hard to copy, compounds 24–36 months</p>
+      </div>
+      <div class="summary-card">
+        <div class="emoji">🔮</div>
+        <h4>Stage 3 (Platform)</h4>
+        <p>Moat = Predictive Models</p>
+        <p style="font-size: 0.85rem; margin-top: 0.75rem; color: var(--text-light);">Very hard to copy, compounds 36+ months</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Database Strategy -->
+  <section>
+    <h2>Architectural Evolution: Key Decisions</h2>
+
+    <div class="architecture-layer">
+      <h4>Database Strategy</h4>
+      <table>
+        <tr>
+          <th>Stage</th>
+          <th>Choice</th>
+          <th>Reasoning</th>
+        </tr>
+        <tr>
+          <td><strong>MVP</strong></td>
+          <td>Supabase (PostgreSQL)</td>
+          <td>Fast, cheap, supports RLS (multi-tenant prep)</td>
+        </tr>
+        <tr>
+          <td><strong>Scale-up</strong></td>
+          <td>Add data warehouse (BigQuery)</td>
+          <td>Analytics + outcome analysis without bogging down transactional DB</td>
+        </tr>
+        <tr>
+          <td><strong>Platform</strong></td>
+          <td>Dual-layer: Supabase (transactional) + Warehouse (analytics/ML)</td>
+          <td>Transactional speed; warehouse for moat-building (predictive models)</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="architecture-layer">
+      <h4>API & Integration Strategy</h4>
+      <table>
+        <tr>
+          <th>Stage</th>
+          <th>Choice</th>
+          <th>Reasoning</th>
+        </tr>
+        <tr>
+          <td><strong>MVP</strong></td>
+          <td>Manual n8n workflows</td>
+          <td>No external dependencies; full data control</td>
+        </tr>
+        <tr>
+          <td><strong>Scale-up</strong></td>
+          <td>Outcome feedback APIs (REST)</td>
+          <td>Agencies send outcome signals; Lawrence ingests them</td>
+        </tr>
+        <tr>
+          <td><strong>Platform</strong></td>
+          <td>Full API marketplace (Zapier, Integromat)</td>
+          <td>Partners integrate with Lawrence; you don't integrate with everyone</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="architecture-layer">
+      <h4>Model Selection & Iteration</h4>
+      <table>
+        <tr>
+          <th>Stage</th>
+          <th>Choice</th>
+          <th>Reasoning</th>
+        </tr>
+        <tr>
+          <td><strong>MVP</strong></td>
+          <td>Hardcoded BANT scoring (JS)</td>
+          <td>Fast, deterministic, transparent to agencies</td>
+        </tr>
+        <tr>
+          <td><strong>Scale-up</strong></td>
+          <td>Tunable scoring (weights from outcomes)</td>
+          <td>Start using outcome data to refine the model</td>
+        </tr>
+        <tr>
+          <td><strong>Platform</strong></td>
+          <td>ML models (gradient boosting, neural nets)</td>
+          <td>Predictive scoring; models train nightly on outcome data</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Final Insight -->
+  <section>
+    <h2>Architecture ≠ Product; Architecture = Moat</h2>
+    <p>The reason to carefully architect each stage is <strong>not</strong> because multi-tenancy or data warehouses are technically interesting—it's because they're the <em>physical implementation of your moat</em>.</p>
+
+    <ul>
+      <li><strong>Stage 1:</strong> Moat is hidden (trust + speed). Architecture is simple because you're proving the concept.</li>
+      <li><strong>Stage 2:</strong> Moat emerges (data quality). Architecture adds outcome pipelines, RLS isolation, analytics. These <em>are</em> where the moat lives.</li>
+      <li><strong>Stage 3:</strong> Moat is explicit (predictive advantage). Architecture scales to warehouse + ML. Expensive and requires hiring, but <em>defensible</em> in ways a chatbot wrapper never is.</li>
+    </ul>
+
+    <div class="callout callout-risk">
+      <h4>The Fragile Transition (Phase 2→3)</h4>
+      <p><strong>Q4 2028–Q1 2029</strong> is the riskiest moment. You're betting on outcome data quality, model accuracy, and network effects forming. If any of these fail, the moat collapses and you're just an AI chatbot company fighting OpenAI on product quality. That's the Jasper trap.</p>
+      <p><strong>Key insight:</strong> If you skip the outcome feedback loop (Phase 2) or treat it as a "nice-to-have feature," you're making Jasper's mistake in slow motion.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Bottom line:</strong> Each stage's architecture is the foundation for the next stage's moat. Don't skip them. The roadmap and business-model TL;DR explain the business case; this document explains how you <em>build</em> it.</p>
+  </footer>
+</div>
+</body>
+</html>

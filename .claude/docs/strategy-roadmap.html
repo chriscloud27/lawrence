@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lawrence 5-Year Roadmap</title>
+<style>
+:root {
+  --bg: #FAFAF8;
+  --text: #1A1A1A;
+  --text-light: #4A4945;
+  --accent: #0D7377;
+  --risk: #C85A17;
+  --divider: #D5D3CF;
+  --table-bg: #F5F3F1;
+  --success: #2D6A4F;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F0E0D;
+    --text: #F5F3F1;
+    --text-light: #B8B6B1;
+    --accent: #2DB8C3;
+    --risk: #E89B4B;
+    --divider: #2A2925;
+    --table-bg: #1A1915;
+    --success: #5BA876;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0F0E0D;
+  --text: #F5F3F1;
+  --text-light: #B8B6B1;
+  --accent: #2DB8C3;
+  --risk: #E89B4B;
+  --divider: #2A2925;
+  --table-bg: #1A1915;
+  --success: #5BA876;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 3rem 2rem;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 2rem 1.5rem;
+    font-size: 15px;
+  }
+}
+
+.container {
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-light);
+  margin-bottom: 3rem;
+  font-style: italic;
+}
+
+h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+  color: var(--text);
+  padding-bottom: 0.75rem;
+  border-bottom: 3px solid var(--accent);
+}
+
+h2.phase {
+  margin-top: 4rem;
+  border-bottom-color: var(--accent);
+  color: var(--text);
+}
+
+h2.phase span {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+em {
+  font-style: italic;
+  color: var(--text-light);
+}
+
+.phase-intro {
+  background: var(--table-bg);
+  padding: 1.5rem;
+  border-left: 5px solid var(--accent);
+  margin-bottom: 2rem;
+  border-radius: 4px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+}
+
+table th {
+  background: var(--table-bg);
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text);
+  border-bottom: 2px solid var(--divider);
+}
+
+table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--divider);
+  color: var(--text);
+}
+
+table tr:last-child td {
+  border-bottom: none;
+}
+
+table td:first-child {
+  font-weight: 500;
+  color: var(--accent);
+}
+
+.callout {
+  background: var(--table-bg);
+  border-left: 4px solid var(--risk);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 4px;
+}
+
+.callout h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--risk);
+  margin-bottom: 0.75rem;
+}
+
+.callout p {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.callout ul {
+  margin: 0.75rem 0 0 1.5rem;
+  list-style: none;
+}
+
+.callout li {
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+  font-size: 0.95rem;
+}
+
+.callout li:before {
+  content: "⚠";
+  position: absolute;
+  left: 0;
+  color: var(--risk);
+}
+
+.decision-gate {
+  background: linear-gradient(135deg, var(--table-bg) 0%, transparent 100%);
+  border: 2px solid var(--accent);
+  padding: 2rem;
+  margin: 2rem 0;
+  border-radius: 4px;
+}
+
+.decision-gate h3 {
+  margin-top: 0;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+
+.decision-gate ul {
+  margin: 1rem 0 1rem 1.5rem;
+}
+
+.decision-gate li {
+  margin-bottom: 0.75rem;
+}
+
+.risk-trio {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: var(--table-bg);
+  border-radius: 4px;
+}
+
+.risk-trio h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+}
+
+.risk-list {
+  list-style: none;
+  margin: 0;
+}
+
+.risk-list li {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.risk-list li:before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--risk);
+  font-weight: bold;
+}
+
+.risk-list strong {
+  color: var(--risk);
+}
+
+.overview-table {
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.overview-table td {
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.overview-table td:first-child {
+  font-weight: 600;
+  width: 40%;
+  color: var(--text);
+}
+
+.overview-table td:nth-child(2),
+.overview-table td:nth-child(3) {
+  text-align: center;
+}
+
+.checkpoint {
+  background: var(--table-bg);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 4px;
+  border: 1px solid var(--divider);
+}
+
+.checkpoint h4 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.confidence {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.confidence.amber {
+  background: rgba(200, 90, 23, 0.15);
+  color: var(--risk);
+}
+
+.confidence.orange {
+  background: rgba(200, 90, 23, 0.2);
+  color: var(--risk);
+}
+
+.confidence.green {
+  background: rgba(45, 106, 79, 0.15);
+  color: var(--success);
+}
+
+.divider {
+  height: 1px;
+  background: var(--divider);
+  margin: 3rem 0;
+}
+
+footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--divider);
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.founder-note {
+  font-style: italic;
+  color: var(--text-light);
+  margin: 1.25rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--divider);
+}
+
+ul, ol {
+  margin: 1rem 0 1rem 1.5rem;
+}
+
+li {
+  margin-bottom: 0.75rem;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Lawrence: 5-Year Roadmap</h1>
+  <p class="subtitle">2026–2031: From MVP through market leadership</p>
+
+  <section>
+    <h2>Overview</h2>
+    <p>This roadmap traces Lawrence from MVP (Sept 2026) through market leadership (Dec 2031), marking the inflection points where business model decisions compound into defensible moat and path to €50K/month personal income.</p>
+    <p><strong>Key decision gate:</strong> Q3–Q4 2028, when you cross the $20K MRR concentration threshold (NRR >110%, churn <5%). This is where you choose: scale Lawrence full-time or keep it as one of two micro-SaaS products.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Phase 1 -->
+  <section>
+    <h2 class="phase"><span>Phase 1</span>MVP & Early Validation</h2>
+    <p class="phase-intro"><strong>Q3 2026 – Q4 2027</strong> | Prove BANT logic works; data ownership is implicit</p>
+
+    <h3>Financials & Metrics</h3>
+    <table>
+      <tr>
+        <th>Metric</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Benchmark</th>
+      </tr>
+      <tr>
+        <td>Revenue (MRR)</td>
+        <td>€0</td>
+        <td>€5–8K</td>
+        <td>N/A (validation)</td>
+      </tr>
+      <tr>
+        <td>Gross Margin</td>
+        <td>N/A</td>
+        <td>60–65%</td>
+        <td>Baseline</td>
+      </tr>
+      <tr>
+        <td>Team Size</td>
+        <td>1</td>
+        <td>3–4</td>
+        <td>Chris + engineer + ops</td>
+      </tr>
+      <tr>
+        <td>Active Agencies</td>
+        <td>1</td>
+        <td>3–5</td>
+        <td>Early adopters</td>
+      </tr>
+      <tr>
+        <td>vs. Concentration</td>
+        <td colspan="3" style="color: var(--text-light); font-style: italic;">Not yet (need 4x growth to hit $20K)</td>
+      </tr>
+    </table>
+
+    <h3>Product Scope</h3>
+    <ul>
+      <li><strong>✓</strong> Core chatbot (Next.js + Anthropic SDK)</li>
+      <li><strong>✓</strong> BANT pre-qualification (Stage 1: JS scoring, 0–75 pts)</li>
+      <li><strong>✓</strong> n8n MVP (basic ingestion + Gmail handoff)</li>
+      <li><strong>✓</strong> Supabase schema (leads, messages, schools)</li>
+      <li><strong>⊘</strong> Stage 2 AI agent (deferred to Phase 2)</li>
+      <li><strong>⊘</strong> Outcome feedback instrumentation</li>
+    </ul>
+
+    <h3>Go-to-Market</h3>
+    <ul>
+      <li>Direct outreach to 3–5 UK/SE Asia education agencies (warm intros)</li>
+      <li>Pilot pricing: free or low-cost (€500–1K/month)</li>
+      <li><strong>Success metric:</strong> 2+ agencies actively using, 1 paying, signal that BANT logic is useful</li>
+    </ul>
+
+    <div class="callout">
+      <h4>Biggest Risk</h4>
+      <p><strong>Product-market fit failure.</strong> The BANT pre-qual logic might not predict hot leads in practice. If pilot agencies report that scoring is no better than their workflow, the moat strategy collapses.</p>
+      <p><strong>Mitigation:</strong> Run daily scorecards (which leads scored hot actually converted?). Iterate scoring weights monthly. Be prepared to pivot to "lead enrichment" if BANT doesn't work.</p>
+    </div>
+
+    <p class="founder-note">You're building this lean: part-time engineer, bootstrapped ops. Focus is validation, not scale. Revenue is secondary.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Phase 2 -->
+  <section>
+    <h2 class="phase"><span>Phase 2</span>Product-Market Fit & Scale-Up</h2>
+    <p class="phase-intro"><strong>2028</strong> | Outcome feedback loop goes live; moat shifts to data quality</p>
+
+    <h3>Financials & Metrics</h3>
+    <table>
+      <tr>
+        <th>Metric</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Benchmark</th>
+      </tr>
+      <tr>
+        <td>Revenue (MRR)</td>
+        <td>€8K</td>
+        <td>€20K</td>
+        <td><strong>Concentration threshold</strong></td>
+      </tr>
+      <tr>
+        <td>Gross Margin</td>
+        <td>60–65%</td>
+        <td>65–70%</td>
+        <td>Outcome pricing improves</td>
+      </tr>
+      <tr>
+        <td>NRR (Net Revenue Retention)</td>
+        <td colspan="2">—</td>
+        <td>>110% (target)</td>
+      </tr>
+      <tr>
+        <td>Churn Rate</td>
+        <td><10%</td>
+        <td><5%</td>
+        <td>Healthy SaaS</td>
+      </tr>
+      <tr>
+        <td>Team Size</td>
+        <td>3–4</td>
+        <td>5–6</td>
+        <td>+2 eng, +1 sales, +1 ops</td>
+      </tr>
+      <tr>
+        <td>Active Agencies</td>
+        <td>5</td>
+        <td>12–15</td>
+        <td>Regional cluster</td>
+      </tr>
+    </table>
+
+    <h3>Product Scope (Critical Addition)</h3>
+    <ul>
+      <li><strong>✓</strong> Stage 2 AI agent (conversational BANT refinement)</li>
+      <li><strong>✓</strong> Outcome feedback loop (track lead closures; train model on outcomes)</li>
+      <li><strong>✓</strong> Outcome-based pricing model (base + per-hot-lead fee)</li>
+      <li><strong>✓</strong> Agency analytics dashboard (conversion trends)</li>
+      <li><strong>✓</strong> Expanded geographic scope (UK + SE Asia)</li>
+      <li><strong>⊘</strong> Multi-tenant architecture (stays single-agency; defer to Phase 3)</li>
+    </ul>
+
+    <div class="risk-trio">
+      <h4>Three Biggest Risks</h4>
+      <ol class="risk-list">
+        <li><strong>NRR collapse.</strong> Agencies see churn, not growth. Mitigation: quarterly business reviews; tie pricing to agency revenue, not just lead count.</li>
+        <li><strong>Margin compression.</strong> LLM costs spike or you need GPT-4o instead of mini. Mitigation: build cost model now; contract with OpenAI early.</li>
+        <li><strong>Competitive entry.</strong> McKinsey/Deloitte launch an AI education tool. Mitigation: lock agencies with multi-year contracts by end of 2028.</li>
+      </ol>
+    </div>
+
+    <div class="decision-gate">
+      <h3>Concentration Decision Gate (Q4 2028)</h3>
+      <p>Measure three metrics at year-end:</p>
+      <ul>
+        <li><strong>NRR >110%?</strong> Agencies expanding + new logos offsetting churn</li>
+        <li><strong>Churn <5%?</strong> Annual cohort retention healthy</li>
+        <li><strong>Gross margin 65%+?</strong> Economics work at scale</li>
+      </ul>
+      <p><strong>If YES to all three:</strong> Lawrence has product-market fit. Commit to full concentration in 2029+. Shut down or spin down other projects.</p>
+      <p><strong>If NO:</strong> Keep as "one of two micro-SaaS" (70–80% of your time). Optimize for profitability, not growth. Still pursue €50K/month total across both products.</p>
+      <p style="margin-top: 1.25rem; font-style: italic; color: var(--text-light);">(This roadmap assumes YES—the concentration path.)</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Phase 3 -->
+  <section>
+    <h2 class="phase"><span>Phase 3</span>Platform & Ecosystem</h2>
+    <p class="phase-intro"><strong>2029</strong> | Multi-tenant architecture; predictive models; network effects begin</p>
+
+    <h3>Financials & Metrics</h3>
+    <table>
+      <tr>
+        <th>Metric</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Benchmark</th>
+      </tr>
+      <tr>
+        <td>Revenue (MRR)</td>
+        <td>€20K</td>
+        <td>€50K</td>
+        <td>2.5x growth (hard)</td>
+      </tr>
+      <tr>
+        <td>Gross Margin</td>
+        <td>65–70%</td>
+        <td>60–65%</td>
+        <td>Platform headcount eats margin</td>
+      </tr>
+      <tr>
+        <td>NRR</td>
+        <td>>110%</td>
+        <td>>120%</td>
+        <td>Sustained excellence</td>
+      </tr>
+      <tr>
+        <td>Team Size</td>
+        <td>5–6</td>
+        <td>10–12</td>
+        <td>+eng, +data sci, +2 sales</td>
+      </tr>
+      <tr>
+        <td>Active Agencies</td>
+        <td>12–15</td>
+        <td>25–35</td>
+        <td>Multi-region, multi-vertical</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <h4>Biggest Risk: Founder Burnout</h4>
+      <p>You're now managing a real team and running feature roadmap planning. Operational overhead grows. If you haven't delegated product/ops by mid-2029, burnout is likely.</p>
+      <p><strong>Mitigation:</strong> Hire a COO or general manager. You transition to founder/investor role, not day-to-day operator.</p>
+    </div>
+
+    <p style="margin-top: 1.5rem;"><strong>Key insight:</strong> At €50K MRR with 60%+ margins, you're now running a defensible vertical SaaS company. This is where the personal income target becomes achievable.</p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Phase 4 & 5 Summary -->
+  <section>
+    <h2>Phase 4 & 5 (2030–2031)</h2>
+    <p><strong>Phase 4 (2030):</strong> Scale to 50+ agencies, €80K MRR. School network launches. Parent app goes live. Network effects kick in (agencies + schools + parents all derive value). Second product incubation begins.</p>
+    <p><strong>Phase 5 (2031):</strong> Lawrence at €100K+ MRR. Second product at early traction (€20K MRR). Combined company revenue €120K+. <strong>Personal income target achieved.</strong></p>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Stress Test -->
+  <section>
+    <h2>Stress Test vs. Ambition</h2>
+
+    <div class="checkpoint">
+      <h4>Is €50K/month by Dec 2031 realistic?</h4>
+      <p><span class="confidence amber">AMBER</span> Achievable if BANT works + NRR stays >110%. Requires: (1) product-market fit by Q4 2027, (2) 2.5x growth in 2029, (3) low churn maintained. One major setback (competitive entry, churn spike, cost explosion) delays to 2032.</p>
+    </div>
+
+    <div class="checkpoint">
+      <h4>Is $10M net worth achievable?</h4>
+      <p><span class="confidence orange">ORANGE</span> Harder without exit or secondary purchase. €150K+ MRR by 2032 on a 5–6x multiple ≈ $7–9M valuation. With accumulated profits, you're close. But this requires both products scaling concurrently.</p>
+    </div>
+
+    <div class="checkpoint">
+      <h4>Can you stay concentrated on Lawrence?</h4>
+      <p><span class="confidence green">GREEN</span> Yes, by end of Phase 2 (Q4 2028). If metrics hit (NRR >110%, churn <5%), the data makes the decision for you.</p>
+    </div>
+
+    <p style="margin-top: 2rem;"><strong>Honest assessment:</strong> The €50K/month target by late 2031 is ambitious. More realistic: €30–40K by Dec 2031, €50K+ by mid-2032. But if BANT becomes a known framework and your moat solidifies early, you can compress the timeline.</p>
+
+    <p><strong>Recommendation:</strong> Set €50K/month as the target, but plan for €35–40K by Dec 2031. The real milestone is proving the moat works (Phase 2). After that, the rest compounds.</p>
+  </section>
+
+  <footer>
+    <p>See the Architecture Overview for how technical choices at each phase enable the moat. See the Business Model TL;DR for why this structure avoids the Jasper trap.</p>
+  </footer>
+</div>
+</body>
+</html>
