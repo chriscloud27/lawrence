@@ -6,15 +6,15 @@
 }
 
 .page {
-  --blue: #066ebd;
-  --dark-blue: #04508a;
-  --light-blue: #e8f4fd;
-  --gold: #f5a623;
-  --text: #333;
-  --muted: #666;
-  --border: #ddd;
-  --white: #fff;
-  --bg: #f8f9fa;
+  --blue: var(--color-lw-accent);
+  --dark-blue: var(--color-lw-accent-hover);
+  --light-blue: var(--color-lw-accent-subtle);
+  --gold: var(--color-amber-500); /* ungoverned — closest Tailwind match to former custom gold, do NOT bind to --lw-warning (reserved for score states) */
+  --text: var(--color-lw-text);
+  --muted: var(--color-lw-text-secondary);
+  --border: var(--color-lw-border);
+  --white: var(--color-lw-bg);
+  --bg: var(--color-lw-bg-subtle);
 
   font-family: Arial, Helvetica, sans-serif;
   color: var(--text);
@@ -33,7 +33,7 @@
 /* TOP BAR */
 .topBar {
   background: var(--dark-blue);
-  color: #fff;
+  color: var(--color-white);
   font-size: 12px;
   padding: 5px 20px;
   display: flex;
@@ -41,7 +41,7 @@
   align-items: center;
 }
 .topBar a {
-  color: #cde;
+  color: var(--color-zinc-400);
   font-size: 12px;
 }
 .topBar span {
@@ -50,7 +50,7 @@
 
 /* HEADER */
 .header {
-  background: #fff;
+  background: var(--color-white);
   border-bottom: 3px solid var(--blue);
   padding: 10px 20px;
   display: flex;
@@ -100,12 +100,12 @@
 }
 .btnBlue {
   background: var(--blue);
-  color: #fff;
+  color: var(--color-white);
 }
 .btnBlue:hover {
   background: var(--dark-blue);
   text-decoration: none;
-  color: #fff;
+  color: var(--color-white);
 }
 .btnOutline {
   background: transparent;
@@ -114,17 +114,17 @@
 }
 .btnOutline:hover {
   background: var(--blue);
-  color: #fff;
+  color: var(--color-white);
   text-decoration: none;
 }
 .btnGold {
   background: var(--gold);
-  color: #fff;
+  color: var(--color-white);
 }
 .btnGold:hover {
-  background: #d4881a;
+  background: var(--color-amber-600);
   text-decoration: none;
-  color: #fff;
+  color: var(--color-white);
 }
 
 /* NAV */
@@ -147,7 +147,7 @@
 }
 .navItem > a {
   display: block;
-  color: #fff;
+  color: var(--color-white);
   padding: 13px 14px;
   font-size: 13px;
   font-weight: 600;
@@ -163,9 +163,9 @@
   position: absolute;
   top: 100%;
   left: 0;
-  background: #fff;
+  background: var(--color-white);
   min-width: 220px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--lw-shadow-md);
   z-index: 50;
   border-top: 3px solid var(--gold);
 }
@@ -174,7 +174,7 @@
   padding: 9px 16px;
   color: var(--text);
   font-size: 13px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--color-zinc-100);
 }
 .dropdown a:hover {
   background: var(--light-blue);
@@ -187,8 +187,8 @@
 
 /* TRUSTPILOT STRIP */
 .trustStrip {
-  background: #1a1a1a;
-  color: #fff;
+  background: var(--color-lw-footer-bg);
+  color: var(--color-white);
   padding: 10px 20px;
   display: flex;
   align-items: center;
@@ -204,7 +204,7 @@
 }
 .tpBadge {
   background: #00b67a;
-  color: #fff;
+  color: var(--color-white);
   font-weight: 900;
   font-size: 14px;
   padding: 4px 10px;
@@ -217,11 +217,11 @@
 }
 .tpText {
   font-size: 11px;
-  color: #888;
+  color: var(--color-zinc-500);
 }
 .tpQuote {
   font-style: italic;
-  color: #ccc;
+  color: var(--color-zinc-400);
   max-width: 500px;
   text-align: center;
 }
@@ -234,7 +234,7 @@
 /* HERO / CAROUSEL */
 .hero {
   position: relative;
-  background: linear-gradient(135deg, #04508a 0%, #066ebd 50%, #0888e8 100%);
+  background: var(--blue);
   min-height: 420px;
   display: flex;
   align-items: center;
@@ -272,7 +272,7 @@
 .heroTitle {
   font-size: 38px;
   font-weight: 900;
-  color: #fff;
+  color: var(--color-white);
   line-height: 1.15;
   margin-bottom: 12px;
 }
@@ -288,7 +288,7 @@
   flex-wrap: wrap;
 }
 .heroOutlineBtn {
-  color: #fff;
+  color: var(--color-white);
   border-color: rgba(255, 255, 255, 0.5);
 }
 .heroBadge {
@@ -296,7 +296,7 @@
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 12px;
   padding: 20px 28px;
-  color: #fff;
+  color: var(--color-white);
   text-align: center;
   max-width: 260px;
 }
@@ -327,7 +327,7 @@
   padding: 0;
 }
 .carouselDotActive {
-  background: #fff;
+  background: var(--color-white);
 }
 .carouselNav {
   position: absolute;
@@ -335,7 +335,7 @@
   transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: #fff;
+  color: var(--color-white);
   font-size: 22px;
   padding: 10px 16px;
   cursor: pointer;
@@ -353,7 +353,7 @@
 
 /* SERVICES TABS */
 .services {
-  background: #fff;
+  background: var(--color-white);
   padding: 50px 20px;
 }
 .sectionLabel {
@@ -410,12 +410,12 @@
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
-  border: 1px solid #c5dff5;
+  border: 1px solid var(--color-lw-border);
   transition: 0.15s;
 }
 .serviceTag:hover {
   background: var(--blue);
-  color: #fff;
+  color: var(--color-white);
   text-decoration: none;
 }
 
@@ -440,7 +440,7 @@
   flex-shrink: 0;
 }
 .aboutImgPlaceholder {
-  background: linear-gradient(135deg, #066ebd, #0888e8);
+  background: var(--blue);
   height: 280px;
   display: flex;
   align-items: center;
@@ -466,7 +466,7 @@
   margin-top: 20px;
 }
 .accredBadge {
-  background: #fff;
+  background: var(--color-white);
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 8px 14px;
@@ -477,7 +477,7 @@
 
 /* TUTORS */
 .tutors {
-  background: #fff;
+  background: var(--color-white);
   padding: 60px 20px;
 }
 .tutorsGrid {
@@ -500,7 +500,7 @@
 }
 .tutorTag:hover {
   background: var(--blue);
-  color: #fff;
+  color: var(--color-white);
   border-color: var(--blue);
   text-decoration: none;
 }
@@ -511,7 +511,7 @@
 
 /* AWARDS */
 .awards {
-  background: var(--light-blue);
+  background: var(--color-lw-accent-subtle);
   padding: 40px 20px;
   text-align: center;
 }
@@ -524,11 +524,11 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  background: #fff;
+  background: var(--color-white);
   border-radius: 12px;
   padding: 24px 32px;
   margin: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--lw-shadow-sm);
   max-width: 260px;
   vertical-align: top;
 }
@@ -558,19 +558,19 @@
   gap: 24px;
 }
 .newsCard {
-  background: #fff;
+  background: var(--color-white);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--lw-shadow-sm);
   transition: 0.2s;
 }
 .newsCard:hover {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--lw-shadow-lg);
   transform: translateY(-2px);
 }
 .newsCardImg {
   height: 160px;
-  background: linear-gradient(135deg, #e8f4fd, #c5dff5);
+  background: var(--color-lw-accent-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -599,8 +599,8 @@
 
 /* FOOTER */
 .footer {
-  background: #1a2a3a;
-  color: #aab;
+  background: var(--color-lw-footer-bg);
+  color: var(--color-lw-footer-text);
   padding: 40px 20px 20px;
 }
 .footerInner {
@@ -614,7 +614,7 @@
   margin-bottom: 30px;
 }
 .footerCol h4 {
-  color: #fff;
+  color: var(--color-white);
   font-size: 13px;
   font-weight: 700;
   margin-bottom: 12px;
@@ -624,11 +624,11 @@
 .footerCol a {
   display: block;
   font-size: 12px;
-  color: #8ab;
+  color: var(--color-lw-footer-text);
   margin-bottom: 6px;
 }
 .footerCol a:hover {
-  color: #fff;
+  color: var(--color-white);
   text-decoration: none;
 }
 .footerBrand {
@@ -645,7 +645,7 @@
   line-height: 1.7;
 }
 .footerBottom {
-  border-top: 1px solid #2a3a4a;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 16px;
   display: flex;
   justify-content: space-between;
@@ -662,7 +662,7 @@
 }
 .footerLegal a {
   font-size: 11px;
-  color: #8ab;
+  color: var(--color-lw-footer-text);
 }
 
 /* UTIL */

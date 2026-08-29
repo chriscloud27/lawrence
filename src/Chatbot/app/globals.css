@@ -1,11 +1,191 @@
 @import "tailwindcss";
 
+/* ============================================================
+   Lawrence Design System — Tailwind-color-only tokens
+   Source of truth: .claude/DESIGN.md — do not hand-edit values
+   without updating that file too.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --lw-bg: var(--color-white);
+  --lw-bg-subtle: var(--color-zinc-50);
+  --lw-bg-card: var(--color-zinc-100);
+  --lw-bg-elevated: var(--color-white);
+
+  --lw-text: var(--color-zinc-900);
+  --lw-text-secondary: var(--color-zinc-600);
+  --lw-text-muted: var(--color-zinc-400);
+  --lw-text-on-accent: var(--color-white);
+
+  --lw-border: var(--color-zinc-200);
+  --lw-border-subtle: var(--color-zinc-100);
+
+  /* ====== WHITE-LABEL BLOCK — swap the family name (blue -> your agency's Tailwind color) ====== */
+  --lw-accent: var(--color-blue-900);
+  --lw-accent-hover: var(--color-blue-950);
+  --lw-accent-subtle: var(--color-blue-50);
+  --lw-score-qualified-bg: var(--color-blue-100);
+  --lw-score-qualified-text: var(--color-blue-900);
+  /* ============================================================================================ */
+
+  --lw-success: var(--color-green-600);
+  --lw-warning: var(--color-amber-500);
+  --lw-error: var(--color-red-500);
+  --lw-hot: var(--color-orange-500);
+
+  --lw-score-cold-bg: var(--color-zinc-100);
+  --lw-score-cold-text: var(--color-zinc-500);
+  --lw-score-warm-bg: var(--color-amber-100);
+  --lw-score-warm-text: var(--color-amber-800);
+  --lw-score-hot-bg: var(--color-orange-100);
+  --lw-score-hot-text: var(--color-orange-800);
+
+  --lw-footer-bg: var(--color-zinc-950);
+  --lw-footer-text: var(--color-zinc-500);
+
+  --lw-shadow-sm: 0 1px 2px rgb(0 0 0 / 5%);
+  --lw-shadow-md: 0 2px 8px rgb(0 0 0 / 8%);
+  --lw-shadow-lg: 0 8px 24px rgb(0 0 0 / 12%);
+  --lw-shadow-focus: 0 0 0 3px var(--lw-accent-subtle);
 }
 
+[data-theme="dark"] {
+  --lw-bg: var(--color-zinc-950);
+  --lw-bg-subtle: var(--color-zinc-900);
+  --lw-bg-card: var(--color-zinc-800);
+  --lw-bg-elevated: var(--color-zinc-700);
+
+  --lw-text: var(--color-zinc-100);
+  --lw-text-secondary: var(--color-zinc-400);
+  --lw-text-muted: var(--color-zinc-500);
+
+  --lw-border: var(--color-zinc-800);
+  --lw-border-subtle: var(--color-zinc-900);
+
+  /* ====== WHITE-LABEL BLOCK (dark) — keep same family as light, lighter shades ====== */
+  --lw-accent: var(--color-blue-400);
+  --lw-accent-hover: var(--color-blue-300);
+  --lw-accent-subtle: color-mix(in oklab, var(--color-blue-400) 10%, transparent);
+  --lw-score-qualified-bg: color-mix(in oklab, var(--color-blue-400) 12%, transparent);
+  --lw-score-qualified-text: var(--color-blue-400);
+  /* =================================================================================== */
+
+  --lw-score-cold-bg: color-mix(in oklab, var(--color-zinc-500) 12%, transparent);
+  --lw-score-cold-text: var(--color-zinc-500);
+  --lw-score-warm-bg: color-mix(in oklab, var(--color-amber-500) 12%, transparent);
+  --lw-score-warm-text: var(--color-amber-400);
+  --lw-score-hot-bg: color-mix(in oklab, var(--color-orange-500) 12%, transparent);
+  --lw-score-hot-text: var(--color-orange-400);
+
+  --lw-footer-bg: var(--color-black);
+  --lw-footer-text: var(--color-zinc-500);
+
+  --lw-shadow-sm: 0 1px 2px rgb(0 0 0 / 20%);
+  --lw-shadow-md: 0 2px 8px rgb(0 0 0 / 30%);
+  --lw-shadow-lg: 0 8px 24px rgb(0 0 0 / 40%);
+  --lw-shadow-focus: 0 0 0 3px var(--lw-accent-subtle);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] {
+    --lw-bg: var(--color-zinc-950);
+    --lw-bg-subtle: var(--color-zinc-900);
+    --lw-bg-card: var(--color-zinc-800);
+    --lw-bg-elevated: var(--color-zinc-700);
+    --lw-text: var(--color-zinc-100);
+    --lw-text-secondary: var(--color-zinc-400);
+    --lw-text-muted: var(--color-zinc-500);
+    --lw-border: var(--color-zinc-800);
+    --lw-border-subtle: var(--color-zinc-900);
+    --lw-accent: var(--color-blue-400);
+    --lw-accent-hover: var(--color-blue-300);
+    --lw-accent-subtle: color-mix(in oklab, var(--color-blue-400) 10%, transparent);
+    --lw-score-cold-bg: color-mix(in oklab, var(--color-zinc-500) 12%, transparent);
+    --lw-score-cold-text: var(--color-zinc-500);
+    --lw-score-warm-bg: color-mix(in oklab, var(--color-amber-500) 12%, transparent);
+    --lw-score-warm-text: var(--color-amber-400);
+    --lw-score-qualified-bg: color-mix(in oklab, var(--color-blue-400) 12%, transparent);
+    --lw-score-qualified-text: var(--color-blue-400);
+    --lw-score-hot-bg: color-mix(in oklab, var(--color-orange-500) 12%, transparent);
+    --lw-score-hot-text: var(--color-orange-400);
+    --lw-footer-bg: var(--color-black);
+    --lw-footer-text: var(--color-zinc-500);
+    --lw-shadow-sm: 0 1px 2px rgb(0 0 0 / 20%);
+    --lw-shadow-md: 0 2px 8px rgb(0 0 0 / 30%);
+    --lw-shadow-lg: 0 8px 24px rgb(0 0 0 / 40%);
+    --lw-shadow-focus: 0 0 0 3px var(--lw-accent-subtle);
+  }
+}
+
+/* ============================================================
+   Tailwind v4 theme aliasing — generates bg-lw-*, text-lw-*,
+   border-lw-*, rounded-lw-*, shadow-lw-*, p-lw-* / gap-lw-* etc.
+   Each var below just re-points at the runtime token above, so
+   utilities stay reactive to [data-theme] and white-label
+   overrides of --lw-accent*.
+   ============================================================ */
+
+@theme {
+  --color-lw-bg: var(--lw-bg);
+  --color-lw-bg-subtle: var(--lw-bg-subtle);
+  --color-lw-bg-card: var(--lw-bg-card);
+  --color-lw-bg-elevated: var(--lw-bg-elevated);
+  --color-lw-text: var(--lw-text);
+  --color-lw-text-secondary: var(--lw-text-secondary);
+  --color-lw-text-muted: var(--lw-text-muted);
+  --color-lw-text-on-accent: var(--lw-text-on-accent);
+  --color-lw-border: var(--lw-border);
+  --color-lw-border-subtle: var(--lw-border-subtle);
+  --color-lw-accent: var(--lw-accent);
+  --color-lw-accent-hover: var(--lw-accent-hover);
+  --color-lw-accent-subtle: var(--lw-accent-subtle);
+  --color-lw-success: var(--lw-success);
+  --color-lw-warning: var(--lw-warning);
+  --color-lw-error: var(--lw-error);
+  --color-lw-hot: var(--lw-hot);
+  --color-lw-score-cold-bg: var(--lw-score-cold-bg);
+  --color-lw-score-cold-text: var(--lw-score-cold-text);
+  --color-lw-score-warm-bg: var(--lw-score-warm-bg);
+  --color-lw-score-warm-text: var(--lw-score-warm-text);
+  --color-lw-score-qualified-bg: var(--lw-score-qualified-bg);
+  --color-lw-score-qualified-text: var(--lw-score-qualified-text);
+  --color-lw-score-hot-bg: var(--lw-score-hot-bg);
+  --color-lw-score-hot-text: var(--lw-score-hot-text);
+  --color-lw-footer-bg: var(--lw-footer-bg);
+  --color-lw-footer-text: var(--lw-footer-text);
+
+  --radius-lw-sm: 6px;
+  --radius-lw: 8px;
+  --radius-lw-lg: 12px;
+  --radius-lw-xl: 16px;
+
+  --shadow-lw-sm: var(--lw-shadow-sm);
+  --shadow-lw-md: var(--lw-shadow-md);
+  --shadow-lw-lg: var(--lw-shadow-lg);
+  --shadow-lw-focus: var(--lw-shadow-focus);
+
+  --spacing-lw-xs: 4px;
+  --spacing-lw-sm: 8px;
+  --spacing-lw-md: 12px;
+  --spacing-lw-base: 16px;
+  --spacing-lw-lg: 24px;
+  --spacing-lw-xl: 32px;
+  --spacing-lw-2xl: 48px;
+  --spacing-lw-section: 64px;
+
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Custom dark variant: our theme switch uses [data-theme="dark"]
+   on <html>, not the OS-only default (prefers-color-scheme) that
+   Tailwind v4's built-in `dark:` variant uses. This lets any
+   component still opt into `dark:` utilities for one-off cases
+   not covered by the lw-* tokens above. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--lw-bg);
+  color: var(--lw-text);
+  font-family: var(--font-sans);
 }

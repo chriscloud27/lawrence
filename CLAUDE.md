@@ -47,6 +47,10 @@ Rules in brief:
 - Credential reference pattern in config/code: `$env.VAR`, `env(VAR)`, or `${VAR}` — never inline
 - Explicit user go-ahead required before accessing any credential file in this session
 
+## Design System
+
+The Lawrence Design System (`.claude/DESIGN.md`) is the source of truth for all UI work in `src/Chatbot/`. All colors map to Tailwind CSS palette families (no custom hex). Tokens are wired as Tailwind v4 utilities via `@theme` in `src/Chatbot/app/globals.css` (`bg-lw-accent`, `text-lw-text`, `rounded-lw-lg`, etc.). White-labeling an agency requires swapping one Tailwind color family in a marked block in `globals.css` — no hex editing. Read `.claude/rules/design.md` before writing or editing any component with visual styling — raw hex values and Tailwind default palette colors (`blue-600`, `gray-100`, …) are not allowed.
+
 ## Key Files
 
 - `.claude/docs/adr/` — architecture decisions
@@ -62,3 +66,5 @@ Rules in brief:
 - `src/Chatbot/db/` — Drizzle schema + local SQLite helpers
 - `src/Chatbot/lib/` — Supabase client, Anthropic client, business logic
 - `.env.example` — all required env vars
+- `.claude/DESIGN.md` — Lawrence Design System (Tailwind-only colors, typography, spacing, components)
+- `src/Chatbot/app/globals.css` — Tailwind v4 `@theme` wiring of `lw-*` design tokens (source of runtime implementation)

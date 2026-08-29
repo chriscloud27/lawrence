@@ -214,15 +214,15 @@ export default function ChatWidget() {
     <>
       <button
         onClick={() => setIsOpen(o => !o)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 transition-all hover:scale-105 flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-lw-accent text-lw-text-on-accent shadow-lw-lg hover:bg-lw-accent-hover transition-all hover:scale-105 flex items-center justify-center"
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
         {isOpen ? "✕" : "💬"}
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-50 w-[380px] h-[560px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
-          <div className="px-4 py-3 bg-blue-600 text-white flex-shrink-0 flex items-center justify-between">
+        <div className="fixed bottom-24 right-6 z-50 w-[380px] h-[560px] bg-lw-bg rounded-lw-xl shadow-lw-lg border border-lw-border flex flex-col overflow-hidden">
+          <div className="px-4 py-3 bg-lw-accent text-lw-text-on-accent flex-shrink-0 flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold">{config.agentName}</p>
               <p className="text-xs text-white/70">Ask me anything</p>
@@ -246,7 +246,7 @@ export default function ChatWidget() {
               <div className="flex justify-start mb-3">
                 <button
                   onClick={startPrequal}
-                  className="rounded-full bg-blue-600 text-white text-sm px-4 py-2 hover:bg-blue-700"
+                  className="rounded-full bg-lw-accent text-lw-text-on-accent text-sm px-4 py-2 hover:bg-lw-accent-hover"
                 >
                   {config.startButtonLabel}
                 </button>
@@ -260,7 +260,7 @@ export default function ChatWidget() {
                     key={option.value}
                     onClick={() => answerPrequalQuestion(option)}
                     disabled={isLoading}
-                    className="rounded-2xl rounded-tl-sm border border-blue-200 bg-blue-50 text-blue-700 text-sm px-4 py-2 text-left hover:bg-blue-100 disabled:opacity-50"
+                    className="rounded-lw-lg rounded-tl-[4px] border border-lw-border bg-lw-accent-subtle text-lw-accent text-sm px-4 py-2 text-left hover:border-lw-accent disabled:opacity-50"
                   >
                     {option.label}
                   </button>
@@ -270,7 +270,7 @@ export default function ChatWidget() {
 
             {isLoading && (
               <div className="flex justify-start mb-3">
-                <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-400 italic">
+                <div className="bg-lw-bg-card rounded-lw-lg rounded-tl-[4px] px-4 py-3 text-sm text-lw-text-muted italic">
                   Thinking…
                 </div>
               </div>
@@ -279,18 +279,18 @@ export default function ChatWidget() {
           </div>
 
           {prequalDone && (
-            <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 border-t border-gray-200">
+            <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 border-t border-lw-border">
               <input
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 disabled={isLoading}
                 placeholder="Type a message…"
-                className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm outline-none focus:border-blue-500"
+                className="flex-1 border border-lw-border rounded-full px-4 py-2 text-sm outline-none focus:border-lw-accent focus:shadow-lw-focus"
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center disabled:opacity-50"
+                className="w-9 h-9 rounded-full bg-lw-accent text-lw-text-on-accent flex items-center justify-center disabled:opacity-50"
                 aria-label="Send"
               >
                 ➤
