@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lawrence — AI Admissions Qualification</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --lw-bg: #ffffff;
+    --lw-bg-subtle: #f7f7f8;
+    --lw-bg-card: #f0f0f2;
+    --lw-text: #18181b;
+    --lw-text-sec: #4a4a55;
+    --lw-text-muted: #91919b;
+    --lw-text-on-accent: #ffffff;
+    --lw-border: #e2e2e6;
+    --lw-border-subtle: #f0f0f2;
+    --lw-accent: #1e3a5f;
+    --lw-accent-hover: #152d4a;
+    --lw-accent-subtle: #eef2f7;
+    --lw-accent-text: #1e3a5f;
+    --lw-hot: #f97316;
+    --lw-hot-bg: #fff4ed;
+    --lw-hot-text: #9a3412;
+    --lw-chip-bg: #f0f0f2;
+    --lw-chip-text: #4a4a55;
+    --lw-footer-bg: #111114;
+    --lw-footer-text: #71717a;
+    --lw-glow: rgba(30,58,95,0.08);
+    --lw-shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --lw-shadow-lg: 0 8px 32px rgba(30,58,95,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  [data-theme="dark"] {
+    --lw-bg: #0f0f11;
+    --lw-bg-subtle: #16161a;
+    --lw-bg-card: #1c1c21;
+    --lw-text: #f4f4f5;
+    --lw-text-sec: #a1a1aa;
+    --lw-text-muted: #63636e;
+    --lw-text-on-accent: #ffffff;
+    --lw-border: #27272c;
+    --lw-border-subtle: #1c1c21;
+    --lw-accent: #5b8cc5;
+    --lw-accent-hover: #7aa3d4;
+    --lw-accent-subtle: rgba(91,140,197,0.10);
+    --lw-accent-text: #7aa3d4;
+    --lw-hot: #f97316;
+    --lw-hot-bg: rgba(249,115,22,0.12);
+    --lw-hot-text: #fb923c;
+    --lw-chip-bg: #22222a;
+    --lw-chip-text: #a1a1aa;
+    --lw-footer-bg: #0a0a0c;
+    --lw-footer-text: #53535e;
+    --lw-glow: rgba(91,140,197,0.06);
+    --lw-shadow-sm: 0 1px 2px rgba(0,0,0,0.15);
+    --lw-shadow-lg: 0 8px 32px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.12);
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--lw-bg);
+    color: var(--lw-text);
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  /* NAV */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--lw-bg);
+    border-bottom: 1px solid var(--lw-border);
+  }
+  .nav-inner {
+    max-width: 960px; margin: 0 auto; padding: 0 24px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-left { display: flex; align-items: center; gap: 10px; }
+  .nav-logo {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--lw-accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .nav-brand { font-size: 16px; font-weight: 700; color: var(--lw-text); letter-spacing: -0.4px; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-link { font-size: 14px; font-weight: 500; color: var(--lw-text-sec); text-decoration: none; }
+  .nav-link:hover { color: var(--lw-text); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    display: flex; border-radius: 9999px; padding: 2px;
+    background: var(--lw-chip-bg);
+  }
+  .theme-btn {
+    width: 28px; height: 28px; border-radius: 50%; border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; cursor: pointer;
+    background: transparent; color: var(--lw-text-muted);
+    transition: all 0.2s;
+  }
+  .theme-btn.active {
+    background: var(--lw-accent); color: #fff;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 16px; border-radius: 8px;
+    font-size: 14px; font-weight: 600; font-family: inherit;
+    cursor: pointer; border: none; text-decoration: none;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-primary {
+    background: var(--lw-accent); color: var(--lw-text-on-accent);
+  }
+  .btn-primary:hover { background: var(--lw-accent-hover); }
+  .btn-secondary {
+    background: transparent; color: var(--lw-text);
+    border: 1px solid var(--lw-border);
+  }
+  .btn-secondary:hover { border-color: var(--lw-text-muted); }
+  .btn-sm { padding: 8px 16px; font-size: 14px; }
+
+  /* HERO */
+  .hero { position: relative; overflow: hidden; }
+  .hero-inner {
+    max-width: 960px; margin: 0 auto; padding: 80px 24px 96px;
+    display: flex; align-items: center; gap: 80px;
+  }
+  .hero-copy { flex: 1; max-width: 480px; }
+  .hero-visual { flex-shrink: 0; position: relative; }
+
+  /* Dot pattern */
+  .hero-dots {
+    position: absolute; top: 0; right: 0; width: 320px; height: 320px;
+    opacity: 0.03; pointer-events: none;
+    background-image: radial-gradient(var(--lw-text-muted) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Eyebrow */
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px; border-radius: 9999px; margin-bottom: 28px;
+    background: var(--lw-accent-subtle); color: var(--lw-accent-text);
+    font-size: 12px; font-weight: 500;
+  }
+  .eyebrow-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--lw-accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero-title {
+    font-size: clamp(32px, 5vw, 48px); font-weight: 700;
+    line-height: 1.1; letter-spacing: -1.5px;
+    color: var(--lw-text); margin-bottom: 20px;
+  }
+  .hero-title span { color: var(--lw-accent-text); }
+
+  .hero-desc {
+    font-size: 17px; line-height: 1.6; color: var(--lw-text-sec);
+    margin-bottom: 32px; max-width: 440px;
+  }
+
+  /* Chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 9999px;
+    background: var(--lw-chip-bg); color: var(--lw-chip-text);
+    font-size: 12px; font-weight: 500;
+  }
+  .chip svg { color: var(--lw-accent-text); }
+
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 32px; }
+
+  /* Social proof */
+  .proof { display: flex; align-items: center; gap: 12px; }
+  .avatars { display: flex; }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: #fff;
+    border: 2px solid var(--lw-bg);
+    margin-left: -8px;
+  }
+  .avatar:first-child { margin-left: 0; }
+  .proof-text { font-size: 12px; color: var(--lw-text-muted); }
+  .proof-text strong { color: var(--lw-text-sec); font-weight: 600; }
+
+  /* CHAT PREVIEW */
+  .chat {
+    width: 340px; border-radius: 12px; overflow: hidden;
+    background: var(--lw-bg);
+    border: 1px solid var(--lw-border);
+    box-shadow: var(--lw-shadow-lg);
+  }
+  .chat-glow {
+    position: absolute; inset: -40px; border-radius: 24px;
+    background: var(--lw-accent); opacity: 0.08; filter: blur(48px);
+    pointer-events: none;
+  }
+  [data-theme="dark"] .chat-glow { opacity: 0.05; }
+
+  .chat-header {
+    padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+    background: var(--lw-accent);
+  }
+  .chat-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .chat-name { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.2; }
+  .chat-status { font-size: 11px; color: rgba(255,255,255,0.6); }
+  .chat-online {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #34d399; margin-left: auto;
+  }
+
+  .chat-messages {
+    padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    background: var(--lw-bg-subtle);
+  }
+
+  .msg { max-width: 85%; }
+  .msg-bot { align-self: flex-start; }
+  .msg-user { align-self: flex-end; }
+
+  .msg-bubble {
+    padding: 10px 14px; font-size: 13px; line-height: 1.5;
+  }
+  .msg-bot .msg-bubble {
+    background: var(--lw-bg); color: var(--lw-text);
+    border-radius: 12px 12px 12px 4px;
+    box-shadow: var(--lw-shadow-sm);
+  }
+  .msg-user .msg-bubble {
+    background: var(--lw-accent); color: #fff;
+    border-radius: 12px 12px 4px 12px;
+  }
+  .msg-time {
+    font-size: 10px; color: var(--lw-text-muted); margin-top: 4px; padding: 0 4px;
+  }
+  .msg-user .msg-time { text-align: right; }
+
+  .msg-score {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 8px; padding-left: 4px;
+  }
+  .score-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 9999px;
+    background: var(--lw-hot-bg); color: var(--lw-hot-text);
+    font-size: 12px; font-weight: 500;
+  }
+  .score-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--lw-hot);
+  }
+  .score-val {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  }
+  .score-max { opacity: 0.6; }
+  .score-flame { color: var(--lw-hot); display: flex; }
+
+  .chat-input-bar {
+    padding: 10px 12px; display: flex; align-items: center; gap: 8px;
+    border-top: 1px solid var(--lw-border); background: var(--lw-bg);
+  }
+  .chat-input {
+    flex: 1; border: 1px solid var(--lw-border); border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; font-family: inherit;
+    background: var(--lw-bg-subtle); color: var(--lw-text); outline: none;
+  }
+  .chat-input:focus { border-color: var(--lw-accent); }
+  .chat-input::placeholder { color: var(--lw-text-muted); }
+  .chat-send {
+    width: 32px; height: 32px; border-radius: 50%; border: none;
+    background: var(--lw-accent); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .chat-powered {
+    text-align: center; padding: 6px; font-size: 10px;
+    color: var(--lw-text-muted); background: var(--lw-bg);
+  }
+
+  /* METRICS */
+  .metrics {
+    border-top: 1px solid var(--lw-border);
+    border-bottom: 1px solid var(--lw-border);
+  }
+  .metrics-inner {
+    max-width: 960px; margin: 0 auto; padding: 56px 24px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+    text-align: center;
+  }
+  .metric-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(24px, 3vw, 30px); font-weight: 700;
+    color: var(--lw-text); letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .metric-label {
+    font-size: 11px; color: var(--lw-text-muted);
+    text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500;
+  }
+
+  /* FOOTER */
+  .footer {
+    padding: 24px; text-align: center;
+    background: var(--lw-footer-bg);
+  }
+  .footer p { font-size: 12px; color: var(--lw-footer-text); }
+
+  /* RESPONSIVE */
+  @media (max-width: 860px) {
+    .hero-inner { flex-direction: column; gap: 48px; padding: 56px 24px 72px; }
+    .hero-copy { max-width: 100%; }
+    .hero-visual { width: 100%; display: flex; justify-content: center; }
+    .chat { width: 100%; max-width: 380px; }
+    .nav-links { display: none; }
+    .metrics-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <div class="nav-logo">L</div>
+      <span class="nav-brand">Lawrence</span>
+    </div>
+    <div class="nav-links">
+      <a href="#" class="nav-link">Product</a>
+      <a href="#" class="nav-link">Pricing</a>
+      <a href="#" class="nav-link">Docs</a>
+    </div>
+    <div class="nav-right">
+      <div class="theme-toggle">
+        <button class="theme-btn active" onclick="setTheme('light')" id="btn-light">☀</button>
+        <button class="theme-btn" onclick="setTheme('dark')" id="btn-dark">☾</button>
+      </div>
+      <a href="#" class="nav-link" style="display:none" id="login-link">Log in</a>
+      <a href="#" class="btn btn-primary btn-sm">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-dots"></div>
+  <div class="hero-inner">
+
+    <!-- Copy -->
+    <div class="hero-copy">
+      <div class="eyebrow">
+        <span class="eyebrow-dot"></span>
+        Qualifying leads in real-time
+      </div>
+
+      <h1 class="hero-title">
+        Turn parent enquiries into <span>qualified leads</span>
+      </h1>
+
+      <p class="hero-desc">
+        An AI admissions assistant that listens to what parents need, scores their fit against BANT criteria, and routes only high-value leads to your counsellors.
+      </p>
+
+      <div class="chips">
+        <span class="chip">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          BANT Qualification
+        </span>
+        <span class="chip">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          White-Label Ready
+        </span>
+        <span class="chip">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Email Handoff
+        </span>
+        <span class="chip">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          CRM Writeback
+        </span>
+      </div>
+
+      <div class="ctas">
+        <a href="#" class="btn btn-primary">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Book a Demo
+        </a>
+        <a href="#" class="btn btn-secondary">
+          See it in Action
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <div class="proof">
+        <div class="avatars">
+          <div class="avatar" style="background:#1e3a5f">AH</div>
+          <div class="avatar" style="background:#4a6e8a">KW</div>
+          <div class="avatar" style="background:#7a5c3e">TS</div>
+          <div class="avatar" style="background:#3a5a4a">RM</div>
+        </div>
+        <p class="proof-text">Trusted by <strong>12 agencies</strong> in pilot</p>
+      </div>
+    </div>
+
+    <!-- Chat Preview -->
+    <div class="hero-visual">
+      <div class="chat-glow"></div>
+      <div class="chat" style="position:relative; z-index:1;">
+        <div class="chat-header">
+          <div class="chat-avatar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div style="flex:1; min-width:0;">
+            <div class="chat-name">Sophie</div>
+            <div class="chat-status">Admissions Assistant</div>
+          </div>
+          <div class="chat-online"></div>
+        </div>
+
+        <div class="chat-messages">
+          <!-- Bot 1 -->
+          <div class="msg msg-bot">
+            <div class="msg-bubble">Hi! I'm Sophie, your admissions assistant. When are you looking to start?</div>
+            <div class="msg-time">Just now</div>
+          </div>
+          <!-- User -->
+          <div class="msg msg-user">
+            <div class="msg-bubble">We need a place by September — ideally a top UK boarding school.</div>
+            <div class="msg-time">Just now</div>
+          </div>
+          <!-- Bot 2 + score -->
+          <div class="msg msg-bot">
+            <div class="msg-bubble">Premium boarding with a September deadline — let me connect you with a specialist right away.</div>
+            <div class="msg-score">
+              <span class="score-pill">
+                <span class="score-dot"></span>
+                <span class="score-val">82</span>
+                <span class="score-max">/ 100</span>
+              </span>
+              <span class="score-flame">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 23c-3.866 0-7-3.134-7-7 0-3.526 3.008-6.584 5-8.5 1.992 1.916 5 4.974 5 8.5 0 3.866-3.134 7-7 7z"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-bar">
+          <input type="text" class="chat-input" placeholder="Type a message..." readonly>
+          <button class="chat-send">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+          </button>
+        </div>
+        <div class="chat-powered">Powered by Lawrence</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="metrics">
+  <div class="metrics-inner">
+    <div>
+      <div class="metric-val">$7.7B</div>
+      <div class="metric-label">Admissions market 2026</div>
+    </div>
+    <div>
+      <div class="metric-val">70%</div>
+      <div class="metric-label">Enquiries never answered</div>
+    </div>
+    <div>
+      <div class="metric-val">&lt; 2s</div>
+      <div class="metric-label">Avg qualification time</div>
+    </div>
+    <div>
+      <div class="metric-val">3.2&times;</div>
+      <div class="metric-label">More bookings vs forms</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Lawrence · AI-powered admissions qualification · Built for premium education agencies</p>
+</footer>
+
+<script>
+  function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    document.getElementById('btn-light').classList.toggle('active', t === 'light');
+    document.getElementById('btn-dark').classList.toggle('active', t === 'dark');
+    localStorage.setItem('lw-theme', t);
+  }
+
+  // Init from stored preference or OS
+  (function() {
+    const stored = localStorage.getItem('lw-theme');
+    if (stored) { setTheme(stored); return; }
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme('dark');
+  })();
+
+  // Show login link on wider screens
+  const login = document.getElementById('login-link');
+  if (window.innerWidth > 640) login.style.display = '';
+</script>
+</body>
+</html>

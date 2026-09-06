@@ -38,6 +38,9 @@ pnpm-debug.log*
 .env.test.local
 .env.production.local
 
+# Python virtual environment
+.venv/
+
 # Build outputs
 dist/
 build/

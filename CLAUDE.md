@@ -2,6 +2,33 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Build Mode
+
+When I say "build step N", read the file at
+`.claude/docs/build-steps/0N-<name>.md` and execute it.
+
+Before starting:
+- Read the referenced files in the "Assumes" section
+- Verify they exist and match the described state
+
+After completing:
+- Run through the "Verify" checklist at the bottom of the step file
+- Report pass/fail for each item
+- Do not proceed to the next step until all items pass
+
+## Design System
+
+All design tokens are defined in `src/styles/design-tokens.css`.
+Never invent new colors, fonts, or spacing values.
+When the step file is silent on a detail, check `.claude/DESIGN.md` first.
+
+## Rules
+
+- One step per turn. Do not read ahead.
+- Create files in the paths specified by each step.
+- If a step says "create component X", check if X already exists first.
+- If a verification item fails, fix it before reporting.
+
 ## Project
 
 **lawrence** — data ingestion platform. Scrape, validate, AI-enrich, store.  
