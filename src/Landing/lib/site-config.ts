@@ -1,4 +1,7 @@
 export const SITE_CONFIG = {
+  // The live prototype app — header "Log in" / "Get Started" both point here.
+  appUrl: "https://lawrence-eidn.vercel.app/",
+
   // TODO: no GTM container provisioned yet for lawrence
   gtmId: "",
   // TODO: placeholder contact until a lawrence-domain inbox exists

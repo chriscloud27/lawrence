@@ -1,4 +1,11 @@
 {
+  "nav": {
+    "product": "Product",
+    "pricing": "Pricing",
+    "docs": "Docs",
+    "login": "Log in",
+    "getStarted": "Get Started"
+  },
   "hero": {
     "eyebrow": "AI Admissions Intake for Education Agencies",
     "h1Part1": "Stop running intake calls.",
@@ -6,6 +13,16 @@
     "sub": "Lawrence turns every parent enquiry into a scored, profiled lead before a counsellor picks up the phone.",
     "cta": "Book a pilot call",
     "ctaSecondary": "See how scoring works",
+    "chip1": "Chat & Form Intake",
+    "chip2": "Document Processing",
+    "chip3": "Real-Time BANT Scoring",
+    "chip4": "Team Dashboard",
+    "chatBotName": "Sophie",
+    "chatBotRole": "Admissions Assistant",
+    "chatMsg1": "Hi! I'm Sophie, your admissions assistant. When are you looking to start?",
+    "chatMsg2": "We need a place by September — ideally a top UK boarding school.",
+    "chatMsg3": "Premium boarding with a September deadline — let me connect you with a specialist right away.",
+    "chatScoreLabel": "Score",
     "stat1Value": "60–70%",
     "stat1Label": "of counsellor time burned on discovery calls that produce no revenue",
     "stat2Value": "70%",
@@ -108,6 +125,7 @@
   },
   "footer": {
     "poweredBy": "Powered by Lawrence",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "tagline": "AI-powered admissions qualification — built for premium education agencies"
   }
 }
