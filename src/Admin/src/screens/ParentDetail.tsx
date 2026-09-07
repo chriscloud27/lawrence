@@ -5,6 +5,7 @@ import { getScoreBand, getBandColor, getBandLabel } from '../utils/score'
 
 interface ParentDetailProps {
   onNavigate: (screen: string) => void
+  parentId: string | null
 }
 
 type CriteriaTab = 'documents' | 'form' | 'conversation'
@@ -39,10 +40,10 @@ function sourceLabel(source: string): string {
   return source.replace('Extracted from: ', '')
 }
 
-export function ParentDetail({ onNavigate }: ParentDetailProps) {
+export function ParentDetail({ onNavigate, parentId }: ParentDetailProps) {
   const [activeTab, setActiveTab] = useState<CriteriaTab>('documents')
 
-  const parent = sampleParents[0]
+  const parent = sampleParents.find((p) => p.id === parentId) ?? sampleParents[0]
   const band = getScoreBand(parent.totalScore)
   const color = getBandColor(band)
 

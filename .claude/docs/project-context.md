@@ -90,6 +90,18 @@ How to add a pipeline: `.claude/docs/pipeline-playbook.md`
 ## Open Questions
 
 - Who are the first external clients? What slice of the Doris catalog do they need first?
-- What does the chatbot's user authentication model look like? (needed before public launch)
 - Headless browser fallback: build in-house or use a service (e.g. Browserless, Apify)?
 - Is there a target SLA for how fresh the school data needs to be (daily / weekly / on-demand)?
+- Document-extraction pipeline design (v2 form intake) — model choice, batch vs. real-time,
+  storage bucket layout — needs its own ADR once `intake_documents` schema is drafted (see
+  ADR-0010, "explicitly deferred").
+
+**Resolved:** Chatbot auth model — Supabase Auth (Google, extending to Apple + email per
+ADR-0010), nullable `leads.user_id` bridge, established in ADR-0008/0009/0010.
+
+## v2 Pivot (September 2026)
+
+Intake is now a per-agency configurable choice between the chatbot (above) and a structured
+intake form with multi-modal document upload (voice notes, PDFs, screenshots) — both feed the
+same downstream profile-construction and BANT-scoring pipeline. See `v2/lawrence-problem-solution-v2.md`
+for the product framing and ADR-0010 for the architectural decision.

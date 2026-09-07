@@ -13,22 +13,31 @@ import type { Parent, ScoreBand } from '../types/lawrence'
 
 interface DashboardProps {
   onNavigate: (screen: string) => void
+  onSelectParent: (id: string) => void
 }
 
-const KPI_CARDS = [
-  { title: 'New Parents', value: '47', trend: '↑ 12% vs last week', positive: true },
-  { title: 'Hot Leads', value: '8', trend: '↑ 3 this week', positive: true },
-  { title: 'Avg Score', value: '61/100', trend: '↑ from 54 last month', positive: true },
-  { title: 'Response Time', value: '< 4 hrs', trend: '↓ from 9h last month', positive: true },
-]
+function computeKpis(parents: Parent[]) {
+  const newParentCount = parents.filter((p) => p.status === 'new').length
+  const hotLeadCount = parents.filter((p) => getScoreBand(p.totalScore) === 'hot').length
+  const avgScore = parents.length > 0 ? Math.round(parents.reduce((s, p) => s + p.totalScore, 0) / parents.length) : 0
+  return [
+    { title: 'New Parents', value: String(newParentCount), trend: '↑ 12% vs last week', positive: true },
+    { title: 'Hot Leads', value: String(hotLeadCount), trend: '↑ 3 this week', positive: true },
+    { title: 'Avg Score', value: `${avgScore}/100`, trend: '↑ from 54 last month', positive: true },
+    { title: 'Response Time', value: '< 4 hrs', trend: '↓ from 9h last month', positive: true },
+  ]
+}
 
-const DISTRIBUTION: { band: ScoreBand; pct: number; count: number }[] = [
-  { band: 'cold', pct: 38, count: 18 },
-  { band: 'warm', pct: 21, count: 10 },
-  { band: 'qualified', pct: 30, count: 14 },
-  { band: 'hot', pct: 11, count: 5 },
-]
+function computeDistribution(parents: Parent[]) {
+  const bands: ScoreBand[] = ['cold', 'warm', 'qualified', 'hot']
+  const total = parents.length
+  return bands.map((band) => {
+    const count = parents.filter((p) => getScoreBand(p.totalScore) === band).length
+    return { band, count, pct: total ? Math.round((count / total) * 100) : 0 }
+  })
+}
 
+// Illustrative only — no real preference-tag aggregation exists in mock data yet.
 const TRENDING = [
   { pattern: 'IB curriculum', meta: '23 parents', trend: '↑ 40%', isNew: false },
   { pattern: 'Boarding in Switzerland', meta: '18 parents', trend: '↑ 25%', isNew: false },
@@ -43,7 +52,21 @@ const BAND_FILTERS = ['All', 'Cold', 'Warm', 'Qualified', 'Hot']
 const TIMELINE_FILTERS = ['All', 'This term', 'Next year', '2+ years']
 const STATUS_FILTERS = ['All', 'New', 'Contacted', 'In Progress', 'Auto-nurture']
 
-export function Dashboard({ onNavigate }: DashboardProps) {
+function matchesTimelineFilter(timeline: string, filter: string): boolean {
+  const t = timeline.toLowerCase()
+  switch (filter) {
+    case 'This term':
+      return t.includes('this term')
+    case 'Next year':
+      return t.includes('next academic year') || t.includes('next year') || t.includes('sometime next year')
+    case '2+ years':
+      return t.includes('exploring') || t.includes('just researching')
+    default:
+      return true
+  }
+}
+
+export function Dashboard({ onNavigate, onSelectParent }: DashboardProps) {
   const [bandFilter, setBandFilter] = useState('All')
   const [timelineFilter, setTimelineFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All')
@@ -66,6 +89,9 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         return false
       }
       if (statusFilter !== 'All' && p.status !== statusFilter.toLowerCase().replace(' ', '-')) {
+        return false
+      }
+      if (timelineFilter !== 'All' && !matchesTimelineFilter(p.timeline, timelineFilter)) {
         return false
       }
       if (
@@ -101,7 +127,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
     })
 
     return list
-  }, [bandFilter, statusFilter, search, sortKey, sortDir])
+  }, [bandFilter, statusFilter, timelineFilter, search, sortKey, sortDir])
 
   const sortIcon = (key: SortKey) =>
     sortKey === key ? (
@@ -110,15 +136,19 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       </span>
     ) : null
 
+  const kpis = useMemo(() => computeKpis(sampleParents), [])
+  const distribution = useMemo(() => computeDistribution(sampleParents), [])
+
   return (
     <div className="lw-dash-page">
       <div className="lw-dash-kpi-row">
-        {KPI_CARDS.map((card) => (
+        {kpis.map((card) => (
           <div key={card.title} className="lw-dash-kpi-card">
             <div className="lw-dash-kpi-title">{card.title}</div>
             <div className="lw-dash-kpi-value">{card.value}</div>
             <div className={`lw-dash-kpi-trend ${card.positive ? 'positive' : 'negative'}`}>
               {card.positive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+              {/* Illustrative trend — not derived from real history with only 6 static records */}
               {card.trend}
             </div>
           </div>
@@ -129,7 +159,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
         <div className="lw-dash-main">
           <div className="lw-dash-section-label">Score Distribution</div>
           <div className="lw-dash-dist-bar">
-            {DISTRIBUTION.map((seg) => {
+            {distribution.map((seg) => {
               const color = getBandColor(seg.band)
               return (
                 <div
@@ -141,7 +171,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             })}
           </div>
           <div className="lw-dash-dist-legend">
-            {DISTRIBUTION.map((seg) => {
+            {distribution.map((seg) => {
               const color = getBandColor(seg.band)
               return (
                 <div key={seg.band} className="lw-dash-dist-legend-item">
@@ -233,7 +263,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
               </thead>
               <tbody>
                 {rows.map((parent) => (
-                  <DashboardRow key={parent.id} parent={parent} onNavigate={onNavigate} />
+                  <DashboardRow key={parent.id} parent={parent} onNavigate={onNavigate} onSelectParent={onSelectParent} />
                 ))}
               </tbody>
             </table>
@@ -276,15 +306,17 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 function DashboardRow({
   parent,
   onNavigate,
+  onSelectParent,
 }: {
   parent: Parent
   onNavigate: (screen: string) => void
+  onSelectParent: (id: string) => void
 }) {
   const band = getScoreBand(parent.totalScore)
   const color = getBandColor(band)
 
   return (
-    <tr onClick={() => onNavigate('parent-detail')}>
+    <tr onClick={() => { onSelectParent(parent.id); onNavigate('parent-detail') }}>
       <td className="lw-dash-td-name">{parent.name}</td>
       <td className="lw-dash-td-child">
         {parent.childName}, {parent.childAge}

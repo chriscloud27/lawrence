@@ -4,6 +4,16 @@
 Next.js 16 app (`src/Chatbot/`) — frontend for querying data stored in Supabase via n8n pipelines.
 Uses Anthropic SDK for AI responses, Drizzle ORM + better-sqlite3 for local state, shadcn/ui + Tailwind for UI.
 
+## Intake Method (v2)
+
+Per ADR-0010, the chatbot is one of two peer intake front-ends — the other is a structured
+intake form with document upload. Which one(s) an agency runs is a per-agency
+`intake_method` setting (`chatbot` | `form` | `both`), never a per-agency code fork. Both write
+into the same `leads` row shape (tagged with a `source` column) and feed the same downstream
+BANT scoring and profile construction — do not build chatbot-only assumptions into that shared
+pipeline. The chatbot's read-only-from-Supabase / writes-via-n8n rule below applies identically
+to the form intake path.
+
 ## Model Selection
 - Default to `claude-haiku-4-5` for fast, cheap chat turns
 - Use `claude-sonnet-4-6` only when reasoning over complex query results requires it

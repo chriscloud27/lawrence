@@ -3,6 +3,8 @@ import { ChevronDown, ArrowRight } from 'lucide-react'
 import { FormField } from '../components/forms/FormField'
 import { ChipSelect } from '../components/forms/ChipSelect'
 import { TagInput } from '../components/forms/TagInput'
+import { ProgressStepper } from '../components/forms/ProgressStepper'
+import { INTAKE_FLOW_STEPS } from '../data/flow-steps'
 import {
   ageOptions,
   timelineOptions,
@@ -16,6 +18,7 @@ import {
 interface IntakeFormData {
   name: string
   email: string
+  phone: string
   childName: string
   ageOrYear: string
   timeline: string
@@ -33,6 +36,7 @@ interface IntakeFormData {
 const INITIAL_DATA: IntakeFormData = {
   name: '',
   email: '',
+  phone: '',
   childName: '',
   ageOrYear: '',
   timeline: '',
@@ -124,19 +128,31 @@ export function IntakeForm({ onNavigate }: IntakeFormProps) {
     }
   }
 
+  const AGENT = {
+    name: 'Jordan Blake',
+    title: 'Senior Placement Advisor',
+  }
+
   return (
     <div style={{ width: '100%', paddingTop: '48px', paddingBottom: '48px' }}>
       <div className="lw-form-card">
-        <div className="lw-progress-label-top">Step 1 of 2</div>
-        <div className="lw-progress">
-          <div className="lw-progress-step">
-            <div className="lw-progress-circle active" />
-            <div className="lw-progress-step-label">Your details</div>
+        <ProgressStepper steps={INTAKE_FLOW_STEPS} currentStep={0} />
+
+        {/* TODO(copy — Liam to finalise): credibility message + why fill this out */}
+        <div style={{ marginTop: '24px', marginBottom: '24px', padding: '12px 16px', backgroundColor: 'var(--lw-bg-subtle)', borderRadius: 'var(--lw-radius-lg)' }}>
+          <p style={{ margin: 0, fontSize: '14px', lineHeight: 1.5, color: 'var(--lw-text)' }}>
+            We've helped hundreds of families reach their first-choice school. By sharing your story and research, we can consult you best and create a tailored pathway for your child.
+          </p>
+        </div>
+
+        {/* Agent personalization block */}
+        <div style={{ marginTop: '12px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--lw-accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--lw-text-on-accent)', fontWeight: 700, fontSize: '16px' }}>
+            JB
           </div>
-          <div className="lw-progress-line" />
-          <div className="lw-progress-step">
-            <div className="lw-progress-circle inactive" />
-            <div className="lw-progress-step-label">Upload research</div>
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--lw-text)' }}>{AGENT.name}</div>
+            <div style={{ fontSize: '12px', color: 'var(--lw-text-muted)' }}>{AGENT.title}</div>
           </div>
         </div>
 
@@ -162,6 +178,15 @@ export function IntakeForm({ onNavigate }: IntakeFormProps) {
             />
           </FormField>
         </div>
+
+        <FormField label="Your phone (optional)">
+          <input
+            className="lw-input"
+            type="tel"
+            value={data.phone}
+            onChange={(e) => update('phone', e.target.value)}
+          />
+        </FormField>
 
         <FormField label="Child's first name" required error={errorFor('childName')}>
           <input

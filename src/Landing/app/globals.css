@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ── Lawrence Design System — light mode (.claude/DESIGN.md §1) ────── */
+  --lw-bg: #ffffff; /* white */
+  --lw-bg-subtle: #fafafa; /* zinc-50 */
+  --lw-bg-card: #f4f4f5; /* zinc-100 */
+  --lw-bg-elevated: #ffffff;
+
+  --lw-text: #18181b; /* zinc-900 */
+  --lw-text-secondary: #52525b; /* zinc-600 */
+  --lw-text-muted: #a1a1aa; /* zinc-400 */
+  --lw-text-on-accent: #ffffff;
+
+  --lw-border: #e4e4e7; /* zinc-200 */
+  --lw-border-subtle: #f4f4f5; /* zinc-100 */
+
+  /* WHITE-LABEL BLOCK (light) — swap this Tailwind family to re-skin an agency */
+  --lw-accent: #1e3a8a; /* blue-900 */
+  --lw-accent-hover: #172554; /* blue-950 */
+  --lw-accent-subtle: #eff6ff; /* blue-50 */
+
+  --lw-error: #ef4444; /* red-500 — inline form validation only, never on CTAs */
+
+  --lw-footer-bg: #111114;
+  --lw-footer-text: #71717a; /* zinc-500 */
+
+  --lw-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --lw-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --lw-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --lw-shadow-focus: 0 0 0 3px var(--lw-accent-subtle);
+
+  /* ── shadcn/ui structural tokens (Radix primitives) ─────────────────── */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 4%;
+  --border: 240 6% 90%;
+  --input: 240 6% 90%;
+  --ring: 224 76% 33%;
+  --primary: 224 76% 33%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 5% 96%;
+  --secondary-foreground: 240 10% 4%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --muted: 240 5% 96%;
+  --muted-foreground: 240 4% 46%;
+  --accent: 240 5% 96%;
+  --accent-foreground: 240 10% 4%;
+}
+
+[data-theme="dark"] {
+  /* ── Lawrence Design System — dark mode (.claude/DESIGN.md §1) ──────── */
+  --lw-bg: #09090b; /* zinc-950 */
+  --lw-bg-subtle: #18181b; /* zinc-900 */
+  --lw-bg-card: #27272a; /* zinc-800 */
+  --lw-bg-elevated: #3f3f46; /* zinc-700 */
+
+  --lw-text: #f4f4f5; /* zinc-100 */
+  --lw-text-secondary: #a1a1aa; /* zinc-400 */
+  --lw-text-muted: #71717a; /* zinc-500 */
+  --lw-text-on-accent: #ffffff;
+
+  --lw-border: #27272a; /* zinc-800 */
+  --lw-border-subtle: #18181b; /* zinc-900 */
+
+  /* WHITE-LABEL BLOCK (dark) — swap this Tailwind family to re-skin an agency */
+  --lw-accent: #60a5fa; /* blue-400 */
+  --lw-accent-hover: #93c5fd; /* blue-300 */
+  --lw-accent-subtle: rgba(96, 165, 250, 0.1); /* blue-400 @ 10% */
+
+  --lw-error: #f87171; /* red-400 */
+
+  --lw-footer-bg: #0a0a0c;
+  --lw-footer-text: #71717a;
+
+  --lw-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --lw-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --lw-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --lw-shadow-focus: 0 0 0 3px var(--lw-accent-subtle);
+
+  --background: 240 10% 4%;
+  --foreground: 240 5% 96%;
+  --border: 240 4% 16%;
+  --input: 240 4% 16%;
+  --ring: 213 94% 68%;
+  --primary: 213 94% 68%;
+  --primary-foreground: 240 10% 4%;
+  --secondary: 240 4% 16%;
+  --secondary-foreground: 240 5% 96%;
+  --destructive: 0 63% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --muted: 240 4% 16%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 240 4% 16%;
+  --accent-foreground: 240 5% 96%;
+}
+
+body {
+  background: var(--lw-bg);
+  color: var(--lw-text);
+}

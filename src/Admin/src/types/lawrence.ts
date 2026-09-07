@@ -14,6 +14,7 @@ export interface Parent {
   id: string;
   name: string;
   email: string;
+  phone: string;
   childName: string;
   childAge: number;
   yearGroup: string;

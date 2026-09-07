@@ -4,6 +4,13 @@
 **Scale:** 0–100 points (two stages)  
 **Purpose:** Route parents to the right tier (standard resources, AI consulting path, or booking link + agent escalation)
 
+**Intake-method-agnostic (ADR-0010):** This scoring engine operates on a `leads` row regardless
+of whether it originated from the chatbot or the v2 structured intake form with document upload.
+Signals from uploaded documents (voice notes, PDFs) feed the same Budget/Authority/Need/Timeline
+dimensions below via profile extraction — do not build chatbot-conversation-only assumptions
+(e.g. "the AI agent's follow-up turn") into scoring logic that must also run on form-sourced
+profiles with no conversational turns at all.
+
 ---
 
 ## Stage 1: Pre-Qualification (0–75 pts via JavaScript)

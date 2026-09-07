@@ -12,6 +12,7 @@ function App() {
   const [activePortal, setActivePortal] = useState<Portal>('parent')
   // Each portal keeps its own last-visited screen across portal switches.
   const [screenByPortal, setScreenByPortal] = useState<Record<Portal, string>>(DEFAULT_SCREEN)
+  const [selectedParentId, setSelectedParentId] = useState<string | null>(null)
 
   const handleScreenChange = (screen: string) => {
     setScreenByPortal((prev) => ({ ...prev, [activePortal]: screen }))
@@ -24,6 +25,8 @@ function App() {
         onPortalChange={setActivePortal}
         activeScreen={screenByPortal[activePortal]}
         onScreenChange={handleScreenChange}
+        selectedParentId={selectedParentId}
+        onSelectParent={setSelectedParentId}
       />
     </ThemeProvider>
   )

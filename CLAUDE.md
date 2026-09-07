@@ -45,6 +45,7 @@ When the step file is silent on a detail, check `.claude/DESIGN.md` first.
 3. **Architecture before implementation** — Discuss decisions first, validate against spec, then build. Open questions are blockers only.
 4. **v1/v2 boundary is a scope guard** — Anything not in v1 spec (dashboard, retry logic, adaptive flow, multi-channel) is explicitly deferred to v2.
 5. **Doris uses JSON-LD** — Structured data embedded in page `<head>`; no LLM extraction needed for v1.
+6. **Intake method is a configurable peer surface, not a fixed product** — Chatbot and structured-form-with-upload are both front-ends producing the same `leads` shape; which one(s) an agency runs is a per-agency setting, not a code fork. Everything downstream (profile construction, BANT scoring, portal display) is intake-method-agnostic. See ADR-0010.
 
 See `.claude/projects/.../memory/architectural-principles.md` for full rationale.
 

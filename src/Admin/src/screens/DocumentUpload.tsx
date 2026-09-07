@@ -8,6 +8,8 @@ import {
   Plus,
   CheckCircle,
 } from 'lucide-react'
+import { ProgressStepper } from '../components/forms/ProgressStepper'
+import { INTAKE_FLOW_STEPS } from '../data/flow-steps'
 
 interface SampleFile {
   id: string
@@ -96,7 +98,7 @@ export function DocumentUpload({ onNavigate }: DocumentUploadProps) {
 
     timers.push(
       setTimeout(() => {
-        onNavigate('search-profile')
+        onNavigate('next-step')
       }, 4500),
     )
 
@@ -111,14 +113,11 @@ export function DocumentUpload({ onNavigate }: DocumentUploadProps) {
     setProcessing(true)
   }
 
-  const handleSkip = () => {
-    onNavigate('search-profile')
-  }
-
   if (processing) {
     return (
       <div style={{ width: '100%', paddingTop: '48px', paddingBottom: '48px' }}>
         <div className="lw-form-card">
+          <ProgressStepper steps={INTAKE_FLOW_STEPS} currentStep={2} />
           <div className="lw-processing-view">
             <div className="lw-spinner" />
             <div className="lw-processing-copy">
@@ -145,21 +144,9 @@ export function DocumentUpload({ onNavigate }: DocumentUploadProps) {
   return (
     <div style={{ width: '100%', paddingTop: '48px', paddingBottom: '48px' }}>
       <div className="lw-form-card">
-        <div className="lw-progress-label-top">Step 2 of 2</div>
-        <div className="lw-progress">
-          <div className="lw-progress-step">
-            <div className="lw-progress-circle active">
-              <CheckCircle size={14} color="var(--lw-success)" />
-            </div>
-            <div className="lw-progress-step-label">Your details</div>
-          </div>
-          <div className="lw-progress-line" />
-          <div className="lw-progress-step">
-            <div className="lw-progress-circle active" />
-            <div className="lw-progress-step-label">Upload research</div>
-          </div>
-        </div>
+        <ProgressStepper steps={INTAKE_FLOW_STEPS} currentStep={1} />
 
+        {/* TODO(copy — Liam to finalise): clarify what documents/research are wanted and why */}
         <div
           style={{
             fontFamily: 'var(--font-sans)',
@@ -169,8 +156,7 @@ export function DocumentUpload({ onNavigate }: DocumentUploadProps) {
             marginBottom: '24px',
           }}
         >
-          You've probably already done a lot of research. Share it with us — we'll
-          use it to build your personalised school search profile.
+          Share anything you've already gathered — school brochures, notes from other consultants, voice memos of things you and your partner have discussed, emails from school contacts.
         </div>
 
         <div
@@ -228,9 +214,6 @@ export function DocumentUpload({ onNavigate }: DocumentUploadProps) {
 
         <button type="button" className="lw-btn-primary" onClick={handleBuildProfile}>
           Build my profile
-        </button>
-        <button type="button" className="lw-btn-secondary" onClick={handleSkip}>
-          Skip for now
         </button>
 
         <div className="lw-form-footer">Powered by Lawrence</div>
