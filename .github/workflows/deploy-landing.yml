@@ -1,0 +1,79 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Setup Environment
+      - uses: actions/checkout@v4
+
+      - name: Setup Environment - Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Setup Environment
+        working-directory: ./src/Landing
+        run: |
+          echo "=== package.json SHA256 ==="
+          sha256sum package.json
+          echo "=== package-lock.json SHA256 ==="
+          sha256sum package-lock.json
+
+          npm install -g npm@11.11.0
+
+          echo "=== Environment Info ==="
+          node --version
+          npm --version
+          echo "=== npm config ==="
+          npm config get lockfileVersion
+
+          npm cache clean --force
+
+          echo "=== Testing lock file sync with dry-run ==="
+          npm ci --dry-run || echo "❌ SYNC CHECK FAILED"
+
+          npm ci
+
+      # Build
+      - name: Build
+        working-directory: ./src/Landing
+        run: |
+          npm run export
+
+          touch ./out/.nojekyll
+
+      - name: Build - Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./src/Landing/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Deploy
+      - name: Deploy
+        run: |
+          echo "Deploying Pages artifact to GitHub Pages"
+
+      - name: Deploy - Publish to GitHub Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
