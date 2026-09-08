@@ -32,10 +32,39 @@ export default function CtaForm() {
     resolver: zodResolver(ctaFormSchema),
   });
 
-  const onSubmit = async () => {
-    // No backend endpoint exists yet — surface the intended success state
-    // so the form is demoable without a fabricated integration.
-    setStatus("success");
+  const onSubmit = async (values: CtaFormValues) => {
+    const webhookUrl = process.env.NEXT_PUBLIC_N8N_CONTACT_WEBHOOK_URL;
+
+    if (!webhookUrl) {
+      console.error("Webhook URL not configured");
+      setStatus("error");
+      return;
+    }
+
+    try {
+      const payload = {
+        "First Name": values.firstName,
+        "Last Name": values.lastName,
+        Company: values.company,
+        Message: values.message || "",
+        Email: values.email,
+      };
+
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Webhook request failed: ${response.statusText}`);
+      }
+
+      setStatus("success");
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setStatus("error");
+    }
   };
 
   return (

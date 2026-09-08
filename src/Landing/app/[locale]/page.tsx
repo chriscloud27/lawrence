@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import HeroSection from "@/components/sections/HeroSection";
-import ProblemSection from "@/components/sections/ProblemSection";
+import StatsSection from "@/components/sections/StatsSection";
 import ServicesSection from "@/components/sections/ServicesSection";
-import CredibilitySection from "@/components/sections/CredibilitySection";
 import CtaSection from "@/components/sections/CtaSection";
-import OutcomesSection from "@/components/sections/OutcomesSection";
 import { getGlobalSettings } from "@/lib/settings";
 import { buildCanonical, buildCanonicalAndAlternates } from "@/lib/seo";
 import { HOME_KEYWORDS } from "@/lib/keywords";
@@ -182,11 +180,9 @@ export default async function HomePage({
       />
       <main>
         <HeroSection />
-        <ProblemSection />
+        <StatsSection />
         <ServicesSection />
-        <OutcomesSection />
         <CtaSection />
-        <CredibilitySection />
       </main>
     </>
   );
