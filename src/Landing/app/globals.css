@@ -97,6 +97,15 @@
   --accent-foreground: 240 5% 96%;
 }
 
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-badge {
+  animation: pulse-badge 2s ease-in-out infinite;
+}
+
 body {
   background: var(--lw-bg);
   color: var(--lw-text);

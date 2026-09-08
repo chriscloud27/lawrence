@@ -7,12 +7,13 @@
     "getStarted": "Get Started"
   },
   "hero": {
-    "eyebrow": "Overwhelmed with enquiries?",
+    "eyebrow": "One scoring engine, flexible intake",
     "h1Part1": "Lawrence turns enquiries into",
     "h1Emphasis": "qualified, scored leads",
     "sub": "So your team can close more deals by focusing on the highest-intent enquiries first.",
     "cta": "Book a pilot call",
-    "ctaSecondary": "See how scoring works"
+    "ctaSecondary": "See how scoring works",
+    "trustedCount": "12 agencies in pilot"
   },
   "stats": {
     "title": "Sound familiar?",
