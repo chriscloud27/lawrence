@@ -12,10 +12,10 @@ export default function StatsSection() {
   return (
     <section className="bg-lw-bg py-lw-2xl md:py-lw-section">
       <div className="mx-auto max-w-content px-lw-lg">
-        <h2 className="text-[28px] font-bold leading-[1.2] tracking-[-0.5px] text-lw-text">
+        <h2 className="text-center text-[28px] font-bold leading-[1.2] tracking-[-0.5px] text-lw-text">
           {t("title")}
         </h2>
-        <p className="mt-lw-base max-w-lead text-[16px] text-lw-text-secondary">
+        <p className="mx-auto mt-lw-base max-w-lead text-center text-[16px] text-lw-text-secondary">
           {t("context")}
         </p>
 

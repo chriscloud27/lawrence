@@ -76,7 +76,7 @@ export default async function HomePage({
   const webPageSchema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Lawrence — AI Admissions Intake for Education Agencies",
+    name: "Lawrence - AI Admissions Intake for Education Agencies",
     url: pageUrl,
     description:
       "Lawrence qualifies parent leads via BANT scoring and routes them to the right counsellor automatically, replacing manual discovery calls with an AI-driven intake that builds a parent profile before a human is involved.",

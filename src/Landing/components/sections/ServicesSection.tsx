@@ -8,18 +8,19 @@ export default function ServicesSection() {
     { label: t("step1Label"), desc: t("step1Desc"), icon: MessageCircle },
     { label: t("step2Label"), desc: t("step2Desc"), icon: Sparkles },
     { label: t("step3Label"), desc: t("step3Desc"), icon: CalendarCheck },
+    { label: t("step4Label"), desc: t("step4Desc"), icon: CalendarCheck },
   ];
 
   return (
     <section id="how-it-works" className="bg-lw-bg py-lw-2xl md:py-lw-section">
       <div className="mx-auto max-w-content px-lw-lg">
-        <h2 className="max-w-lead text-[28px] font-bold leading-[1.2] tracking-[-0.5px] text-lw-text">
+        <h2 className="text-center text-[28px] font-bold leading-[1.2] tracking-[-0.5px] text-lw-text">
           {t("heading")}
         </h2>
-        <p className="mt-lw-sm max-w-lead text-[16px] text-lw-text-secondary">
+        <p className="mx-auto mt-lw-sm max-w-lead text-center text-[16px] text-lw-text-secondary">
           {t("sub")}
         </p>
-        <div className="mt-lw-xl grid grid-cols-1 gap-lw-lg md:grid-cols-3">
+        <div className="mt-lw-xl grid grid-cols-1 gap-lw-lg md:grid-cols-4">
           {steps.map((step) => {
             const Icon = step.icon;
             return (

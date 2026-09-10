@@ -21,7 +21,7 @@ export default function Footer() {
             <span className="text-lw-border">·</span>
             <a href="#" className="hover:text-lw-text">Docs</a>
             <span className="text-lw-border">·</span>
-            <a href="#" className="hover:text-lw-text">Contact</a>
+            <a href="/en/contact" className="hover:text-lw-text">Contact</a>
           </nav>
 
           <p className="text-[14px] text-lw-text-secondary">

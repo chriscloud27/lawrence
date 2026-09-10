@@ -28,6 +28,9 @@ export default function Header() {
           <a href="#" className="text-[14px] font-medium text-lw-text-secondary hover:text-lw-text">
             {t("docs")}
           </a>
+          <a href="/en/contact" className="text-[14px] font-medium text-lw-text-secondary hover:text-lw-text">
+            {t("contact")}
+          </a>
         </nav>
 
         <div className="flex items-center gap-lw-sm">

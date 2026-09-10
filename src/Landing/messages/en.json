@@ -3,21 +3,22 @@
     "product": "Product",
     "pricing": "Pricing",
     "docs": "Docs",
+    "contact": "Contact",
     "login": "Log in",
     "getStarted": "Get Started"
   },
   "hero": {
-    "eyebrow": "One scoring engine, flexible intake",
+    "eyebrow": "Overwhelmed with enquiries?",
     "h1Part1": "Lawrence turns enquiries into",
     "h1Emphasis": "qualified, scored leads",
-    "sub": "So your team can close more deals by focusing on the highest-intent enquiries first.",
+    "sub": "So your team can close more deals by focusing on the highest-intent enquiries first.So your team spends every minute on families most likely to enrol and wins more admissions.",
     "cta": "Book a pilot call",
     "ctaSecondary": "See how scoring works",
     "trustedCount": "12 agencies in pilot"
   },
   "stats": {
-    "title": "Sound familiar?",
-    "context": "You're drowning in enquiries, spending too much time on low-intent leads that were never going anywhere this year. Meanwhile, your strong leads wait too long for a reply and move on.",
+    "title": "Where admissions are lost",
+    "context": "Agencies field 25,000+ enquiries a year, but 75% never get a follow-up, and the average reply takes 47 hours. By then, your strongest leads have already gone elsewhere.",
     "stat1Value": "40%",
     "stat1Label": "Of agencies receive 25,000+ enquiries a year",
     "stat2Value": "75%",
@@ -26,19 +27,25 @@
     "stat3Label": "Average time before a reply"
   },
   "services": {
-    "heading": "How it works",
-    "sub": "Every enquiry gets qualified automatically, and nobody gets dropped.",
-    "step1Label": "Parent enquires",
-    "step1Desc": "A short survey for parents to answer, plus an area to upload any research they may have already conducted.",
+    "heading": "How admissions are won",
+    "sub": "Enquiries qualified instantly, so hot leads gets locked in.",
+    "step1Label": "A parent reaches out",
+    "step1Desc": "Our specially designed and tested form surfaces what matters most to each parent, and we extract any shortlist or research they've already done to feed directly into how they're scored.",
     "step2Label": "Lawrence scores it",
-    "step2Desc": "A profile is built from their answers and uploads, then scored 0-100 in real time and sorted into Hot (70-100), Warm (40-69), or Cold (0-39) automatically.",
+    "step2Desc": "A profile is built from their answers and research, then scored 0-100 in real time and sorted into Hot (70-100), Warm (40-69), or Cold (0-39).",
     "step3Label": "Qualified and booked",
-    "step3Desc": "Hot leads book straight onto your calendar, and every lead is prioritised hot to cold, so you and your team know exactly who to follow up with first each day for the best chance of admission."
+    "step3Desc": "Hot leads book straight onto your calendar, and every lead is prioritised hot to cold, so you and your team know exactly who to follow up with first each day, helping you win more admissions.",
+    "step4Label": "Opportunity logged",
+    "step4Desc": "Every follow-up is logged as an opportunity in our CRM dashboard, so you always know where each family stands and nothing slips through the cracks."
   },
   "cta": {
-    "heading": "Ready to see it on your own enquiries?",
-    "sub": "Book a short pilot call and we'll show you exactly how it scores your real enquiries.",
-    "ctaLabel": "Book a pilot call"
+    "heading": "Ready to start winning more admissions?",
+    "sub": "Book a short demo and we'll show you exactly how it scores your real enquiries.",
+    "ctaLabel": "Book a demo"
+  },
+  "contact": {
+    "heading": "Book a demo",
+    "sub": "Tell us about your agency and we'll show you exactly how Lawrence scores your real enquiries."
   },
   "form": {
     "firstName": "First name",
