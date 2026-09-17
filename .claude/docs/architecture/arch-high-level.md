@@ -15,7 +15,7 @@
 | **Messaging / Queue** | Event bus | Decouple ingestion from scoring from notification | Direct node-to-node in n8n | Kafka/SQS between ingestion, scoring, notification domains |
 | **Data store (OLTP)** | Relational DB | Leads, messages, sessions, schools | Supabase (Postgres) | Same, with read replicas per region |
 | **Data store (analytics)** | OLAP / warehouse | Funnel metrics, BANT score distributions | — (none yet) | ClickHouse/BigQuery fed by CDC from Postgres |
-| **AI layer** | LLM gateway | Model routing, cost control, prompt versioning | Direct OpenAI/Anthropic SDK calls | Internal gateway (LiteLLM-style) with fallback + rate limiting |
+| **AI layer** | LLM gateway | Model routing, cost control, prompt versioning | LLM calls inside n8n workflow JSON — no SDK in TypeScript (see stack-audit Critical Change 02) | Internal gateway (LiteLLM-style) with fallback + rate limiting |
 | **Observability** | Logs/metrics/traces | Pipeline health, AI cost tracking, chat latency | n8n execution logs only | OpenTelemetry → Grafana/Datadog, cost dashboards per model |
 | **Secrets** | Secret management | Credential rotation, no plaintext in workflow JSON | n8n SET-node pattern (Community limitation) | Vault/External Secrets once on Enterprise/self-hosted multi-instance |
 | **Compute** | Containers | Run n8n, chatbot, workers | Docker Compose, single host | Kubernetes (or managed container platform) with autoscaling |
@@ -43,7 +43,8 @@ Grouped by the four domains implied in `solution-components.md`: **Chatbot**, **
 - `leads`, `messages` tables owned by the chatbot
 - `schools_chatbot` read view owned by ingestion, decoupled from chatbot writes (ADR-0005)
 - RLS enforced on every user/pipeline-facing table
-- Local dev via Drizzle + SQLite mirror for fast iteration without touching Supabase
+- Local dev against a local Supabase stack (`supabase start`), not a separate ORM/SQLite mirror —
+  the Drizzle + better-sqlite3 layer this line described was retired and is not installed
 
 ### School Search / Discovery
 - Structured data ingestion via JSON-LD (Doris source, no LLM extraction needed for v1)

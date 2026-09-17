@@ -17,6 +17,8 @@ Enum values: `.claude/docs/data/schemas/schools-enums.json`
 | `school_fees` | One row per fee line item. Linked to school. | ~5–15 per school |
 | `school_entry_points` | One row per admissions window/cohort. | ~1–5 per school |
 | `scrape_queue` | Pipeline control. Tracks scrape status, ETag, hash. | ~1,000+ |
+| `agencies` | One row per tenant agency. White-label + intake config. | ~1–10 |
+| `agency_members` | Join table: which auth user is a counsellor of which agency. | ~1–5 per agency |
 | `leads` | One row per chatbot BANT lead. See "Chatbot Leads" below. | ~10s–100s |
 | `messages` | One row per chat message, linked to a lead. | ~10 per lead |
 
@@ -26,7 +28,17 @@ Enum values: `.claude/docs/data/schemas/schools-enums.json`
 schools (1) ──< school_fees (many)
 schools (1) ──< school_entry_points (many)
 schools (1) ──< scrape_queue (1)
+
+auth.users (1) ──< agency_members (many) >── (1) agencies
+                                                  │
+                                         agencies (1) ──< leads (many)
+                                                             │
+                                                    leads (1) ──< messages (many)
 ```
+
+Two ownership domains (ADR-0005, ADR-0016). The school directory is a shared public
+catalogue and carries **no** `agency_id`; tenancy applies to the app-owned tables only.
+`messages` has no `agency_id` either — its tenant derives through `lead_id`.
 
 ---
 
@@ -151,6 +163,58 @@ schools (1) ──< scrape_queue (1)
 
 ---
 
+## Agency Tenancy
+
+**Purpose:** The tenant primitive for the app-owned tables (ADR-0016). Isolation is an RLS
+policy, not a filter every query has to remember.
+
+**Canonical source:** `supabase/migrations/20260915071821_add_agency_tenancy.sql` and
+`20260915071822_backfill_leads_agency_id.sql`.
+
+### agencies
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| id | UUID | NO | `gen_random_uuid()` | |
+| slug | TEXT | NO | | UNIQUE. `demo-agency`, `rival-agency` seeded as reference data |
+| name | TEXT | NO | | Display name |
+| intake_method | TEXT | NO | `chatbot` | `chatbot` \| `form` \| `both` — ADR-0010's per-agency setting, a column and never a code fork |
+| accent_family | TEXT | NO | `blue` | Tailwind colour **family name** (`blue`, `emerald`, …), never a hex value. The single white-label axis in `.claude/rules/design.md` |
+| created_at | TIMESTAMPTZ | NO | NOW() | |
+
+RLS: enabled. `agencies_member_select` scopes `SELECT` to agencies the caller belongs to.
+
+### agency_members
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| agency_id | UUID | NO | | FK → `agencies.id` ON DELETE CASCADE. PK part 1 |
+| user_id | UUID | NO | | FK → `auth.users.id` ON DELETE CASCADE. PK part 2 |
+| role | TEXT | NO | | `owner` \| `counsellor` |
+| created_at | TIMESTAMPTZ | NO | NOW() | |
+
+Index: `idx_agency_members_user(user_id)` — every tenancy check runs this lookup.
+
+RLS: enabled. `agency_members_self_select` scopes `SELECT` to the caller's own agencies.
+
+### current_agency_ids()
+
+`SECURITY DEFINER`, `STABLE`, returns `SETOF UUID` — the agencies the current `auth.uid()`
+belongs to. Every counsellor-facing policy goes through it.
+
+It exists because a policy that subqueries `agency_members` re-triggers `agency_members`'s own
+policy, which Postgres rejects outright (`infinite recursion detected in policy for relation
+"agency_members"`). Running as the function owner side-steps that, and gives the tenant of the
+current request exactly one definition. The planner evaluates it once per query (hashed SubPlan),
+not once per row.
+
+**Why not a JWT claim.** A claim is a snapshot: revoke a counsellor's membership and their
+existing token keeps working until it refreshes — up to `jwt_expiry` of access after removal.
+The function is evaluated per statement and is always current. Revisit only when a query plan
+asks for it.
+
+---
+
 ## Chatbot Leads
 
 **Purpose:** BANT-qualified leads captured by the `src/Chatbot` widget (ADR-0006, ADR-0007,
@@ -190,9 +254,64 @@ not be edited further (see ADR-0008).
 | budget_range_usd | TEXT | YES | | |
 | user_id | UUID | YES | | FK → `auth.users.id`. Set by the `link-lead` n8n workflow after Google sign-in (ADR-0008) |
 | session_id | TEXT | YES | | UNIQUE. Bridges the browser's localStorage session to this row before/without auth |
+| agency_id | UUID | NO | | FK → `agencies.id`. The tenant. Added nullable then backfilled + set NOT NULL across two migrations |
+| source | TEXT | NO | `chatbot` | `chatbot` \| `form` — ADR-0010's intake tag. Ships with the chatbot as the only producer so the v2 form path is an INSERT, not a migration |
+| escalated_at | TIMESTAMPTZ | YES | | When admissions was emailed about this lead. NULL = never. Claimed by a conditional `UPDATE ... WHERE escalated_at IS NULL` so a retried Inngest step cannot send a second email (ADR-0018) |
 
-RLS: enabled. `leads_owner_select` policy scopes `SELECT` to `auth.uid() = user_id`. Writes
-happen only via the `service_role` key (n8n), which bypasses RLS — no write policy needed.
+Indexes: `idx_leads_agency(agency_id)`, `idx_leads_agency_score(agency_id, score DESC)` — the
+Admin list's default ordering.
+
+RLS: enabled, with two `SELECT` policies that Postgres ORs together:
+
+- `leads_owner_select` — the parent reading their own recap: `auth.uid() = user_id` (ADR-0009).
+- `leads_agency_select` — the counsellor: `agency_id IN (SELECT current_agency_ids())` (ADR-0016).
+
+Plus one `UPDATE` policy, `leads_agency_update`, for counsellor status changes. It carries
+`WITH CHECK` as well as `USING`: `USING` filters what is visible, `WITH CHECK` constrains what
+the row may become — without it a counsellor could update a row they can see *into* another
+agency.
+
+Ingest writes still happen only via the `service_role` key (n8n today, step 14 after), which
+bypasses RLS — no INSERT policy for `anon` or `authenticated`.
+
+### agent_config
+
+The prompt and the thresholds a counsellor owns, versioned. Added by
+[ADR-0018](../adr/0018-chat-agent-in-typescript.md) as the answer to the requirement that put the
+agent in n8n in the first place: a non-developer changes how the assistant speaks, without a
+developer and without a deploy.
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| id | UUID | NO | `gen_random_uuid()` | |
+| agency_id | UUID | NO | | FK → `agencies.id`, ON DELETE CASCADE |
+| system_prompt | TEXT | NO | | Seeded from `src/agents/prompts/parent-turn.txt`. **The two must be kept identical** — `evals/prompt.js` grades the file, the app runs the row |
+| bant_thresholds | JSONB | NO | | `{"low":25,"medium":50,"hot":75}` (ADR-0017) |
+| routing_copy | JSONB | NO | | `{turn_cap_close, resources, booking}` — the parent-visible copy the model does not write |
+| version | INTEGER | NO | | Unique per agency |
+| created_by | UUID | YES | | FK → `auth.users.id`, ON DELETE SET NULL |
+| created_at | TIMESTAMPTZ | NO | NOW() | |
+| is_active | BOOLEAN | NO | false | |
+
+**Never updated in place.** A save INSERTs version N+1 and moves `is_active`; a revert moves it
+back. The row that was live before an edit still exists to revert *to* — the audit trail n8n never
+had.
+
+Indexes: `idx_agent_config_one_active` — a **partial unique index** on `(agency_id) WHERE is_active`,
+so two active rows for one agency are a constraint violation rather than a coin flip at read time.
+Plus `idx_agent_config_agency_version(agency_id, version DESC)` for the chat route's per-turn read.
+
+RLS: enabled.
+
+- `agent_config_agency_select` — `agency_id IN (SELECT current_agency_ids())`, reusing the
+  ADR-0016 helper rather than re-deriving the membership subquery.
+- `agent_config_owner_insert` / `agent_config_owner_update` — `current_owner_agency_ids()`, a second
+  `SECURITY DEFINER` helper that adds `role = 'owner'`. Both carry `WITH CHECK` as well as `USING`,
+  for the same reason `leads_agency_update` does.
+
+No grant to `anon`. The parent-facing `/api/chat` reads the active row with the **service key**,
+because the parent has no session and one agency's visitors must never be able to read another's
+prompt.
 
 ### messages
 
@@ -204,17 +323,39 @@ happen only via the `service_role` key (n8n), which bypasses RLS — no write po
 | content | TEXT | NO | | |
 | created_at | TIMESTAMPTZ | NO | NOW() | |
 
-RLS: enabled. `messages_owner_select` policy (ADR-0009) scopes `SELECT` to `lead_id IN (SELECT id FROM leads WHERE user_id = auth.uid())`, allowing signed-in users to read their own message history. Writes happen only via the `service_role` key (n8n).
+No `agency_id` column, deliberately: the tenant derives through `lead_id`. Denormalising it onto
+both tables creates two copies that can disagree, and nothing in the schema would notice.
+
+RLS: enabled, two `SELECT` policies:
+
+- `messages_owner_select` (ADR-0009) — `lead_id IN (SELECT id FROM leads WHERE user_id = auth.uid())`.
+- `messages_agency_select` (ADR-0016) — `lead_id IN (SELECT id FROM leads WHERE agency_id IN (SELECT current_agency_ids()))`.
+
+Writes happen only via the `service_role` key (n8n).
 
 ### Write paths
 
-- `n8n/workflows/bant-prequalify.json` — every tier (low, medium, hot) now writes:
-  - `upsert-lead-*` node: upserts a `leads` row keyed by `session_id`, with tier-appropriate classification (`cold`/`warm`/`hot`).
-  - `insert-messages-*` node: inserts a 2-row batch (user message + assistant reply) into `messages` for that lead.
-  - Low tier: after `send-standard-info`.
-  - Medium tier: after `re-scoreJS` (post-refinement), upstream of the 3-way `Switch2-tier2` split.
-  - Hot tier: in parallel with existing `offer-booking-link`/`inform-agent` nodes.
-- `n8n/workflows/link-lead.json` — sets `leads.user_id` by `session_id` after Google sign-in (ADR-0008).
+Since [ADR-0018](../adr/0018-chat-agent-in-typescript.md) the chat write path is TypeScript, not
+n8n. `bant-prequalify.json` and `chat-agent.json` are deleted (archived under
+`.claude/docs/archive/n8n/`).
+
+- `src/Chatbot/inngest/functions/score-and-persist.ts` — on `chat/turn.completed`, as separately
+  retried steps:
+  - `upsert-lead` — upserts a `leads` row keyed by `id` (= the browser's `session_id`), carrying
+    `agency_id`, `source`, `score`, `score_breakdown`, `classification`, and any profile fields the
+    delta extracted. Null profile fields are dropped rather than written, so a later turn cannot
+    erase what an earlier one captured.
+  - `insert-messages` — appends only the turns not already stored. `messages.id` is derived as
+    `{session_id}-{index}`, so a retry that partially succeeded collides instead of duplicating.
+  - `notify-admissions` — fires once above the hot threshold, claimed via a conditional UPDATE on
+    `leads.escalated_at` so a retry cannot send a second email.
+  - All four use the **service-role** client (`lib/supabase-admin.ts`), which bypasses RLS. There is
+    still no INSERT policy for `anon` or `authenticated` on `leads` or `messages`.
+- `src/Chatbot/app/(admin)/admin/settings/actions.ts` — the only counsellor-facing write. Inserts a
+  new `agent_config` version and moves `is_active`; never updates prompt or threshold columns in
+  place. Uses the **cookie-bound** client so the owner-only RLS policies authorise it.
+- `n8n/workflows/link-lead.json` — sets `leads.user_id` by `session_id` after Google sign-in
+  (ADR-0008). The one remaining n8n write.
 
 ### Read paths (ADR-0009)
 

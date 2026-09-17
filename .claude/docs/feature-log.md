@@ -8,6 +8,51 @@ config) · `refactor` (no behavior change)
 
 ---
 
+## LAW-12: Take the parent-facing chat agent out of n8n
+**Date:** 2026-09-16  **Type:** refactor  **Status:** done
+
+**What:** The conversation now runs in TypeScript. `/api/chat` streams from the ADR-0015
+provider seam with `search_schools` and `offer_calendar` as AI SDK tools; BANT scoring moved
+to `src/Chatbot/lib/bant/` with 15 unit tests; `leads`/`messages` writes and a Resend
+hot-lead email became retried Inngest steps; a versioned `agent_config` table plus an Admin
+form at `/admin/settings` carries the prompt-ownership requirement that originally justified
+n8n. `chat-agent.json`, `bant-prequalify.json` and `/api/prequalify` are deleted; the widget
+streams tokens and its three canned pre-qual buttons are gone.
+**Why:** Build step 14 / Critical Change 02. Three defects had survived months of live use in
+workflow JSON — an escalation branch unreachable by arithmetic (so no lead has ever reached
+admissions), a scorer reading `"not my decision"` as maximum authority, and Stage 2 scoring
+the *advisor's* reply rather than the parent's. All three are now fixed and covered by tests
+or evals.
+**Scope:** `src/Chatbot/{app/api/chat,app/api/inngest,app/(admin)/admin/settings,inngest,
+emails,lib/bant,lib/ai/tools.ts,lib/agent-config.ts,lib/supabase-admin.ts,lib/notify.ts,
+lib/prompts.ts,components/chat/ChatWidget.tsx,components/admin/AgentConfigForm.tsx}`,
+`supabase/migrations/20260916181457_create_agent_config.sql`, `src/agents/prompts/`,
+`promptfooconfig.yaml`, `.claude/rules/{chatbot,bant-scoring}.md`, `.claude/docs/data/db-tables.md`,
+`.claude/docs/stack-audit.md`, `CLAUDE.md`, `.env.example`
+**Links:** ADR-0018 (supersedes ADR-0006), ADR-0017, build step 14
+
+---
+
+## LAW-11: Fold the Admin dashboard into the Chatbot app, on real data
+**Date:** 2026-09-15  **Type:** refactor  **Status:** done
+
+**What:** Deleted `src/Admin/` (Vite 5 / React 18) and rebuilt its seven screens as
+`src/Chatbot/app/(admin)/` routes behind an auth + agency-membership gate. Added
+`getSupabaseRequestClient()` (cookie-bound), `lib/leads.ts`, `lib/score.ts`,
+`types/lawrence.ts` mapped onto the real `leads`/`messages` columns, a sign-in
+page and a sign-out control. Retired ~2,500 lines of raw-hex CSS in favour of
+`lw-*` tokens; `mock-data.ts` is gone.
+**Why:** Build step 13 / Critical Change 03 — three frontends across two React
+majors and two Tailwind majors is triple maintenance, and step 14's
+`agent_config` form would otherwise be written twice.
+**Scope:** `src/Chatbot/app/(admin)/`, `src/Chatbot/app/sign-in/`,
+`src/Chatbot/components/admin/`, `src/Chatbot/lib/{leads,score,supabase-server}.ts`,
+`src/Chatbot/types/lawrence.ts`, `src/Admin/` (deleted), `CLAUDE.md`,
+`.claude/docs/stack-audit.md`, `.claude/docs/build-steps/13-admin-consolidation.md`
+**Links:** ADR-0016, ADR-0010, ADR-0005
+
+---
+
 ## LAW-10: Document the missing needs_review → ok promotion step
 **Date:** 2026-08-16  **Type:** fix  **Status:** done
 

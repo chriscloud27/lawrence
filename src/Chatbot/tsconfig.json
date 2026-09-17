@@ -6,6 +6,10 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
+    // Node's --experimental-strip-types resolves the real file, so the test
+    // files import "./keywords.ts" with the extension. Safe here because
+    // noEmit is on — nothing is written, so nothing can emit a bad specifier.
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",

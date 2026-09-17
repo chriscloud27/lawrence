@@ -1,6 +1,6 @@
 # ADR-0006: Orchestrate the chatbot AI agent in an n8n workflow
 
-**Status:** proposed
+**Status:** superseded by [ADR-0018](0018-chat-agent-in-typescript.md)
 **Date:** 2026-07-03
 
 ## Context

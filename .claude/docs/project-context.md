@@ -63,7 +63,7 @@ Supabase (PostgreSQL)
         │
         ▼
 Next.js Chatbot (src/Chatbot/)
-  - Anthropic SDK + Drizzle ORM
+  - @supabase/supabase-js + @supabase/ssr (no ORM, no AI SDK installed)
   - Reads from Supabase; answers school-search queries
 ```
 

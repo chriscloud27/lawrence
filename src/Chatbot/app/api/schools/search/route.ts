@@ -1,6 +1,12 @@
 import { searchSchools } from "@/lib/schools";
+import { checkLimits, clientIp, limitResponse } from "@/lib/rate-limit";
 
 export async function GET(request: Request) {
+  // Database load rather than LLM spend, but still an unauthenticated public
+  // endpoint — same IP ceiling. No sessionId on a GET, so no turn counting.
+  const limit = await checkLimits({ ip: clientIp(request) });
+  if (!limit.ok) return limitResponse(limit);
+
   const { searchParams } = new URL(request.url);
 
   const schools = await searchSchools({

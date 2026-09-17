@@ -81,3 +81,10 @@ logs/
 
 # OS
 Thumbs.db
+.backup/
+
+# n8n workflow exports carry init-secrets SET-node values in plaintext
+# (.claude/rules/n8n-workflows.md). The step-14 archive is a convenience copy on
+# disk for rollback; the durable record is git history —
+# `git show a46e12d:n8n/workflows/chat-agent.json`.
+.claude/docs/archive/n8n/

@@ -2,6 +2,12 @@
 
 **Status:** draft · **Date:** 2026-07-02 · **Owner:** data/platform
 
+> **Historical — read as a point-in-time plan, not current state (noted 2026-09-13).** The Drizzle /
+> `pgTable` / `lib/db.ts` chatbot layer described in Step 3 was retired; `src/Chatbot` now reaches
+> Supabase through `@supabase/supabase-js` with no ORM installed. The read-view decoupling decision
+> itself still holds — see [ADR-0005](../adr/0005-chatbot-read-view-decoupling.md) — and
+> `schools_chatbot` is live. Only the client library named here has changed.
+
 Plan to reach the target-state database in `db-tables.md`, covering (1) school
 web-scraping ingestion and (2) migrating the sales-team Chatbot prototype
 (`src/Chatbot/`) onto the target schema.

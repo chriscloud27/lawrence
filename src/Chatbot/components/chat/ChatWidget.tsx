@@ -3,7 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import ChatMessage from "./ChatMessage";
 import { getChatbotConfig } from "@/lib/chatbot-config";
-import { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } from "@/lib/env";
+import {
+  NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY,
+} from "@/lib/env";
 import { getSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { fetchLatestLeadRecap, type LeadRecap } from "@/lib/lead-history";
 import { composeWelcomeBackMessage } from "@/lib/greeting";
@@ -11,18 +14,14 @@ import {
   getOrCreateSessionId,
   loadHistory,
   saveHistory,
-  loadScoreState,
-  saveScoreState,
-  loadPrequalState,
-  savePrequalState,
   type ChatMessageData,
-  type BantScoreState,
-  type PrequalState,
 } from "@/lib/session";
 
 // Google sign-in (ADR-0008) is optional — only offered when Supabase auth env
 // vars are configured, so the feature degrades cleanly in dev/local setups.
-const authEnabled = Boolean(NEXT_PUBLIC_SUPABASE_URL && NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const authEnabled = Boolean(
+  NEXT_PUBLIC_SUPABASE_URL && NEXT_PUBLIC_SUPABASE_ANON_KEY,
+);
 
 const config = getChatbotConfig();
 
@@ -43,14 +42,8 @@ export default function ChatWidget() {
     const history = loadHistory();
     return history.length > 0 ? history : [INITIAL_MESSAGE];
   });
-  const [scoreState, setScoreState] = useState<BantScoreState | null>(() =>
-    typeof window === "undefined" ? null : loadScoreState()
-  );
-  const [prequal, setPrequal] = useState<PrequalState>(() =>
-    typeof window === "undefined" ? { stepIndex: -1, answers: {} } : loadPrequalState()
-  );
   const [sessionId] = useState<string>(() =>
-    typeof window === "undefined" ? "" : getOrCreateSessionId()
+    typeof window === "undefined" ? "" : getOrCreateSessionId(),
   );
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -58,11 +51,9 @@ export default function ChatWidget() {
   const [recap, setRecap] = useState<LeadRecap | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const prequalDone = prequal.stepIndex >= config.prequalQuestions.length;
-
   useEffect(() => {
     if (isOpen) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isOpen, prequal.stepIndex]);
+  }, [messages, isOpen]);
 
   useEffect(() => {
     if (!authEnabled) return;
@@ -72,9 +63,11 @@ export default function ChatWidget() {
       if (data.session?.user) setUserId(data.session.user.id);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user?.id ?? null);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUserId(session?.user?.id ?? null);
+      },
+    );
 
     return () => listener.subscription.unsubscribe();
   }, []);
@@ -96,7 +89,7 @@ export default function ChatWidget() {
     // (not mid-conversation). A fresh state is exactly [INITIAL_MESSAGE].
     if (!(messages.length === 1 && messages[0].id === "initial")) return;
 
-    fetchLatestLeadRecap().then(r => {
+    fetchLatestLeadRecap().then((r) => {
       if (!r) return; // No prior lead found, keep the generic INITIAL_MESSAGE
       setRecap(r);
       // Replace the initial message with the personalized welcome-back greeting
@@ -118,85 +111,103 @@ export default function ChatWidget() {
     });
   };
 
-  const appendMessage = (message: ChatMessageData) => {
-    setMessages(prev => {
-      const next = [...prev, message];
-      saveHistory(next);
-      return next;
-    });
-  };
-
-  const callPrequalify = async (chatInput: string) => {
+  /**
+   * Post the conversation to /api/chat and append tokens as they arrive.
+   *
+   * The response body is plain text — not JSON, not a UI message stream. That
+   * is deliberate (see the route): there is no field in this response for a
+   * score, a tier, or a BANT breakdown to leak into, because the parent must
+   * never see any of it. The scoring runs server-side after the stream closes.
+   */
+  const streamReply = async (history: ChatMessageData[]) => {
     setIsLoading(true);
+
+    // The assistant bubble is created empty and filled in place, so the first
+    // token paints immediately instead of after the whole reply.
+    const replyId = crypto.randomUUID();
+    let streamed = "";
+    let opened = false;
+
     try {
-      const res = await fetch("/api/prequalify", {
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          chatInput,
           sessionId,
-          previousScore: scoreState?.score,
-          previousBreakdown: scoreState?.breakdown,
+          messages: history.map(({ role, content }) => ({ role, content })),
         }),
       });
 
-      if (!res.ok) throw new Error(`Request failed (${res.status})`);
-      const data = await res.json();
-      const reply: string = data.reply || data.output || "Thanks! How can I help you today?";
+      if (!res.ok || !res.body)
+        throw new Error(`Request failed (${res.status})`);
 
-      appendMessage({ id: crypto.randomUUID(), role: "assistant", content: reply });
+      const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
 
-      if (typeof data.score === "number" && data.breakdown && data.tier) {
-        const nextScore: BantScoreState = { score: data.score, breakdown: data.breakdown, tier: data.tier };
-        setScoreState(nextScore);
-        saveScoreState(nextScore);
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (!value) continue;
+
+        streamed += value;
+
+        if (!opened) {
+          // First token: the placeholder becomes a real bubble and the
+          // "Thinking…" indicator goes away.
+          opened = true;
+          setIsLoading(false);
+          setMessages((prev) => [
+            ...prev,
+            { id: replyId, role: "assistant", content: streamed },
+          ]);
+        } else {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === replyId ? { ...m, content: streamed } : m,
+            ),
+          );
+        }
       }
+
+      if (!opened) throw new Error("Empty response");
+
+      setMessages((prev) => {
+        const next = prev.map((m) =>
+          m.id === replyId ? { ...m, content: streamed } : m,
+        );
+        saveHistory(next);
+        return next;
+      });
     } catch {
-      appendMessage({
-        id: crypto.randomUUID(),
-        role: "assistant",
-        content: "Sorry, something went wrong reaching the assistant. Please try again.",
+      setMessages((prev) => {
+        const withoutPartial = prev.filter((m) => m.id !== replyId);
+        const next: ChatMessageData[] = [
+          ...withoutPartial,
+          {
+            id: crypto.randomUUID(),
+            role: "assistant",
+            content:
+              "Sorry, something went wrong reaching the assistant. Please try again.",
+          },
+        ];
+        saveHistory(next);
+        return next;
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const startPrequal = () => {
-    const next: PrequalState = { stepIndex: 0, answers: {} };
-    setPrequal(next);
-    savePrequalState(next);
-    appendMessage({ id: crypto.randomUUID(), role: "assistant", content: config.prequalQuestions[0].question });
-  };
-
-  const answerPrequalQuestion = (option: { label: string; value: string }) => {
-    if (isLoading) return;
-    const question = config.prequalQuestions[prequal.stepIndex];
-    if (!question) return;
-
-    appendMessage({ id: crypto.randomUUID(), role: "user", content: option.label });
-
-    const nextAnswers = { ...prequal.answers, [question.id]: option.value };
-    const nextStepIndex = prequal.stepIndex + 1;
-    const next: PrequalState = { stepIndex: nextStepIndex, answers: nextAnswers };
-    setPrequal(next);
-    savePrequalState(next);
-
-    if (nextStepIndex < config.prequalQuestions.length) {
-      const nextQuestion = config.prequalQuestions[nextStepIndex];
-      appendMessage({ id: crypto.randomUUID(), role: "assistant", content: nextQuestion.question });
-    } else {
-      const combined = config.prequalQuestions
-        .map(q => `${q.id[0].toUpperCase()}${q.id.slice(1)}: ${nextAnswers[q.id]}.`)
-        .join(" ");
-      callPrequalify(combined);
-    }
-  };
-
   const sendMessage = async (content: string) => {
     if (isLoading || !content.trim() || !sessionId) return;
-    appendMessage({ id: crypto.randomUUID(), role: "user", content });
-    await callPrequalify(content);
+
+    const withUserTurn: ChatMessageData[] = [
+      ...messages,
+      { id: crypto.randomUUID(), role: "user", content },
+    ];
+    setMessages(withUserTurn);
+    saveHistory(withUserTurn);
+
+    await streamReply(withUserTurn);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -207,13 +218,10 @@ export default function ChatWidget() {
     sendMessage(content);
   };
 
-  const currentQuestion = !prequalDone && prequal.stepIndex >= 0 ? config.prequalQuestions[prequal.stepIndex] : null;
-  const showStartButton = !prequalDone && prequal.stepIndex === -1;
-
   return (
     <>
       <button
-        onClick={() => setIsOpen(o => !o)}
+        onClick={() => setIsOpen((o) => !o)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-lw-accent text-lw-text-on-accent shadow-lw-lg hover:bg-lw-accent-hover transition-all hover:scale-105 flex items-center justify-center"
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
@@ -227,7 +235,7 @@ export default function ChatWidget() {
               <p className="text-sm font-semibold">{config.agentName}</p>
               <p className="text-xs text-white/70">Ask me anything</p>
             </div>
-            {authEnabled && prequalDone && !userId && (
+            {authEnabled && !userId && (
               <button
                 onClick={signInWithGoogle}
                 className="text-xs bg-white/10 hover:bg-white/20 rounded-full px-3 py-1.5 whitespace-nowrap"
@@ -238,35 +246,9 @@ export default function ChatWidget() {
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 pt-4 pb-2">
-            {messages.map(msg => (
+            {messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} />
             ))}
-
-            {showStartButton && (
-              <div className="flex justify-start mb-3">
-                <button
-                  onClick={startPrequal}
-                  className="rounded-full bg-lw-accent text-lw-text-on-accent text-sm px-4 py-2 hover:bg-lw-accent-hover"
-                >
-                  {config.startButtonLabel}
-                </button>
-              </div>
-            )}
-
-            {currentQuestion && (
-              <div className="flex flex-col items-start gap-2 mb-3">
-                {currentQuestion.options.map(option => (
-                  <button
-                    key={option.value}
-                    onClick={() => answerPrequalQuestion(option)}
-                    disabled={isLoading}
-                    className="rounded-lw-lg rounded-tl-[4px] border border-lw-border bg-lw-accent-subtle text-lw-accent text-sm px-4 py-2 text-left hover:border-lw-accent disabled:opacity-50"
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            )}
 
             {isLoading && (
               <div className="flex justify-start mb-3">
@@ -278,25 +260,26 @@ export default function ChatWidget() {
             <div ref={bottomRef} />
           </div>
 
-          {prequalDone && (
-            <form onSubmit={handleSubmit} className="flex items-center gap-2 p-3 border-t border-lw-border">
-              <input
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                disabled={isLoading}
-                placeholder="Type a message…"
-                className="flex-1 border border-lw-border rounded-full px-4 py-2 text-sm outline-none focus:border-lw-accent focus:shadow-lw-focus"
-              />
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-9 h-9 rounded-full bg-lw-accent text-lw-text-on-accent flex items-center justify-center disabled:opacity-50"
-                aria-label="Send"
-              >
-                ➤
-              </button>
-            </form>
-          )}
+          <form
+            onSubmit={handleSubmit}
+            className="flex items-center gap-2 p-3 border-t border-lw-border"
+          >
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isLoading}
+              placeholder="Type a message…"
+              className="flex-1 border border-lw-border rounded-full px-4 py-2 text-sm outline-none focus:border-lw-accent focus:shadow-lw-focus"
+            />
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-9 h-9 rounded-full bg-lw-accent text-lw-text-on-accent flex items-center justify-center disabled:opacity-50"
+              aria-label="Send"
+            >
+              ➤
+            </button>
+          </form>
         </div>
       )}
     </>

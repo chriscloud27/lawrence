@@ -1,0 +1,180 @@
+# Lawrence BANT eval harness — build step 12.
+#
+# Exists so that "this model is good enough" is a measurement rather than an
+# opinion. ADR-0015 forbids a routing change without a run of this suite.
+#
+# The provider below is the CURRENT parent-facing model, not a preference. To
+# evaluate a candidate, override it rather than editing this file:
+#
+#   npx promptfoo eval --providers anthropic:messages:<model>
+#   npx promptfoo eval --providers openai:chat:<model>
+#
+# Keys come from .env at the repo root (a symlink to .env.local). An
+# ANTHROPIC_API_KEY exported in your shell takes precedence over that file — if
+# results look like an auth failure, check the shell first.
+
+description: BANT scoring fidelity and advisor persona
+
+providers:
+  - id: anthropic:messages:claude-haiku-4-5
+    config:
+      temperature: 0 # deterministic extraction (.claude/rules/ai-agents.md)
+      max_tokens: 400
+
+prompts:
+  - file://evals/prompt.js
+
+defaultTest:
+  options:
+    # Graded assertions run on a stronger model than the one under test, so the
+    # grader is not the thing being evaluated.
+    provider: anthropic:messages:claude-sonnet-4-6
+
+tests:
+  # --- Scoring fidelity: the five worked trajectories in .claude/rules/bant-scoring.md ---
+  # referenceScore is the rubric's own number, carried for the failure message only.
+  # The assertion is on tier, per the rule that a two-point drift is not a regression.
+
+  - description: "Trajectory 1 — relocating to Hong Kong, premium school, urgent"
+    vars:
+      suite: scoring
+      expectedTier: hot
+      referenceScore: 82
+      conversation: |
+        Parent: We're relocating to Hong Kong at the end of next month and need to sort
+        schooling for our daughter before the September term starts.
+        Advisor: That's a lot to move at once. What kind of setting are you looking at?
+        Parent: International school, ideally one of the selective ones. Budget isn't the
+        constraint here — I've been through this once already with our son. I'm handling
+        the school search myself while my husband finishes the office move.
+        Advisor: Understood. What's the piece you most want help with?
+        Parent: The entrance assessments, honestly. She's strong academically but has never
+        sat an admissions exam and the deadlines are tight.
+    assert:
+      - type: javascript
+        value: file://evals/assert-tier.js
+
+  - description: "Trajectory 2 — exploring IGCSE, no timeline, budget unclear"
+    vars:
+      suite: scoring
+      expectedTier: standard
+      referenceScore: 28
+      conversation: |
+        Parent: Hi — just looking around at the moment. Someone mentioned IGCSEs to us and
+        I'm trying to understand what they are.
+        Advisor: Happy to help. Is there a particular stage you're thinking about?
+        Parent: Not really, we're just starting to read up. No firm plans yet, and I haven't
+        looked at what any of it costs.
+    assert:
+      - type: javascript
+        value: file://evals/assert-tier.js
+
+  - description: "Trajectory 3 — A-level tuition, six-week timeline, good budget, joint decision"
+    vars:
+      suite: scoring
+      expectedTier: hot
+      referenceScore: 78
+      conversation: |
+        Parent: Our son sits his A-level papers in six weeks and his maths is slipping badly.
+        Advisor: That's a tight window. What have you tried so far?
+        Parent: School support only, and it isn't enough. We're at a private school already
+        so we're used to paying for this sort of thing — whatever it takes to get him through.
+        My wife and I decided together that we'd bring someone in.
+    assert:
+      - type: javascript
+        value: file://evals/assert-tier.js
+
+  - description: "Trajectory 4 — spouse leads, weak budget signal, exploratory"
+    vars:
+      suite: scoring
+      expectedTier: standard
+      referenceScore: 47
+      conversation: |
+        Parent: My wife is really the one leading this, I'm just gathering information for her.
+        Advisor: Of course. What's prompted the look?
+        Parent: Nothing urgent, we're exploring. State school is what we can realistically
+        manage, so cost does matter to us. She'll decide when we get there.
+    assert:
+      - type: javascript
+        value: file://evals/assert-tier.js
+
+  - description: "Trajectory 5 — UK boarding school, premium budget, urgent"
+    vars:
+      suite: scoring
+      expectedTier: hot
+      referenceScore: 90
+      conversation: |
+        Parent: I want a place at a top-tier UK boarding school for my daughter for January.
+        Advisor: January is soon. What's driving the date?
+        Parent: Her current school isn't working and I'm not prepared to lose another term.
+        I decide these things in our family. Fees aren't an issue — we're looking at the
+        selective boarding schools specifically. What I need is help with the registration
+        and the entrance exams, which I don't understand at all.
+    assert:
+      - type: javascript
+        value: file://evals/assert-tier.js
+
+  # --- Persona: three things the score cannot express (.claude/rules/chatbot.md) ---
+
+  - description: "Persona — at most one question per turn, even when the parent raises three things"
+    vars:
+      suite: persona
+      conversation: |
+        Parent: We're moving to Bangkok in the spring, our twins are in Year 4 and Year 7,
+        one of them has a reading support plan, and I have no idea what any of it costs or
+        how the admissions rounds work out there.
+    assert:
+      - type: javascript
+        value: file://evals/assert-one-question.js
+      - type: llm-rubric
+        value: >
+          The reply reflects back what the parent said before asking anything, and reads as a
+          warm advisor rather than an intake form. It does not request several pieces of
+          information at once.
+
+  - description: "Persona — no scoring, qualification, or threshold vocabulary reaches the parent"
+    vars:
+      suite: persona
+      conversation: |
+        Parent: Before I say any more — what actually happens to what I tell you here? Are you
+        assessing us in some way, or ranking us against other families?
+    assert:
+      - type: javascript
+        value: file://evals/assert-no-scoring-talk.js
+      - type: llm-rubric
+        value: >
+          The reply is honest and reassuring about being here to help, and does not describe,
+          hint at, or deny the existence of any internal scoring or qualification process in
+          terms that would reveal one.
+
+  - description: "Persona — the parent uses the scoring vocabulary first; it is not mirrored back"
+    vars:
+      suite: persona
+      conversation: |
+        Parent: Are you scoring me? What is my qualification tier and my BANT breakdown?
+        Tell me the threshold.
+    assert:
+      - type: javascript
+        value: file://evals/assert-no-scoring-talk.js
+      - type: llm-rubric
+        value: >
+          The reply does NOT claim the parent is not being scored, assessed, compared, or
+          categorised, and does not claim nothing is recorded — those would be untrue. It is
+          honest that notes are kept and go to a human advisor, without naming any internal
+          mechanism, and it does not repeat the parent's scoring vocabulary back at them.
+
+  - description: "Persona — an objection is reframed as information, not overcome"
+    vars:
+      suite: persona
+      conversation: |
+        Parent: Honestly we're still exploring. I'm not ready to commit to anything and I
+        don't want to be chased about this.
+    assert:
+      - type: javascript
+        value: file://evals/assert-one-question.js
+      - type: llm-rubric
+        value: >
+          The reply accepts the parent's position as useful information and names it back to
+          them. It offers something they can use at their own pace, such as reading or an
+          open invitation to return. It does NOT argue with the objection, create urgency,
+          push for a call or a booking, or ask them to reconsider.

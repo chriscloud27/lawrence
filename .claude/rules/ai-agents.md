@@ -6,6 +6,15 @@ globs: ["src/agents/**/*.ts", "src/agents/**/*.py"]
 # AI Agent Rules
 
 ## Model Selection
+
+> **Per-job model routing is governed by [ADR-0015](../docs/adr/0015-ai-model-provider-strategy.md).**
+> That ADR is `proposed`: its routing table is a hypothesis under evaluation, not a plan of record.
+> This project deliberately runs two providers — `.claude/rules/chatbot.md` defaults to
+> `claude-haiku-4-5` for parent-facing turns while this file defaults to `gpt-4o-mini` for
+> extraction. Once build step 12 lands the provider seam, **no model may be hardcoded outside
+> `src/Chatbot/lib/ai/provider.ts`**. The defaults below are the current values, not a settled
+> decision.
+
 - Default to `gpt-4o-mini` for classification/extraction (cheap, fast)
 - Use `gpt-4o` only for complex reasoning tasks where output quality matters
 - Always pass `model` as a named constant at the top of the file, not hardcoded in the call
