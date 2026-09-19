@@ -160,7 +160,12 @@ site_url = "http://127.0.0.1:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+# The app runs on localhost:3000 and Auth treats localhost and 127.0.0.1 as different
+# origins, so both are listed. The callback path carries a ?next= query string, hence /**.
+additional_redirect_urls = [
+  "http://localhost:3000/**",
+  "http://127.0.0.1:3000/**",
+]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -319,6 +324,18 @@ max_frequency = "5s"
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
+# Google sign-in (ADR-0008/0009). Credentials come from the repo-root .env (a symlink to
+# .env.local) via env() substitution — never inline, per .claude/rules/secrets.md.
+#
+# The Google Cloud OAuth client must list this exact authorized redirect URI:
+#   http://127.0.0.1:54321/auth/v1/callback
+[auth.external.google]
+enabled = true
+client_id = "env(GCP_OAUTH_CLIENT_ID)"
+secret = "env(GCP_OAUTH_CLIENT_SECRET)"
+# Required for local sign-in with Google: the local stack cannot verify the nonce.
+skip_nonce_check = true
+
 [auth.external.apple]
 enabled = false
 client_id = ""

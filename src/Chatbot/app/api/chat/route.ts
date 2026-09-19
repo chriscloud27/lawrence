@@ -102,14 +102,23 @@ export async function POST(request: Request) {
     // Five steps: a search, a refined search, a calendar offer, and slack.
     // It is a ceiling against a loop, not a target.
     stopWhen: stepCountIs(5),
-    onFinish({ usage, providerMetadata, text }) {
+    onFinish({ totalUsage, providerMetadata, steps }) {
+      // `text` on this event is the LAST step only, and `usage` likewise — a
+      // turn that called a tool has at least two steps, so both undercount.
+      // The parent saw every step's text, so the transcript must carry it, and
+      // ADR-0015 is decided on cost per conversation, so the log must total it.
+      const fullText = steps
+        .map((step) => step.text)
+        .filter((part) => part.length > 0)
+        .join("\n\n");
+
       // The cost log is not optional for a streaming call site
       // (.claude/rules/ai-providers.md). Counts only — no prompt or completion
       // text, because parent messages are PII.
       logAiCall(
         costLogFrom({
           job: "parent_turn",
-          usage,
+          usage: totalUsage,
           providerMetadata,
           latencyMs: Date.now() - startedAt,
           sessionId,
@@ -124,7 +133,7 @@ export async function POST(request: Request) {
         .send(
           chatTurnCompleted.create({
             sessionId,
-            messages: [...messages, { role: "assistant" as const, content: text }],
+            messages: [...messages, { role: "assistant" as const, content: fullText }],
           }),
         )
         .catch((error) => {

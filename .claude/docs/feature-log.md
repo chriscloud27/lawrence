@@ -8,6 +8,25 @@ config) · `refactor` (no behavior change)
 
 ---
 
+## LAW-13: Local end-to-end runbook, and two defects the smoke test found
+**Date:** 2026-09-19  **Type:** chore  **Status:** done
+
+**What:** Build step 16. Added `docs/LOCAL-DEV.md` (prerequisites, the local-stack env
+override, the five processes, seeded identities, known limitations) and an `npm run dev:reset`
+one-command path, then ran the nine-check smoke test end to end. Two real defects surfaced and
+were fixed in `app/api/chat/route.ts`: `onFinish` hands back only the LAST step's `text` and
+`usage`, so a turn that called a tool persisted a truncated assistant message and logged
+roughly half its tokens. Both now aggregate across `steps` / `totalUsage`.
+**Why:** Step 16 is the definition of "the prototype is done" for this build, and it is the
+only gate that runs the whole path rather than a layer of it. The two defects are exactly the
+class a unit test cannot see: the streamed response was always correct, only the record of it
+was wrong.
+**Scope:** `docs/LOCAL-DEV.md`, `src/Chatbot/package.json`,
+`src/Chatbot/app/api/chat/route.ts`, `CLAUDE.md`
+**Links:** `.claude/docs/build-steps/16-local-e2e.md`, ADR-0015, ADR-0018
+
+---
+
 ## LAW-12: Take the parent-facing chat agent out of n8n
 **Date:** 2026-09-16  **Type:** refactor  **Status:** done
 

@@ -13,7 +13,8 @@ Two series live there:
   `.claude/docs/stack-audit.md`. The order encodes dependencies, not severity, and it is **not**
   numeric: run `10 → 11 → 12 → 15 → 13 → 14 → 16`. Step 15 lands the tenancy primitive that
   steps 13 and 14 both assume; step 12 must precede 14. The execution-order table in
-  `stack-audit.md` is the reference. **10–15 are done; 16 is what remains.**
+  `stack-audit.md` is the reference. **10–16 are all done** — the local end-to-end runbook is
+  `docs/LOCAL-DEV.md`, and deployment is the next step, not part of this series.
 
 Before starting:
 - Read the referenced files in the "Assumes" section

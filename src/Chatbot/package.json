@@ -11,7 +11,8 @@
     "sync-prompts": "node scripts/sync-prompts.mjs",
     "predev": "npm run sync-prompts",
     "prebuild": "npm run sync-prompts",
-    "test": "node --import tsx --test \"lib/**/*.test.ts\""
+    "test": "node --import tsx --test \"lib/**/*.test.ts\"",
+    "dev:reset": "cd ../.. && supabase db reset && ./scripts/seed-local-counsellors.sh && cd src/Chatbot && npm run dev"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.118",
